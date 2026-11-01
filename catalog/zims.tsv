@@ -1,0 +1,76 @@
+# Kiwix ZIM archives for the Offline Emergency Library.
+# Read by get-offline-library.sh and Get-OfflineLibrary.ps1.
+#
+# Columns (TAB-separated):
+#   group   - skip a whole group with --skip-groups / -SkipGroups
+#   folder  - where the file goes, under OfflineLibrary/
+#   path    - Kiwix directory + file-name prefix, under https://download.kiwix.org/zim/
+#             The installer picks the NEWEST "<prefix>YYYY-MM.zim" in that directory,
+#             because Kiwix deletes old builds (dated URLs stop working).
+#   note    - "dupwiki" = skipped when full Wikipedia (maxi or nopic) is downloaded
+#   title   - shown in the log
+#
+# Most entries are adapted from Project NOMAD's collections/kiwix-categories.json
+# (Crosstalk Solutions, Apache-2.0). Content keeps its own licence (see each archive).
+#
+# group	folder	path	note	title
+medicine	Medical/zimgit-medicine	other/zimgit-medicine_en_	-	Medical Library (field and emergency medicine)
+medicine	Medical/Library	zimit/nhs.uk_en_medicines_	-	NHS Medicines A to Z
+medicine	Medical/Library	zimit/fas.org_en_military-medicine_	-	Military Medicine
+medicine	Medical/Library	zimit/wwwnc.cdc.gov_en_all_	-	CDC Health Information
+medicine	Medical/Library	zimit/medlineplus.gov_en_all_	-	MedlinePlus
+medicine	Medical/Library	libretexts/libretexts.org_en_med_	-	LibreTexts Medicine
+medicine	Medical/Library	other/librepathology_en_all_maxi_	-	LibrePathology
+medicine	Medical/WikiMed	wikipedia/wikipedia_en_medicine_maxi_	dupwiki	Wikipedia Medicine
+survival	Manuals/Survival-Water-Food	other/zimgit-water_en_	-	Water Treatment Library
+survival	Manuals/Survival-Water-Food	other/zimgit-food-preparation_en_	-	Food for Preppers
+survival	Manuals/Survival-Water-Food	other/zimgit-knots_en_	-	A Library of Knots
+survival	Manuals/Survival-Water-Food	other/zimgit-post-disaster_en_	-	Post Disaster Resource Library
+survival	Manuals/Survival-Water-Food	zimit/www.ready.gov_en_	-	Ready.gov
+survival	Manuals/Survival-Water-Food	stack_exchange/outdoors.stackexchange.com_en_all_	-	The Great Outdoors Q&A
+survival	Manuals/Radio-Communications	stack_exchange/ham.stackexchange.com_en_all_	-	Amateur Radio Q&A
+survival	Manuals/Survival-Water-Food	zimit/100r.co_en_all_	-	Hundred Rabbits (off-grid living)
+survival	Manuals/Survival-Water-Food	gutenberg/gutenberg_en_lcc-u_	-	Project Gutenberg: Military Science
+survival	Manuals/Survival-Water-Food	zimit/cd3wdproject.org_en_all_	-	CD3WD Appropriate Technology Library
+survival	Manuals/Survival-Videos	videos/canadian-prepper_en_winterprepping_	-	Canadian Prepper: Winter Prepping (video)
+survival	Manuals/Survival-Videos	videos/canadian-prepper_en_bugoutroll_	-	Canadian Prepper: Bug Out Roll (video)
+survival	Manuals/Survival-Videos	videos/canadian-prepper_en_bugoutconcepts_	-	Canadian Prepper: Bug Out Concepts (video)
+survival	Manuals/Survival-Videos	videos/canadian-prepper_en_preppingfood_	-	Canadian Prepper: Prepping Food (video)
+survival	Manuals/Survival-Videos	videos/urban-prepper_en_all_	-	Urban Prepper (video)
+diy	Manuals/Repair-iFixit	ifixit/ifixit_en_all_	-	iFixit Repair Guides
+diy	Manuals/DIY-Appropedia	other/appropedia_en_all_maxi_	-	Appropedia (sustainable DIY)
+diy	Manuals/DIY-Repair	stack_exchange/diy.stackexchange.com_en_all_	-	DIY & Home Improvement Q&A
+diy	Manuals/DIY-Repair	stack_exchange/woodworking.stackexchange.com_en_all_	-	Woodworking Q&A
+diy	Manuals/DIY-Repair	stack_exchange/mechanics.stackexchange.com_en_all_	-	Motor Vehicle Maintenance Q&A
+food	Manuals/Food-Garden	zimit/foss.cooking_en_all_	-	FOSS Cooking
+food	Manuals/Food-Garden	zimit/based.cooking_en_all_	-	Based.Cooking
+food	Manuals/Food-Garden	stack_exchange/gardening.stackexchange.com_en_all_	-	Gardening Q&A
+food	Manuals/Food-Garden	stack_exchange/cooking.stackexchange.com_en_all_	-	Cooking Q&A
+food	Manuals/Food-Garden	videos/lrnselfreliance_en_all_	-	Learning Self-Reliance: Homesteading (video)
+food	Manuals/Food-Garden	gutenberg/gutenberg_en_lcc-s_	-	Project Gutenberg: Agriculture
+education	Education	wikibooks/wikibooks_en_all_maxi_	-	Wikibooks (with images)
+education	Education	wikiversity/wikiversity_en_all_maxi_	-	Wikiversity
+education	Education	libretexts/libretexts.org_en_math_	-	LibreTexts Mathematics
+education	Education	libretexts/libretexts.org_en_phys_	-	LibreTexts Physics
+education	Education	libretexts/libretexts.org_en_chem_	-	LibreTexts Chemistry
+education	Education	libretexts/libretexts.org_en_bio_	-	LibreTexts Biology
+education	Education	libretexts/libretexts.org_en_human_	-	LibreTexts Humanities
+education	Education	libretexts/libretexts.org_en_geo_	-	LibreTexts Geosciences
+education	Education	libretexts/libretexts.org_en_eng_	-	LibreTexts Engineering
+education	Education	libretexts/libretexts.org_en_biz_	-	LibreTexts Business
+education	Education/Videos	ted/ted_mul_ted-ed_	-	TED-Ed (video)
+education	Education/Videos	ted/ted_mul_ted-conference_	-	TED Conference talks (video)
+computing	Computing	freecodecamp/freecodecamp_en_all_	-	freeCodeCamp
+computing	Computing	devdocs/devdocs_en_python_	-	Python Documentation
+computing	Computing	devdocs/devdocs_en_javascript_	-	JavaScript Documentation
+computing	Computing	devdocs/devdocs_en_html_	-	HTML Documentation
+computing	Computing	devdocs/devdocs_en_css_	-	CSS Documentation
+computing	Computing	devdocs/devdocs_en_node_	-	Node.js Documentation
+computing	Computing	devdocs/devdocs_en_react_	-	React Documentation
+computing	Computing	devdocs/devdocs_en_git_	-	Git Documentation
+computing	Computing	devdocs/devdocs_en_docker_	-	Docker Documentation
+computing	Computing	devdocs/devdocs_en_bash_	-	Bash Documentation
+computing	Computing	stack_exchange/arduino.stackexchange.com_en_all_	-	Arduino Q&A
+computing	Computing	stack_exchange/raspberrypi.stackexchange.com_en_all_	-	Raspberry Pi Q&A
+computing	Computing	stack_exchange/electronics.stackexchange.com_en_all_	-	Electronics Q&A
+computing	Computing	stack_exchange/robotics.stackexchange.com_en_all_	-	Robotics Q&A
