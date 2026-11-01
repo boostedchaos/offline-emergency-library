@@ -95,7 +95,8 @@ one 127 GB Wikipedia file would take about 12 hours with plain curl. With
 [aria2](https://aria2.github.io) the script downloads each archive in up to 16 pieces
 from several Kiwix mirrors at once, and aria2 checks every 4 MB piece against Kiwix's
 fingerprints. Measured on 2026-11-01 (2 Gbit line, exFAT SSD): **86–94 MB/s with aria2
-vs 11 MB/s with curl**.
+vs 11 MB/s with curl**. Each run first times every mirror for a few seconds and skips the ones
+slower than 1 MB/s (on 2026-11-01 `mirror.download.kiwix.org` gave 0.04–0.07 MB/s and stalled aria2).
 - macOS: `brew install aria2` · Linux: `sudo apt install aria2`
 - Windows: nothing to do — the script uses the `aria2c.exe` inside the Kiwix desktop app it downloads.
 

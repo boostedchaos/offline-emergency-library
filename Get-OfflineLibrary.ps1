@@ -149,12 +149,32 @@ function Latest-Zim($dirPrefix){
 }
 # Kiwix program files are served by one slow server; its mirrors carry them too.
 $script:Mirrors = $null
-function Rel-Url($path){
-  if ($null -eq $script:Mirrors) {
-    $k = Latest-Zim 'other/zimgit-knots_en_'
-    $m = if ($k) { Page "$Kiwix/zim/$k.meta4" } else { $null }
-    $script:Mirrors = @([regex]::Matches("$m", '<url location="[a-z]+" priority="[0-9]+">([^<]+)') | ForEach-Object { $_.Groups[1].Value -replace '/zim/other/.*$','' })
+function Init-Mirrors {
+  if ($null -ne $script:Mirrors) { return }
+  $k = Latest-Zim 'other/zimgit-knots_en_'
+  $m = if ($k) { Page "$Kiwix/zim/$k.meta4" } else { $null }
+  $script:Mirrors = @([regex]::Matches("$m", '<url location="[a-z]+" priority="[0-9]+">([^<]+)') | ForEach-Object { $_.Groups[1].Value -replace '/zim/other/.*$','' })
+}
+# Fast-Mirrors: once per run, time a 4 MB piece from each mirror; keep the ones >= 1 MB/s.
+# (On 2026-11-01 mirror.download.kiwix.org gave 0.07 MB/s and aria2 got stuck on it.)
+$script:FastMirrors = $null
+function Fast-Mirrors {
+  if ($null -ne $script:FastMirrors) { return }
+  Init-Mirrors
+  $k = Latest-Zim 'other/zimgit-knots_en_'
+  $probe = Join-Path $Work 'probe.bin'
+  $fast = @()
+  foreach ($b in $script:Mirrors) {
+    $r = (& curl.exe -s -r 0-4194303 -m 10 -o $probe -w '%{http_code} %{speed_download}' "$b/zim/$k") -split ' '
+    $sp = 0.0; if ($r.Count -ge 2 -and $r[0] -eq '206') { $sp = [double]$r[1] }
+    if ($sp -ge 1000000) { $fast += $b; Log ("  mirror ok   {0:N1} MB/s  {1}" -f ($sp/1e6), $b) }
+    else { Log ("  mirror slow {0:N2} MB/s  {1} (not used)" -f ($sp/1e6), $b) }
   }
+  Remove-Item $probe -Force -ErrorAction SilentlyContinue
+  $script:FastMirrors = if ($fast.Count) { $fast } else { $script:Mirrors }   # none fast: use them all
+}
+function Rel-Url($path){
+  Init-Mirrors
   foreach ($b in $script:Mirrors) { if ((HeadInfo "$b/$path")[0] -eq '200') { return "$b/$path" } }
   return "$Kiwix/$path"
 }
@@ -224,7 +244,7 @@ if (-not $DryRun) {
   else { $c = Get-Command aria2c -ErrorAction SilentlyContinue; if ($c) { $Aria = $c.Source } }
 }
 if ($Jobs -le 0) { $Jobs = if ($Aria) { 2 } else { 4 } }
-if ($Aria) { Log "aria2 found: archives use many mirrors at once ($Jobs at a time)" }
+if ($Aria) { Log "aria2 found: archives use many mirrors at once ($Jobs at a time)"; Log 'Testing Kiwix mirrors:'; Fast-Mirrors }
 function Prepare-Aria($url,$out){
   $name = Split-Path $out -Leaf
   if ((Test-Path -LiteralPath $out) -and -not (Test-Path -LiteralPath "$out.aria2")) {
@@ -235,8 +255,12 @@ function Prepare-Aria($url,$out){
   # a curl partial from an older run is a clean start of the file: aria2 continues it
   if ((Test-Path -LiteralPath "$out.part") -and -not (Test-Path -LiteralPath $out)) { Move-Item -LiteralPath "$out.part" $out -Force }
   New-Item -ItemType Directory -Force (Split-Path $out -Parent) | Out-Null
-  Log "  get  $name (aria2, many mirrors)"
-  return @{ url = $url; out = $out; aria = $true }
+  Fast-Mirrors
+  $zpath = $url.Substring($Kiwix.Length + 1)
+  $uris = @($script:FastMirrors | ForEach-Object { "$_/$zpath" }); if (-not $uris) { $uris = @($url) }
+  $sum = $null; $t = Page "$url.sha256"; if ($t) { $sum = ($t -split '\s+')[0] }
+  Log "  get  $name (aria2, $($uris.Count) mirrors)"
+  return @{ url = $url; out = $out; aria = $true; uris = $uris; sum = $sum }
 }
 function Finish-Aria($job,$rc){
   $name = Split-Path $job.out -Leaf
@@ -284,7 +308,8 @@ while ($queue.Count -gt 0 -or $running.Count -gt 0) {
     $job = $queue.Dequeue()
     $proc = $null
     if ($job.aria) {
-      $a = "--dir=`"$(Split-Path $job.out -Parent)`" --continue=true --follow-metalink=mem --split=16 --max-connection-per-server=4 --min-split-size=20M --file-allocation=none --max-tries=10 --retry-wait=10 --summary-interval=0 --show-console-readout=false --console-log-level=error --download-result=hide `"$($job.url).meta4`""
+      $ck = if ($job.sum) { "--checksum=sha-256=$($job.sum) " } else { '' }
+      $a = "--dir=`"$(Split-Path $job.out -Parent)`" --out=`"$(Split-Path $job.out -Leaf)`" --continue=true $ck--piece-length=4M --allow-piece-length-change=true --split=16 --max-connection-per-server=4 --min-split-size=20M --file-allocation=none --max-tries=10 --retry-wait=10 --summary-interval=0 --show-console-readout=false --console-log-level=error --download-result=hide " + (($job.uris | ForEach-Object { "`"$_`"" }) -join ' ')
       try { $proc = Start-Process -FilePath $Aria -ArgumentList $a -NoNewWindow -PassThru -ErrorAction Stop } catch { Bad (Split-Path $job.out -Leaf) "could not start aria2: $($_.Exception.Message)" }
     } else {
       $a = "-fL -C - --retry 5 --retry-delay 5 --retry-all-errors -s -A `"$UA`" -o `"$($job.out).part`" `"$($job.url)`""

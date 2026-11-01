@@ -141,8 +141,8 @@ dl_zim(){ # "dir/file.zim" folder title
 }
 # aria2: one archive in many pieces from every mirror in Kiwix's .meta4 list.
 # aria2 keeps "<file>.aria2" beside an unfinished file; no .aria2 = finished and hash-checked.
-aria_get(){ # URL OUT
-  url="$1"; out="$2"; name="$(basename "$out")"; d="$(dirname "$out")"
+aria_get(){ # URL OUT   (URL = $KIWIX/zim/<dir>/<file>)
+  url="$1"; out="$2"; name="$(basename "$out")"; d="$(dirname "$out")"; zpath="${url#"$KIWIX"/}"
   if [ -f "$out" ] && [ ! -f "$out.aria2" ]; then
     want="$(head_info "$url" | awk '{print $2}')"
     if [ -z "$want" ] || [ "$(fsize "$out")" = "$want" ]; then log "  have $name"; return 0; fi
@@ -150,10 +150,16 @@ aria_get(){ # URL OUT
   fi
   # a curl partial from an older run is a clean start of the file: aria2 continues it
   [ -f "$out.part" ] && [ ! -f "$out" ] && mv -f "$out.part" "$out"
-  mkdir -p "$d"; log "  get  $name (aria2, many mirrors)"
-  aria2c --dir="$d" --continue=true --follow-metalink=mem --split=16 --max-connection-per-server=4 \
-    --min-split-size=20M --file-allocation=none --max-tries=10 --retry-wait=10 --summary-interval=0 --show-console-readout=false \
-    --console-log-level=error --download-result=hide "$url.meta4" >> "$WORK/aria2.log" 2>&1; rc=$?
+  mkdir -p "$d"; fast_mirrors
+  set --; while IFS= read -r b; do set -- "$@" "$b/$zpath"; done < "$WORK/fast_mirrors"
+  [ $# -eq 0 ] && set -- "$url"
+  sum="$(page "$url.sha256" | awk '{print $1; exit}')"
+  ck=""; [ -n "$sum" ] && ck="--checksum=sha-256=$sum"
+  log "  get  $name (aria2, $# mirrors)"
+  aria2c --dir="$d" --out="$name" --continue=true $ck --piece-length=4M --allow-piece-length-change=true --split=16 --max-connection-per-server=4 \
+    --min-split-size=20M --file-allocation=none --max-tries=10 --retry-wait=10 \
+    --summary-interval=0 --show-console-readout=false --console-log-level=error --download-result=hide \
+    "$@" >> "$WORK/aria2.log" 2>&1; rc=$?
   if [ "$rc" != 0 ] || [ -f "$out.aria2" ] || [ ! -f "$out" ]; then
     bad "$name" "aria2 stopped (exit $rc). Run the script again to resume."; return 1
   fi
@@ -166,6 +172,20 @@ kiwix_mirrors(){
   k="$(latest_zim "other/zimgit-knots_en_")"
   page "$KIWIX/zim/other/$k.meta4" 2>/dev/null | grep -oE '<url location="[a-z]+" priority="[0-9]+">[^<]+' |
     sed -E 's/.*">//; s#/zim/other/.*##' > "$WORK/mirrors"
+}
+# fast_mirrors: once per run, time a 4 MB piece from each mirror; keep the ones >= 1 MB/s.
+# (On 2026-11-01 mirror.download.kiwix.org gave 0.07 MB/s and aria2 got stuck on it.)
+fast_mirrors(){
+  [ -f "$WORK/fast_mirrors" ] && return
+  kiwix_mirrors; k="$(latest_zim "other/zimgit-knots_en_")"
+  : > "$WORK/fast_mirrors.tmp"
+  while IFS= read -r b; do
+    sp="$(curl -s -r 0-4194303 -m 10 -o /dev/null -w '%{http_code} %{speed_download}' "$b/zim/other/$k" | awk '$1==206{printf "%d", $2}')"
+    if [ "${sp:-0}" -ge 1000000 ]; then echo "$b" >> "$WORK/fast_mirrors.tmp"; log "  mirror ok   $(awk -v s="$sp" 'BEGIN{printf "%.1f", s/1e6}') MB/s  $b"
+    else log "  mirror slow $(awk -v s="${sp:-0}" 'BEGIN{printf "%.2f", s/1e6}') MB/s  $b (not used)"; fi
+  done < "$WORK/mirrors"
+  [ -s "$WORK/fast_mirrors.tmp" ] || cp "$WORK/mirrors" "$WORK/fast_mirrors.tmp"   # none fast: use them all
+  mv "$WORK/fast_mirrors.tmp" "$WORK/fast_mirrors"
 }
 rel_url(){ # path under download.kiwix.org -> first mirror that has it
   kiwix_mirrors
@@ -257,6 +277,7 @@ while IFS="$(printf '\t')" read -r grp folder zpath note title; do
   add_zim "$zpath" "$folder" "$title"
 done < "$WORK/zims.tsv"
 log "archives to get: $(wc -l < "$WORK/zimjobs" | tr -d ' ')   (up to $JOBS at a time)"
+[ "$DRY" = 0 ] && [ "$HAVE_ARIA" = 1 ] && { log "Testing Kiwix mirrors:"; fast_mirrors; }
 while IFS="$(printf '\t')" read -r zp folder title; do
   if [ "$DRY" = 1 ]; then dl_zim "$zp" "$folder" "$title"; continue; fi
   while [ "$(jobs -rp | wc -l)" -ge "$JOBS" ]; do sleep 2; done
