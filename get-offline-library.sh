@@ -487,13 +487,30 @@ hsz(){ du -h "$1" 2>/dev/null | cut -f1; }
     find "$ROOT" -type f -name '*.apk' ! -name '._*' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td><a href='$rel'>$(basename "$f")</a></td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td></tr>"; done
     printf '%s' "</table>"
   fi
-  mc=$(find "$ROOT/OsmAnd" -maxdepth 1 -type f -name '*.obf.zip' 2>/dev/null | wc -l | tr -d ' ')
+  mc=$(find "$ROOT/OsmAnd" -maxdepth 1 -type f -name '*.obf.zip' ! -name '._*' 2>/dev/null | wc -l | tr -d ' ')
   if [ "$mc" -gt 0 ]; then
     printf '%s' "<h2>&#128451; Maps</h2><table><tr><th>Item</th><th>Folder</th><th>Size</th></tr>"
-    printf '%s' "<tr><td>Offline US maps - $mc files</td><td class='muted'>OsmAnd</td><td>$(du -ch "$ROOT"/OsmAnd/*.obf.zip 2>/dev/null | tail -1 | cut -f1)</td></tr></table>"
+    printf '%s' "<tr><td>Offline US maps - $mc files</td><td class='muted'>OsmAnd</td><td>$(find "$ROOT/OsmAnd" -maxdepth 1 -type f -name '*.obf.zip' ! -name '._*' -print0 | xargs -0 du -ch 2>/dev/null | tail -1 | cut -f1)</td></tr></table>"
   fi
   printf '%s' "</div></body></html>"
 } > "$IDX"
+
+# ================================================================ library list for OPEN-LIBRARY
+# One kiwix-manage call writes library.xml with paths relative to it, so OPEN-LIBRARY can
+# serve every archive at once on any computer (no per-start scan of 60+ big files).
+log "=== Library list for OPEN-LIBRARY (library.xml) ==="
+case "$PLAT-$CPU" in mac-arm64) kp=macos-arm64;; mac-*) kp=macos-x86_64;; linux-arm64) kp=linux-aarch64;; *) kp=linux-x86_64;; esac
+KM="$(find "$ROOT/Kiwix-Reader/tools/$kp" -name kiwix-manage -type f 2>/dev/null | head -n1)"
+if [ -n "$KM" ]; then
+  KM="$(cd "$(dirname "$KM")" && pwd)/kiwix-manage"; chmod +x "$KM" 2>/dev/null
+  ( cd "$ROOT" && find . -type f -name '*.zim' ! -name '._*' | sed 's#^\./##' | LC_ALL=C sort |
+      while IFS= read -r z; do [ -f "$z.aria2" ] || printf '%s\0' "$z"; done > "$WORK/zimlist0"
+    rm -f library.xml.new
+    if [ -s "$WORK/zimlist0" ] && xargs -0 "$KM" library.xml.new add < "$WORK/zimlist0" >/dev/null 2>&1; then
+      mv -f library.xml.new library.xml
+    else rm -f library.xml.new; exit 1; fi ) || bad "library.xml" "kiwix-manage could not build it (OPEN-LIBRARY will scan the drive instead)"
+  [ -f "$ROOT/library.xml" ] && log "library.xml: $(grep -c '<book ' "$ROOT/library.xml") archives"
+else log "library.xml: skipped (no kiwix-manage for $kp)"; fi
 
 # ================================================================ checksums
 # One fingerprint per file, so CHECK-DRIVE can prove nothing has rotted.

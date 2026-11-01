@@ -17,12 +17,14 @@ if [ -z "$KS" ] || [ -z "$KM" ]; then
   read -r -p "Press Enter to close. " _; exit 1
 fi
 chmod +x "$KS" "$KM" 2>/dev/null
-LIB="${TMPDIR:-/tmp}/offline-library-$$.xml"
-echo "Finding archives on the drive..."
-n=0
-while IFS= read -r z; do
-  "$KM" "$LIB" add "$z" >/dev/null 2>&1 && n=$((n+1))
-done < <(find "$PWD" -name '*.zim' -type f ! -name '._*' | sort)
+if [ -s library.xml ]; then
+  LIB="$PWD/library.xml"; n=$(grep -c '<book ' library.xml)     # built by the installer
+else
+  LIB="${TMPDIR:-/tmp}/offline-library-$$.xml"; rm -f "$LIB"
+  echo "Finding archives on the drive (one time per start; the installer normally does this)..."
+  find "$PWD" -name '*.zim' -type f ! -name '._*' -print0 | xargs -0 "$KM" "$LIB" add >/dev/null 2>&1
+  n=$(grep -c '<book ' "$LIB" 2>/dev/null || echo 0)
+fi
 if [ "$n" = 0 ]; then echo "No .zim archives found."; read -r -p "Press Enter to close. " _; exit 1; fi
 echo "Opening $n archives at http://localhost:$PORT  (close this window to stop)"
 ( sleep 3; open "http://localhost:$PORT" 2>/dev/null || xdg-open "http://localhost:$PORT" >/dev/null 2>&1 ) &

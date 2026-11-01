@@ -556,6 +556,32 @@ try {
   [System.IO.File]::WriteAllText((P 'README.html'), $sb.ToString(), (New-Object System.Text.UTF8Encoding($false)))
 } catch { Bad 'README.html' $_.Exception.Message }
 
+# ================================================================ library list for OPEN-LIBRARY
+# One kiwix-manage call writes library.xml with paths relative to it, so OPEN-LIBRARY can
+# serve every archive at once on any computer (no per-start scan of 60+ big files).
+Log '=== Library list for OPEN-LIBRARY (library.xml) ==='
+$km = $null
+if ([System.Environment]::OSVersion.Platform -eq 'Win32NT') {
+  $km = Get-ChildItem (P 'Kiwix-Reader/tools/win-x86_64') -Recurse -Filter 'kiwix-manage.exe' -ErrorAction SilentlyContinue | Select-Object -First 1
+}
+if ($km) {
+  $rels = @(Get-ChildItem $Root -Recurse -File -Filter '*.zim' -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -notlike '._*' -and -not (Test-Path -LiteralPath "$($_.FullName).aria2") } |
+    ForEach-Object { Rel2 $_.FullName } | Sort-Object)
+  $new = P 'library.xml.new'; Remove-Item $new -Force -ErrorAction SilentlyContinue
+  Push-Location $Root
+  try {
+    $ok = $true
+    for ($i = 0; $i -lt $rels.Count; $i += 20) {      # 20 per call keeps the command line short
+      $chunk = $rels[$i..([math]::Min($i + 19, $rels.Count - 1))]
+      & $km.FullName 'library.xml.new' 'add' @chunk *> $null
+      if ($LASTEXITCODE -ne 0) { $ok = $false }
+    }
+  } finally { Pop-Location }
+  if ($ok -and $rels.Count -and (Test-Path $new)) { Move-Item $new (P 'library.xml') -Force; Log "library.xml: $(([regex]::Matches((Get-Content (P 'library.xml') -Raw), '<book ')).Count) archives" }
+  else { Remove-Item $new -Force -ErrorAction SilentlyContinue; Bad 'library.xml' 'kiwix-manage could not build it (OPEN-LIBRARY will scan the drive instead)' }
+} else { Log 'library.xml: skipped (needs Windows kiwix-manage.exe)' }
+
 # ================================================================ checksums
 # One fingerprint per file, so CHECK-DRIVE can prove nothing has rotted.
 # Same format on every OS: "<lowercase sha256>  ./path/with/forward/slashes".

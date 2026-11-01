@@ -7,10 +7,13 @@ for /r "Kiwix-Reader\tools\win-x86_64" %%f in (kiwix-serve.exe) do if exist "%%f
 for /r "Kiwix-Reader\tools\win-x86_64" %%f in (kiwix-manage.exe) do if exist "%%f" set "KM=%%f"
 if not defined KS goto noreader
 if not defined KM goto noreader
+set "LIB=%~dp0library.xml"
+if exist "%LIB%" goto serve
 set "LIB=%TEMP%\offline-library.xml"
 if exist "%LIB%" del "%LIB%"
-echo Finding archives on the drive...
+echo Finding archives on the drive (the installer normally does this)...
 for /r %%f in (*.zim) do "%KM%" "%LIB%" add "%%f" >nul 2>&1
+:serve
 echo Opening the library at http://localhost:8095  (close this window to stop)
 start "" cmd /c "timeout /t 3 >nul & start http://localhost:8095"
 "%KS%" --address=127.0.0.1 --port=8095 --library "%LIB%"
