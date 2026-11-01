@@ -11,12 +11,14 @@
 #   --skip-groups a,b                  skip content groups: medicine,survival,diy,food,education,computing,pdfs
 #   --skip-wikipedia  --skip-maps  --skip-models  --skip-ai
 #   --catalog FILE                     use another ZIM list (default: catalog/zims.tsv)
-#   --jobs N                           archives downloaded at the same time (default 4)
+#   --jobs N                           archives downloaded at the same time (default 4; 2 with aria2)
+# Faster: install aria2 (brew install aria2 / apt install aria2). Then each archive is
+# downloaded in many pieces from several Kiwix mirrors at once, and checked by aria2.
 
 REPO_RAW="https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main"
 KIWIX="https://download.kiwix.org"
 UA="Mozilla/5.0"
-DEST=""; JOBS=4; WIKI="nopic"; SKIP_MAPS=0; SKIP_MODELS=0; SKIP_AI=0; DRY=0; SKIP_GROUPS=""; CATALOG=""
+DEST=""; JOBS=""; WIKI="nopic"; SKIP_MAPS=0; SKIP_MODELS=0; SKIP_AI=0; DRY=0; SKIP_GROUPS=""; CATALOG=""
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--destination) DEST="$2"; shift 2;;
@@ -38,6 +40,8 @@ command -v curl >/dev/null 2>&1 || { echo "ERROR: 'curl' is required."; exit 1; 
 HAVE_UNZIP=1; command -v unzip >/dev/null 2>&1 || HAVE_UNZIP=0
 HAVE_TAR=1;   command -v tar   >/dev/null 2>&1 || HAVE_TAR=0
 if command -v sha256sum >/dev/null 2>&1; then SHA="sha256sum"; else SHA="shasum -a 256"; fi
+HAVE_ARIA=0; command -v aria2c >/dev/null 2>&1 && HAVE_ARIA=1
+[ -z "$JOBS" ] && { JOBS=4; [ "$HAVE_ARIA" = 1 ] && JOBS=2; }   # aria2 opens up to 16 connections per file
 
 if [ -z "$DEST" ] && [ "$DRY" = 0 ]; then
   echo ""
@@ -131,8 +135,29 @@ add_zim(){ # "dir/prefix" folder title
 }
 dl_zim(){ # "dir/file.zim" folder title
   n="${1##*/}"; log "zim: $3"
-  fetch "$KIWIX/zim/$1" "$ROOT/$2/$n" || return
+  if [ "$DRY" = 0 ] && [ "$HAVE_ARIA" = 1 ]; then aria_get "$KIWIX/zim/$1" "$ROOT/$2/$n" || return
+  else fetch "$KIWIX/zim/$1" "$ROOT/$2/$n" || return; fi
   real && { page "$KIWIX/zim/$1.sha256" > "$ROOT/$2/$n.sha256" || rm -f "$ROOT/$2/$n.sha256"; }
+}
+# aria2: one archive in many pieces from every mirror in Kiwix's .meta4 list.
+# aria2 keeps "<file>.aria2" beside an unfinished file; no .aria2 = finished and hash-checked.
+aria_get(){ # URL OUT
+  url="$1"; out="$2"; name="$(basename "$out")"; d="$(dirname "$out")"
+  if [ -f "$out" ] && [ ! -f "$out.aria2" ]; then
+    want="$(head_info "$url" | awk '{print $2}')"
+    if [ -z "$want" ] || [ "$(fsize "$out")" = "$want" ]; then log "  have $name"; return 0; fi
+    log "  $name has the wrong size - downloading it again"; rm -f "$out"
+  fi
+  # a curl partial from an older run is a clean start of the file: aria2 continues it
+  [ -f "$out.part" ] && [ ! -f "$out" ] && mv -f "$out.part" "$out"
+  mkdir -p "$d"; log "  get  $name (aria2, many mirrors)"
+  aria2c --dir="$d" --continue=true --follow-metalink=mem --split=16 --max-connection-per-server=4 \
+    --min-split-size=20M --file-allocation=none --max-tries=10 --retry-wait=10 --summary-interval=0 --show-console-readout=false \
+    --console-log-level=error --download-result=hide "$url.meta4" >> "$WORK/aria2.log" 2>&1; rc=$?
+  if [ "$rc" != 0 ] || [ -f "$out.aria2" ] || [ ! -f "$out" ]; then
+    bad "$name" "aria2 stopped (exit $rc). Run the script again to resume."; return 1
+  fi
+  log "  done $name"
 }
 # Kiwix program files are served by one slow server; its mirrors carry them too.
 # Mirror list = the one Kiwix publishes for an archive (.meta4), best first.
@@ -156,6 +181,8 @@ case "$ARCHN" in arm64|aarch64) CPU=arm64; JARCH=aarch64;; *) CPU=x64; JARCH=x64
 case "$OSN" in Darwin) PLAT=mac;; *) PLAT=linux;; esac
 [ "$DRY" = 1 ] && log "DRY RUN: checking every link and adding up sizes. Nothing is downloaded."
 log "Platform: $PLAT/$CPU   Destination: $ROOT   Wikipedia: $WIKI   Skip groups: ${SKIP_GROUPS:-none}"
+if [ "$HAVE_ARIA" = 1 ]; then log "aria2 found: archives use many mirrors at once ($JOBS at a time)"
+else log "TIP: install aria2 for much faster archive downloads (brew install aria2 / apt install aria2)"; fi
 [ "$HAVE_UNZIP" = 0 ] && log "NOTE: 'unzip' not found - the desktop map viewer and Windows reader need it."
 
 # ================================================================ 1. AI engine
@@ -452,7 +479,7 @@ hsz(){ du -h "$1" 2>/dev/null | cut -f1; }
 # Same format on every OS: "<lowercase sha256>  ./path/with/forward/slashes".
 log "=== Fingerprinting every file (SHA256SUMS.txt) - this takes a while ==="
 ( cd "$ROOT" && find . -type f \
-    ! -name 'SHA256SUMS.txt*' ! -name '._*' ! -name '.DS_Store' ! -name '*.part' ! -name '*.sha256' ! -name '_*' \
+    ! -name 'SHA256SUMS.txt*' ! -name '._*' ! -name '.DS_Store' ! -name '*.part' ! -name '*.aria2' ! -name '*.sha256' ! -name '_*' \
     ! -path './.Spotlight-V100/*' ! -path './.fseventsd/*' ! -path './.Trashes/*' ! -path './System Volume Information/*' |
   LC_ALL=C sort | while IFS= read -r f; do $SHA "$f" || echo "HASHFAIL $f" >&2; done ) > "$ROOT/SHA256SUMS.txt.new" 2> "$WORK/hashfail.txt"
 if [ -s "$WORK/hashfail.txt" ]; then bad "checksums" "could not read: $(tr '\n' ' ' < "$WORK/hashfail.txt")"; fi
@@ -464,13 +491,14 @@ log "=== Checking archives against Kiwix's published fingerprints ==="
 zok=0; znone=0
 while IFS= read -r s; do
   z="${s%.sha256}"; rel="./${z#"$ROOT"/}"
+  [ -f "$z.aria2" ] && continue      # unfinished aria2 download: already listed as a problem
   want="$(awk '{print $1; exit}' "$s" | tr 'A-F' 'a-f')"
   got="$(awk -v p="$rel" 'substr($0, 67) == p {print $1; exit}' "$ROOT/SHA256SUMS.txt")"
   if [ -n "$want" ] && [ "$want" = "$got" ]; then zok=$((zok+1))
   elif [ -n "$want" ] && [ -f "$z" ]; then bad "$(basename "$z")" "does not match Kiwix's fingerprint (damaged download). Deleted it - run the script again."; rm -f "$z"
   fi
 done < <(find "$ROOT" -type f -name '*.zim.sha256' ! -name '._*')
-while IFS= read -r z; do [ -f "$z.sha256" ] || znone=$((znone+1)); done < <(find "$ROOT" -type f -name '*.zim' ! -name '._*')
+while IFS= read -r z; do [ -f "$z.sha256" ] || [ -f "$z.aria2" ] || znone=$((znone+1)); done < <(find "$ROOT" -type f -name '*.zim' ! -name '._*')
 log "archives matching Kiwix's fingerprint: $zok   (no published fingerprint: $znone)"
 
 echo ""

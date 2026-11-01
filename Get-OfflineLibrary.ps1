@@ -12,7 +12,9 @@
     -SkipGroups medicine,survival,diy,food,education,computing,pdfs
     -SkipWikipedia -SkipMaps -SkipModels -SkipAI
     -Catalog FILE    another ZIM list (default catalog/zims.tsv)
-    -Jobs N          archives downloaded at the same time (default 4)
+    -Jobs N          archives downloaded at the same time (default 4; 2 with aria2)
+  Faster: aria2c.exe (shipped inside Kiwix desktop, which this script downloads) fetches
+  each archive in many pieces from several Kiwix mirrors at once and checks it.
 #>
 [CmdletBinding()]
 param(
@@ -25,7 +27,7 @@ param(
   [switch]$SkipAI,
   [string]$Catalog,
   [switch]$DryRun,
-  [int]$Jobs = 4
+  [int]$Jobs = 0
 )
 
 $ErrorActionPreference = 'Continue'
@@ -213,6 +215,36 @@ $ai = [regex]::Matches("$kd", 'kiwix-desktop_x86_64_[0-9][0-9.]*[0-9]\.appimage'
 if ($ai) { [void](Fetch (Rel-Url "release/kiwix-desktop/$ai") (P "Kiwix-Reader/$ai")) }
 
 # ================================================================ 5-6. ZIM archives
+# aria2: one archive in many pieces from every mirror in Kiwix's .meta4 list.
+# aria2 keeps "<file>.aria2" beside an unfinished file; no .aria2 = finished and hash-checked.
+$Aria = $null
+if (-not $DryRun) {
+  $bundled = P 'Kiwix-Reader/app/aria2c.exe'      # a Windows program: use it only on Windows
+  if ([System.Environment]::OSVersion.Platform -eq 'Win32NT' -and (Test-Path $bundled)) { $Aria = $bundled }
+  else { $c = Get-Command aria2c -ErrorAction SilentlyContinue; if ($c) { $Aria = $c.Source } }
+}
+if ($Jobs -le 0) { $Jobs = if ($Aria) { 2 } else { 4 } }
+if ($Aria) { Log "aria2 found: archives use many mirrors at once ($Jobs at a time)" }
+function Prepare-Aria($url,$out){
+  $name = Split-Path $out -Leaf
+  if ((Test-Path -LiteralPath $out) -and -not (Test-Path -LiteralPath "$out.aria2")) {
+    $want = (HeadInfo $url)[1]
+    if (-not $want -or (Size $out) -eq [long]$want) { Log "  have $name"; return $null }
+    Log "  $name has the wrong size - downloading it again"; Remove-Item -LiteralPath $out -Force
+  }
+  # a curl partial from an older run is a clean start of the file: aria2 continues it
+  if ((Test-Path -LiteralPath "$out.part") -and -not (Test-Path -LiteralPath $out)) { Move-Item -LiteralPath "$out.part" $out -Force }
+  New-Item -ItemType Directory -Force (Split-Path $out -Parent) | Out-Null
+  Log "  get  $name (aria2, many mirrors)"
+  return @{ url = $url; out = $out; aria = $true }
+}
+function Finish-Aria($job,$rc){
+  $name = Split-Path $job.out -Leaf
+  if ($rc -ne 0 -or (Test-Path -LiteralPath "$($job.out).aria2") -or -not (Test-Path -LiteralPath $job.out)) {
+    Bad $name "aria2 stopped (exit $rc). Run the script again to resume."; return $false
+  }
+  Log "  done $name"; return $true
+}
 $zimJobs = New-Object System.Collections.ArrayList
 function Add-Zim($dirPrefix,$folder,$title){
   $z = Latest-Zim $dirPrefix
@@ -241,7 +273,8 @@ $queue = New-Object System.Collections.Queue
 foreach ($j in $zimJobs) {
   $n = Split-Path $j.z -Leaf
   Log "zim: $($j.title)"
-  $prep = Prepare "$Kiwix/zim/$($j.z)" (P "$($j.folder)/$n")
+  if ($Aria) { $prep = Prepare-Aria "$Kiwix/zim/$($j.z)" (P "$($j.folder)/$n") }
+  else { $prep = Prepare "$Kiwix/zim/$($j.z)" (P "$($j.folder)/$n") }
   if ($prep) { $prep.z = $j.z; $queue.Enqueue($prep) }
 }
 $running = New-Object System.Collections.ArrayList
@@ -249,21 +282,32 @@ $finished = New-Object System.Collections.ArrayList
 while ($queue.Count -gt 0 -or $running.Count -gt 0) {
   while ($queue.Count -gt 0 -and $running.Count -lt $Jobs) {
     $job = $queue.Dequeue()
-    $a = "-fL -C - --retry 5 --retry-delay 5 --retry-all-errors -s -A `"$UA`" -o `"$($job.out).part`" `"$($job.url)`""
-    $proc = Start-Process -FilePath 'curl.exe' -ArgumentList $a -NoNewWindow -PassThru
+    $proc = $null
+    if ($job.aria) {
+      $a = "--dir=`"$(Split-Path $job.out -Parent)`" --continue=true --follow-metalink=mem --split=16 --max-connection-per-server=4 --min-split-size=20M --file-allocation=none --max-tries=10 --retry-wait=10 --summary-interval=0 --show-console-readout=false --console-log-level=error --download-result=hide `"$($job.url).meta4`""
+      try { $proc = Start-Process -FilePath $Aria -ArgumentList $a -NoNewWindow -PassThru -ErrorAction Stop } catch { Bad (Split-Path $job.out -Leaf) "could not start aria2: $($_.Exception.Message)" }
+    } else {
+      $a = "-fL -C - --retry 5 --retry-delay 5 --retry-all-errors -s -A `"$UA`" -o `"$($job.out).part`" `"$($job.url)`""
+      try { $proc = Start-Process -FilePath 'curl.exe' -ArgumentList $a -NoNewWindow -PassThru -ErrorAction Stop } catch { Bad (Split-Path $job.out -Leaf) "could not start curl.exe: $($_.Exception.Message)" }
+    }
+    if (-not $proc) { continue }      # already reported; never wait on a process that did not start
     $null = $proc.Handle     # keeps ExitCode readable after the process ends (PowerShell 5.1)
     $job.proc = $proc; [void]$running.Add($job)
   }
   Start-Sleep -Seconds 2
   foreach ($job in @($running)) {
-    if ($job.proc.HasExited) { $running.Remove($job); if (Finish $job $job.proc.ExitCode) { [void]$finished.Add($job) } }
+    if ($job.proc.HasExited) {
+      $running.Remove($job)
+      $ok = if ($job.aria) { Finish-Aria $job $job.proc.ExitCode } else { Finish $job $job.proc.ExitCode }
+      if ($ok) { [void]$finished.Add($job) }
+    }
   }
 }
 # Kiwix's published SHA-256 for every ZIM we have (checked at the end)
 if (-not $DryRun) {
   foreach ($j in $zimJobs) {
     $n = Split-Path $j.z -Leaf; $zf = P "$($j.folder)/$n"
-    if (Test-Path -LiteralPath $zf) { $t = Page "$Kiwix/zim/$($j.z).sha256"; if ($t) { Set-Content -LiteralPath "$zf.sha256" -Value $t -Encoding ascii } }
+    if ((Test-Path -LiteralPath $zf) -and -not (Test-Path -LiteralPath "$zf.aria2")) { $t = Page "$Kiwix/zim/$($j.z).sha256"; if ($t) { Set-Content -LiteralPath "$zf.sha256" -Value $t -Encoding ascii } }
   }
 }
 
@@ -491,7 +535,7 @@ try {
 # One fingerprint per file, so CHECK-DRIVE can prove nothing has rotted.
 # Same format on every OS: "<lowercase sha256>  ./path/with/forward/slashes".
 Log '=== Fingerprinting every file (SHA256SUMS.txt) - this takes a while ==='
-$skipRe = '(^|/)(\._[^/]*|\.DS_Store|_[^/]*|SHA256SUMS\.txt[^/]*|[^/]*\.part|[^/]*\.sha256)$|^(\.Spotlight-V100|\.fseventsd|\.Trashes|System Volume Information)/'
+$skipRe = '(^|/)(\._[^/]*|\.DS_Store|_[^/]*|SHA256SUMS\.txt[^/]*|[^/]*\.part|[^/]*\.aria2|[^/]*\.sha256)$|^(\.Spotlight-V100|\.fseventsd|\.Trashes|System Volume Information)/'
 $files = Get-ChildItem $Root -Recurse -File -Force -ErrorAction SilentlyContinue |
   ForEach-Object { @{ full = $_.FullName; rel = Rel2 $_.FullName } } |
   Where-Object { $_.rel -notmatch $skipRe }
@@ -511,6 +555,7 @@ Log "SHA256SUMS.txt: $($arr.Count) files"
 Log "=== Checking archives against Kiwix's published fingerprints ==="
 $zok = 0; $znone = 0
 foreach ($z in (Get-ChildItem $Root -Recurse -File -Filter '*.zim' -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '._*' })) {
+  if (Test-Path -LiteralPath "$($z.FullName).aria2") { continue }   # unfinished aria2 download: already listed as a problem
   $s = "$($z.FullName).sha256"
   if (-not (Test-Path -LiteralPath $s)) { $znone++; continue }
   $want = ((Get-Content -LiteralPath $s -TotalCount 1) -split '\s+')[0].ToLower()

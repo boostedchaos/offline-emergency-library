@@ -10,6 +10,12 @@ everything. It is made for a drive you keep somewhere safe, such as a lockbox.
 
 > **This is a fork** of [elhajahmadj/offline-emergency-library](https://github.com/elhajahmadj/offline-emergency-library).
 > See [What this fork changed](#what-this-fork-changed) below.
+>
+> **Inspired by [Project NOMAD](https://github.com/Crosstalk-Solutions/project-nomad)**
+> ([projectnomad.us](https://www.projectnomad.us)) by Crosstalk Solutions — a full
+> offline knowledge server with AI, maps, Kiwix and Kolibri. Its curated content
+> collections are the basis of this fork's archive list. If you want an always-on
+> offline server instead of a drive in a drawer, use NOMAD. See [Credits](#credits).
 
 ---
 
@@ -84,8 +90,18 @@ Install the skill in `skills/offline-emergency-library/`, then say `/offline-eme
 **Resumable:** if it stops, run the same command again. It keeps finished files and
 continues the rest. Run it again later to add newer builds.
 
-**Speed:** Kiwix's mirrors gave about 3 MB/s per file on 2026-11-01, so the
-script downloads 4 archives at once. Plan on several hours for the full set.
+**Speed — install aria2 first.** Kiwix's mirrors give about 3 MB/s per connection, so
+one 127 GB Wikipedia file would take about 12 hours with plain curl. With
+[aria2](https://aria2.github.io) the script downloads each archive in up to 16 pieces
+from several Kiwix mirrors at once, and aria2 checks every 4 MB piece against Kiwix's
+fingerprints. Measured on 2026-11-01 (2 Gbit line, exFAT SSD): **86–94 MB/s with aria2
+vs 11 MB/s with curl**.
+- macOS: `brew install aria2` · Linux: `sudo apt install aria2`
+- Windows: nothing to do — the script uses the `aria2c.exe` inside the Kiwix desktop app it downloads.
+
+On an exFAT drive the first minutes of a big file are slow: exFAT has no sparse files, so
+the OS writes zeros up to each piece aria2 starts far into the file. It speeds up once
+that is done.
 
 ---
 
@@ -139,13 +155,30 @@ Every item below was reproduced on 2026-11-01 before it was fixed.
 - **Much more content:** 60 archives in 6 groups (`catalog/zims.tsv`), adapted from
   [Project NOMAD](https://github.com/Crosstalk-Solutions/project-nomad)'s curated lists.
   The newest build is picked automatically, because Kiwix deletes old ones.
-- **Faster:** program files come from the first working Kiwix mirror (the default server
+- **Faster:** archives use aria2 (many mirrors, many pieces) when it is installed;
+  program files come from the first working Kiwix mirror (the default server
   gave 62 KB/s); archives download 4 at a time.
 - `--dry-run`, one run per folder at a time, and `curl | bash` no longer eats its own input.
 - The HTML guides are rebuilt from the Markdown (`tools/render-docs.sh`); the old ones
   showed garbled emoji and dashes.
 
 ---
+
+## Credits
+
+- **[Project NOMAD](https://github.com/Crosstalk-Solutions/project-nomad)** by
+  [Crosstalk Solutions](https://www.projectnomad.us) — the inspiration for this fork. Its
+  curated collections (`collections/kiwix-categories.json`, Apache-2.0) became
+  `catalog/zims.tsv`: the medicine, survival, DIY, food & garden, education and computing
+  groups, and the Wikipedia size options. NOMAD runs as a home server (Docker, web UI,
+  local AI, maps, Khan Academy via Kolibri); this fork puts similar content on a single
+  drive you can store offline. Thank you to the NOMAD team and community.
+- **[elhajahmadj/offline-emergency-library](https://github.com/elhajahmadj/offline-emergency-library)** —
+  the original one-command downloader, guides and folder layout.
+- **[Kiwix](https://kiwix.org)** and its mirror hosts — the ZIM archives and readers.
+- **[OsmAnd](https://osmand.net)**, **[llama.cpp](https://github.com/ggml-org/llama.cpp)**,
+  **[GPT4All](https://github.com/nomic-ai/gpt4all)**, **[Hesperian](https://hesperian.org)**,
+  and the US Army manuals on the [Internet Archive](https://archive.org).
 
 ## ⚠️ Disclaimers
 
