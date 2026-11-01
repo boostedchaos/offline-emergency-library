@@ -16,7 +16,7 @@
 # group	folder	path	note	title
 medicine	Medical/zimgit-medicine	other/zimgit-medicine_en_	-	Medical Library (field and emergency medicine)
 medicine	Medical/Library	zimit/nhs.uk_en_medicines_	-	NHS Medicines A to Z
-medicine	Medical/Library	zimit/fas.org_en_military-medicine_	-	Military Medicine
+medicine	Medical/Library	zimit/irp.fas.org_en_military-medicine_	-	Military Medicine
 medicine	Medical/Library	zimit/wwwnc.cdc.gov_en_all_	-	CDC Health Information
 medicine	Medical/Library	zimit/medlineplus.gov_en_all_	-	MedlinePlus
 medicine	Medical/Library	libretexts/libretexts.org_en_med_	-	LibreTexts Medicine

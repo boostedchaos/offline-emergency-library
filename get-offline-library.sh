@@ -119,7 +119,7 @@ latest_zim(){ # "dir/prefix"
   d="${1%/*}"; p="${1##*/}"; cache="$WORK/list_$(printf '%s' "$d" | tr '/' '_')"
   [ -s "$cache" ] || page "$KIWIX/zim/$d/" > "$cache"
   re="$(printf '%s' "$p" | sed 's/[.]/\\./g')[0-9]{4}-[0-9]{2}\.zim"
-  grep -oE "$re" "$cache" | sort -u | tail -n1
+  grep -oE "[\"'>/]$re" "$cache" | cut -c2- | sort -u | tail -n1
 }
 # ZIMs: add_zim finds the newest file name (one at a time, so listings are read once);
 # dl_zim downloads it plus Kiwix's published SHA-256 (checked at the end).
@@ -383,7 +383,9 @@ log "=== Documentation and drive tools ==="
 place(){ # repo-path dest-path
   mkdir -p "$(dirname "$2")"
   if [ -f "$SCRIPTDIR/$1" ]; then cp "$SCRIPTDIR/$1" "$2"
-  else page "$REPO_RAW/$1" > "$2" || { rm -f "$2"; bad "$(basename "$1")" "could not get it from $REPO_RAW"; }; fi
+  else page "$REPO_RAW/$1" > "$2" || { rm -f "$2"; bad "$(basename "$1")" "could not get it from $REPO_RAW"; return; }; fi
+  # Windows .bat/.ps1 files need CRLF line ends (GitHub serves them with LF)
+  case "$2" in *.bat|*.ps1) awk '{sub(/\r$/,""); printf "%s\r\n", $0}' "$2" > "$2.tmp" && mv -f "$2.tmp" "$2";; esac
 }
 place_doc(){ place "docs/$1.md" "$2.md"; place "docs/$1.html" "$2.html"; }
 place_doc "START-HERE"            "$ROOT/START-HERE"

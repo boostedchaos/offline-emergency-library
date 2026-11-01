@@ -1,223 +1,345 @@
 <#
   Get-OfflineLibrary.ps1
-  One-shot downloader for the Offline Emergency Library.
-  Downloads: offline AI (3 models + CPU/GPU engines), GPT4All doc-Q&A, full Wikipedia
-  (article text), offline US maps (OsmAnd), survival/repair/medical archives (Kiwix ZIM),
-  public-domain Army field manuals + medical PDFs, the Kiwix reader, launchers, and all
-  documentation (Markdown + HTML).
+  Windows downloader for the Offline Emergency Library. Mirrors get-offline-library.sh.
+  Resumable: run it again to continue or to update.
 
   Usage:
-    .\Get-OfflineLibrary.ps1                      # will ask where to save
-    .\Get-OfflineLibrary.ps1 -Destination E:\     # non-interactive
-  Everything is RESUMABLE: re-run to continue after an interruption.
+    .\Get-OfflineLibrary.ps1                       # asks where to save
+    .\Get-OfflineLibrary.ps1 -Destination E:\      # no questions
+    .\Get-OfflineLibrary.ps1 -DryRun               # check every link + total size, download nothing
+  Options:
+    -Wikipedia maxi|nopic|mini|none   which Wikipedia (default nopic = all articles, no images)
+    -SkipGroups medicine,survival,diy,food,education,computing,pdfs
+    -SkipWikipedia -SkipMaps -SkipModels -SkipAI
+    -Catalog FILE    another ZIM list (default catalog/zims.tsv)
+    -Jobs N          archives downloaded at the same time (default 4)
 #>
 [CmdletBinding()]
 param(
   [string]$Destination,
-  [switch]$SkipWikipedia,   # Wikipedia is the biggest (~24 GB); allow skipping
-  [switch]$SkipMaps,        # OsmAnd US maps (~17 GB)
-  [switch]$SkipModels       # the large AI chat models (~11 GB)
+  [ValidateSet('maxi','nopic','mini','none')][string]$Wikipedia = 'nopic',
+  [string[]]$SkipGroups = @(),
+  [switch]$SkipWikipedia,
+  [switch]$SkipMaps,
+  [switch]$SkipModels,
+  [switch]$SkipAI,
+  [string]$Catalog,
+  [switch]$DryRun,
+  [int]$Jobs = 4
 )
 
 $ErrorActionPreference = 'Continue'
 $ProgressPreference    = 'SilentlyContinue'
-$RepoRaw = 'https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main'
+$RepoRaw = 'https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main'
+$Kiwix   = 'https://download.kiwix.org'
+$UA      = 'Mozilla/5.0'
+if ($SkipWikipedia) { $Wikipedia = 'none' }
+$SkipGroups = @($SkipGroups | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 
 # ---------------------------------------------------------------- destination
-if (-not $Destination) {
+if (-not $Destination -and -not $DryRun) {
   Write-Host ''
   Write-Host '  Offline Emergency Library installer' -ForegroundColor Cyan
   Write-Host '  -----------------------------------'
   $Destination = Read-Host 'Where would you like to save these files?'
+  if (-not $Destination) { Write-Host 'No destination given. Exiting.' -ForegroundColor Red; exit 1 }
 }
-if (-not $Destination) { Write-Host 'No destination given. Exiting.' -ForegroundColor Red; return }
+if (-not $Destination) { $Destination = '.' }
 $Root = Join-Path $Destination 'OfflineLibrary'
-try { New-Item -ItemType Directory -Force $Root | Out-Null }
-catch { Write-Host "Cannot create $Root : $($_.Exception.Message)" -ForegroundColor Red; return }
-
-$Log = Join-Path $Root '_download.log'
-function Log($m){ $s = "{0}  {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $m; Add-Content $Log $s; Write-Host $s }
-function Fetch($url,$out){ curl.exe -L -C - --retry 10 --retry-delay 5 --retry-all-errors -s -o $out $url }
-function UA(){ 'Mozilla/5.0' }
-
-# free-space check (needs roughly 60 GB for everything)
-try {
-  $drive = (Get-Item $Root).PSDrive
-  $freeGB = [math]::Round((Get-PSDrive $drive.Name).Free/1GB,1)
-  Log "Destination: $Root   (free space: $freeGB GB)"
-  if ($freeGB -lt 65) { Log "WARNING: ~65 GB recommended for the full library. You have $freeGB GB free. Consider -SkipWikipedia / -SkipMaps / -SkipModels." }
-} catch {}
-
-# ---------------------------------------------------------------- folder tree
-$dirs = @(
- 'AI-Offline','AI-Offline\engine','AI-Offline\models','AI-Offline\DocReader-GPT4All',
- 'Manuals','Manuals\ArmyFieldManuals','Manuals\Repair-iFixit','Manuals\DIY-Appropedia',
- 'Manuals\Survival-Water-Food','Manuals\Radio-Communications',
- 'Medical','Medical\WikiMed','Medical\zimgit-medicine','Medical\Manuals-PDF',
- 'Wikipedia','OsmAnd','Kiwix-Reader','Kiwix-Reader\app','Phone-Apps'
-)
-foreach($d in $dirs){ New-Item -ItemType Directory -Force (Join-Path $Root $d) | Out-Null }
+$Work = Join-Path ([System.IO.Path]::GetTempPath()) ("oel-" + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force $Work | Out-Null
+if ($DryRun) { $Log = $null }
+else {
+  try { New-Item -ItemType Directory -Force $Root | Out-Null }
+  catch { Write-Host "Cannot create $Root : $($_.Exception.Message)" -ForegroundColor Red; exit 1 }
+  $Root = (Resolve-Path -LiteralPath $Root).Path     # absolute, so relative paths in the index are right
+  $Log = Join-Path $Root '_download.log'
+  # one run per folder: two runs writing the same file would corrupt it
+  $pidFile = Join-Path $Root '_running.pid'
+  if (Test-Path $pidFile) {
+    $old = (Get-Content $pidFile -ErrorAction SilentlyContinue | Select-Object -First 1)
+    if ($old -and (Get-Process -Id $old -ErrorAction SilentlyContinue)) {
+      Write-Host "Another download is already running into $Root (process $old). Wait for it, or close it first." -ForegroundColor Red; exit 1
+    }
+  }
+  Set-Content -Path $pidFile -Value $PID
+}
+function Log($m){ $s = "{0}  {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $m; if ($Log) { Add-Content $Log $s }; Write-Host $s }
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 
 # ---------------------------------------------------------------- helpers
-function Latest-Zim($dirUrl,$prefix){
-  $html = curl.exe -sL -A (UA) $dirUrl
-  $names = [regex]::Matches($html, [regex]::Escape($prefix)+'[^"<]*\.zim') | ForEach-Object {$_.Value} | Sort-Object -Unique
-  if($names){ return ($names | Select-Object -Last 1) } else { return $null }
+$script:Failed = New-Object System.Collections.ArrayList
+$script:DryBytes = [long]0; $script:DryFiles = 0
+function Bad($what,$why){ [void]$script:Failed.Add("  - ${what}: $why"); Log "  FAILED ${what}: $why" }
+function GB($b){ "{0:N2} GB" -f ([double]$b / 1e9) }
+function P($rel){ Join-Path $Root $rel }          # relative paths use '/', which Windows accepts
+function Skipped($g){ $SkipGroups -contains $g }
+function Page($url){
+  $t = & curl.exe -fsL --max-time 120 --retry 3 -A $UA $url
+  if ($LASTEXITCODE -ne 0) { return $null }
+  return ($t -join "`n")
 }
-function Gh-ReleaseWith($repo,$needle){
-  $rels = Invoke-RestMethod "https://api.github.com/repos/$repo/releases?per_page=20" -Headers @{'User-Agent'='ps'}
-  foreach($r in $rels){ if($r.assets | Where-Object { $_.name -match $needle }){ return $r } }
+# HeadInfo URL -> @(status, length) after redirects
+function HeadInfo($url){
+  $h = & curl.exe -sIL --max-time 60 --retry 3 -A $UA $url
+  $st = ''; $len = ''
+  foreach ($l in $h) {
+    if ($l -match '^HTTP/\S+\s+(\d+)') { $st = $Matches[1]; $len = '' }
+    elseif ($l -match '^(?i)content-length:\s*(\d+)') { $len = $Matches[1] }
+  }
+  return @($st, $len)
+}
+function Size($p){ if (Test-Path -LiteralPath $p) { (Get-Item -LiteralPath $p).Length } else { -1 } }
+
+# Prepare: returns $null when there is nothing to download (or dry run), else @{url;out;want}
+function Prepare($url,$out){
+  $name = Split-Path $out -Leaf
+  $hi = HeadInfo $url
+  if ($hi[0] -ne '200') { Start-Sleep 5; $hi = HeadInfo $url }
+  $st = $hi[0]; $want = $hi[1]
+  if ($DryRun) {
+    if ($st -eq '200') { $script:DryBytes += [long]("0$want"); $script:DryFiles++; Log "  ok  $(GB ("0$want"))  $name" }
+    else { Bad $name "HTTP $(if($st){$st}else{'no answer'}) for $url" }
+    return $null
+  }
+  New-Item -ItemType Directory -Force (Split-Path $out -Parent) | Out-Null
+  if (Test-Path -LiteralPath $out) {
+    if (-not $want -or (Size $out) -eq [long]$want) { Log "  have $name"; return $null }
+    Log "  $name has the wrong size - downloading it again"; Remove-Item -LiteralPath $out -Force
+  }
+  $part = "$out.part"
+  if ($want -and (Test-Path -LiteralPath $part)) {
+    $ps = Size $part
+    if ($ps -gt [long]$want) { Remove-Item -LiteralPath $part -Force }
+    elseif ($ps -eq [long]$want) { Move-Item -LiteralPath $part $out -Force; Log "  done $name"; return $null }
+  }
+  Log "  get  $name $(if($want){GB $want})"
+  return @{ url = $url; out = $out; want = $want }
+}
+function Finish($job,$rc){
+  $name = Split-Path $job.out -Leaf; $part = "$($job.out).part"
+  if ($rc -ne 0) { Bad $name "download failed (curl exit $rc). Run the script again to resume."; return $false }
+  $got = Size $part
+  if ($job.want -and $got -ne [long]$job.want) { Bad $name "got $got bytes, server says $($job.want). Run again to resume."; return $false }
+  Move-Item -LiteralPath $part $job.out -Force; Log "  done $name"; return $true
+}
+# Fetch URL OUT - resumable; fails on HTTP errors; checks size against the server.
+function Fetch($url,$out){
+  $job = Prepare $url $out
+  if (-not $job) { return (-not $DryRun) -and (Test-Path -LiteralPath $out) -or $DryRun }
+  & curl.exe -fL -C - --retry 5 --retry-delay 5 --retry-all-errors -s -A $UA -o "$out.part" $url
+  return (Finish $job $LASTEXITCODE)
+}
+function Gh-Asset($repo,$pattern,[switch]$Latest){
+  $u = if ($Latest) { "https://api.github.com/repos/$repo/releases/latest" } else { "https://api.github.com/repos/$repo/releases?per_page=20" }
+  try { $r = Invoke-RestMethod $u -Headers @{'User-Agent'='oel'} } catch { return $null }
+  foreach ($rel in @($r)) { $a = $rel.assets | Where-Object { $_.name -match $pattern } | Select-Object -First 1; if ($a) { return $a.browser_download_url } }
   return $null
 }
-
-# ================================================================ 1. AI engine
-Log '=== [1/8] Offline AI engine (llama.cpp, CPU + GPU) ==='
-try{
-  $rel = Gh-ReleaseWith 'ggml-org/llama.cpp' 'bin-win-cpu-x64'
-  if($rel){
-    foreach($pat in @('bin-win-cpu-x64\.zip$','bin-win-cpu-arm64\.zip$','bin-win-vulkan-x64\.zip$')){
-      $a = $rel.assets | Where-Object { $_.name -match $pat } | Select-Object -First 1
-      if($a){
-        $zip = Join-Path $Root ("AI-Offline\engine\"+$a.name)
-        Log "engine: $($a.name)"; Fetch $a.browser_download_url $zip
-        $sub = if($a.name -match 'arm64'){'arm64'} elseif($a.name -match 'vulkan'){'vulkan-x64'} else {'x64'}
-        try{ Expand-Archive $zip -DestinationPath (Join-Path $Root "AI-Offline\engine\$sub") -Force }catch{ Log "  extract failed: $($_.Exception.Message)" }
-      }
-    }
-  } else { Log 'engine: no suitable llama.cpp release found' }
-}catch{ Log "engine ERROR: $($_.Exception.Message)" }
-
-# ================================================================ 2. AI models
-Log '=== [2/8] AI chat models (GGUF, Q4_K_M) ==='
-$models = @(
- @{n='Llama-3.2-3B-Instruct-Q4_K_M.gguf';      u='https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf'; big=$false}
- @{n='Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'; u='https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'; big=$true}
- @{n='Qwen2.5-7B-Instruct-Q4_K_M.gguf';        u='https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf'; big=$true}
-)
-foreach($m in $models){
-  if($SkipModels -and $m.big){ Log "model (skipped): $($m.n)"; continue }
-  Log "model: $($m.n)"; Fetch $m.u (Join-Path $Root "AI-Offline\models\$($m.n)")
+# newest "<prefix>YYYY-MM.zim" in a Kiwix directory (one listing download per directory)
+$script:Listings = @{}
+function Latest-Zim($dirPrefix){
+  $i = $dirPrefix.LastIndexOf('/'); $d = $dirPrefix.Substring(0,$i); $p = $dirPrefix.Substring($i+1)
+  if (-not $script:Listings.ContainsKey($d)) { $script:Listings[$d] = Page "$Kiwix/zim/$d/" }
+  $re = '(?<=["''>/])' + [regex]::Escape($p) + '[0-9]{4}-[0-9]{2}\.zim'   # whole file names only
+  $names = [regex]::Matches("$($script:Listings[$d])", $re) | ForEach-Object { $_.Value } | Sort-Object -Unique
+  if ($names) { return "$d/" + ($names | Select-Object -Last 1) } else { return $null }
 }
-
-# ================================================================ 3. GPT4All
-Log '=== [3/8] GPT4All (offline document Q&A) ==='
-try{
-  $rel = Gh-ReleaseWith 'nomic-ai/gpt4all' 'installer-win64-v'
-  $a = $rel.assets | Where-Object { $_.name -match 'installer-win64-v.*\.exe$' -and $_.name -notmatch 'arm' } | Select-Object -First 1
-  if($a){ Log "gpt4all: $($a.name)"; Fetch $a.browser_download_url (Join-Path $Root "AI-Offline\DocReader-GPT4All\$($a.name)") }
-}catch{ Log "gpt4all ERROR: $($_.Exception.Message)" }
-
-# ================================================================ 4. Kiwix reader
-Log '=== [4/8] Kiwix reader (portable) ==='
-try{
-  $kdir = 'https://download.kiwix.org/release/kiwix-desktop/'
-  $html = curl.exe -sL -A (UA) $kdir
-  $zip = [regex]::Matches($html,'kiwix-desktop_windows_x64_[0-9][^"<]*\.zip') | ForEach-Object {$_.Value} | Sort-Object -Unique | Select-Object -Last 1
-  if($zip){
-    $out = Join-Path $Root "Kiwix-Reader\$zip"
-    Log "kiwix: $zip"; Fetch ($kdir+$zip) $out
-    try{ Expand-Archive $out -DestinationPath (Join-Path $Root 'Kiwix-Reader\app') -Force }catch{ Log "  extract failed: $($_.Exception.Message)" }
+# Kiwix program files are served by one slow server; its mirrors carry them too.
+$script:Mirrors = $null
+function Rel-Url($path){
+  if ($null -eq $script:Mirrors) {
+    $k = Latest-Zim 'other/zimgit-knots_en_'
+    $m = if ($k) { Page "$Kiwix/zim/$k.meta4" } else { $null }
+    $script:Mirrors = @([regex]::Matches("$m", '<url location="[a-z]+" priority="[0-9]+">([^<]+)') | ForEach-Object { $_.Groups[1].Value -replace '/zim/other/.*$','' })
   }
-}catch{ Log "kiwix ERROR: $($_.Exception.Message)" }
-
-# ================================================================ 5. ZIM archives
-Log '=== [5/8] Offline archives (Kiwix ZIM: repair, DIY, medical, survival) ==='
-$zims = @(
- @{dir='https://download.kiwix.org/zim/ifixit/'; pre='ifixit_en_all_';            d='Manuals\Repair-iFixit'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='appropedia_en_all_maxi_';   d='Manuals\DIY-Appropedia'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-post-disaster_en_';  d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-water_en_';          d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-food-preparation_en_'; d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-knots_en_';          d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/wikipedia/'; pre='wikipedia_en_medicine_maxi_'; d='Medical\WikiMed'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-medicine_en_';       d='Medical\zimgit-medicine'}
-)
-foreach($z in $zims){
-  $name = Latest-Zim $z.dir $z.pre
-  if($name){ Log "zim: $name"; Fetch ($z.dir+$name) (Join-Path $Root "$($z.d)\$name") }
-  else { Log "zim: NOT FOUND for prefix $($z.pre)" }
+  foreach ($b in $script:Mirrors) { if ((HeadInfo "$b/$path")[0] -eq '200') { return "$b/$path" } }
+  return "$Kiwix/$path"
 }
+function Expand-Tgz($file,$dest){ New-Item -ItemType Directory -Force $dest | Out-Null; & tar.exe -xzf $file -C $dest 2>$null; if ($LASTEXITCODE -ne 0) { & tar -xzf $file -C $dest } }
 
-# ================================================================ 6. PDFs (Internet Archive)
-Log '=== [6/8] Public-domain manuals (PDF) ==='
-$pdfs = @(
- @{id='fm-21-76-us-army-survival-manual';                    n='FM 21-76 Army Survival Manual.pdf';               d='Manuals\ArmyFieldManuals'}
- @{id='fm-3-05.70-survival-2002';                            n='FM 3-05.70 Survival (2002).pdf';                  d='Manuals\ArmyFieldManuals'}
- @{id='105-page-survival-field-manual';                      n='105-Page Survival Field Manual.pdf';              d='Manuals\ArmyFieldManuals'}
- @{id='UsArmyFirstAidManualFm4-25.11';                       n='FM 4-25.11 First Aid.pdf';                        d='Manuals\ArmyFieldManuals'}
- @{id='Survival-FirstAidForSoldiers-AFieldManual';           n='Survival and First Aid for Soldiers.pdf';         d='Manuals\ArmyFieldManuals'}
- @{id='use-and-care-of-hand-tools-and-measuring-tools-1983'; n='TM 9-243 Use and Care of Hand Tools.pdf';         d='Manuals\ArmyFieldManuals'}
- @{id='fm-5-426-carpentry-1995';                             n='FM 5-426 Carpentry.pdf';                          d='Manuals\ArmyFieldManuals'}
- @{id='tm-9-8000-principles-of-automotive-vehicles-1985';    n='TM 9-8000 Principles of Automotive Vehicles.pdf'; d='Manuals\ArmyFieldManuals'}
- @{id='u-s-army-guide-to-rigging';                           n='FM 5-125 Army Guide to Rigging.pdf';              d='Manuals\ArmyFieldManuals'}
- @{id='fm-90-3-desert-operations-1993';                      n='FM 90-3 Desert Operations.pdf';                   d='Manuals\ArmyFieldManuals'}
- @{id='tm-10-412-armed-forces-recipe-service-2003';          n='TM 10-412 Armed Forces Recipe Service.pdf';       d='Manuals\ArmyFieldManuals'}
- @{id='bwb_S0-EJI-512';                                      n='Where There Is No Doctor.pdf';                    d='Medical\Manuals-PDF'}
- @{id='where-there-is-no-dentist-13th-printing-2010';        n='Where There Is No Dentist.pdf';                   d='Medical\Manuals-PDF'}
- @{id='shipsmedicineche0000medi';                            n='Ships Medicine Chest and First Aid at Sea.pdf';   d='Medical\Manuals-PDF'}
-)
-foreach($p in $pdfs){
-  try{
-    $meta = curl.exe -sL "https://archive.org/metadata/$($p.id)" -A (UA) | ConvertFrom-Json
-    $f = $meta.files | Where-Object {$_.name -match '\.pdf$' -and $_.name -notmatch '_text\.pdf$'} | Sort-Object {[double]$_.size} -Descending | Select-Object -First 1
-    if($f){ Log "pdf: $($p.n)"; Fetch "https://archive.org/download/$($p.id)/$([uri]::EscapeDataString($f.name))" (Join-Path $Root "$($p.d)\$($p.n)") }
-    else { Log "pdf: NO PDF for $($p.id)" }
-  }catch{ Log "pdf ERROR $($p.n): $($_.Exception.Message)" }
-}
+# free space
+if (-not $DryRun) { try { $freeGB = [math]::Round(((Get-Item $Root).PSDrive.Free)/1GB,1); Log "Destination: $Root   (free space: $freeGB GB)" } catch { Log "Destination: $Root" } }
+if ($DryRun) { Log 'DRY RUN: checking every link and adding up sizes. Nothing is downloaded.' }
+Log "Wikipedia: $Wikipedia   Skip groups: $(if($SkipGroups){$SkipGroups -join ','}else{'none'})"
 
-# ================================================================ 7. Wikipedia + Maps
-if(-not $SkipWikipedia){
-  Log '=== [7/8] Wikipedia (article text, compressed ~24 GB) ==='
-  Fetch 'https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2' (Join-Path $Root 'Wikipedia\enwiki-latest-pages-articles.xml.bz2')
-} else { Log '=== [7/8] Wikipedia SKIPPED ===' }
-
-if(-not $SkipMaps){
-  Log '=== [8/8] Offline US maps (OsmAnd, ~17 GB) ==='
-  try{
-    $idxFile = Join-Path $env:TEMP 'osmand_idx.xml'
-    curl.exe -s 'https://download.osmand.net/get_indexes' -o $idxFile
-    [xml]$idx = Get-Content $idxFile
-    $us = $idx.osmand_regions.region | Where-Object { $_.name -like 'US_*' -and $_.type -eq 'map' }
-    Log "osmand: $($us.Count) US map files"
-    foreach($r in $us){
-      $out = Join-Path $Root "OsmAnd\$($r.name)"
-      Fetch "https://download.osmand.net/download.php?standard=yes&file=$($r.name)" $out
+# ================================================================ 1-3. AI
+if (-not $SkipAI) {
+  Log '=== [1/9] Offline AI engine (llama.cpp, CPU + GPU) ==='
+  foreach ($spec in @(@('x64','bin-win-cpu-x64\.zip$'), @('arm64','bin-win-cpu-arm64\.zip$'), @('vulkan-x64','bin-win-vulkan-x64\.zip$'))) {
+    $u = Gh-Asset 'ggml-org/llama.cpp' $spec[1]
+    if (-not $u) { Bad "llama.cpp ($($spec[0]))" 'no release asset found'; continue }
+    $zip = P ("AI-Offline/engine/" + (Split-Path $u -Leaf))
+    if ((Fetch $u $zip) -and -not $DryRun) {
+      try { Expand-Archive $zip -DestinationPath (P "AI-Offline/engine/$($spec[0])") -Force } catch { Bad (Split-Path $zip -Leaf) "extract failed: $($_.Exception.Message)" }
     }
-  }catch{ Log "osmand ERROR: $($_.Exception.Message)" }
-} else { Log '=== [8/8] Maps SKIPPED ===' }
+  }
+  Log '=== [2/9] AI chat models (GGUF, Q4_K_M) ==='
+  $models = @(
+    @{n='Llama-3.2-3B-Instruct-Q4_K_M.gguf';      u='https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf'; big=$false}
+    @{n='Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'; u='https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'; big=$true}
+    @{n='Qwen2.5-7B-Instruct-Q4_K_M.gguf';        u='https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf'; big=$true}
+  )
+  foreach ($m in $models) {
+    if ($SkipModels -and $m.big) { Log "model (skipped): $($m.n)"; continue }
+    [void](Fetch $m.u (P "AI-Offline/models/$($m.n)"))
+  }
+  Log '=== [3/9] GPT4All (offline document Q&A) ==='
+  $u = Gh-Asset 'nomic-ai/gpt4all' 'installer-win64-v.*\.exe$' -Latest
+  if ($u) { [void](Fetch $u (P ("AI-Offline/DocReader-GPT4All/" + (Split-Path $u -Leaf)))) } else { Bad 'GPT4All' 'no release asset found' }
+} else { Log '=== [1-3/9] Offline AI SKIPPED ===' }
 
-# ---------------- desktop map viewer (use the maps on a PC, no phone needed) -----------
-if(-not $SkipMaps){
+# ================================================================ 4. readers for every platform
+Log '=== [4/9] Library readers for Windows, macOS and Linux (Kiwix) ==='
+$kt = Page "$Kiwix/release/kiwix-tools/"
+foreach ($pl in 'win-x86_64','macos-arm64','macos-x86_64','linux-x86_64','linux-aarch64') {
+  $f = [regex]::Matches("$kt", "kiwix-tools_$pl-[0-9][0-9.]*[0-9]\.(tar\.gz|zip)") | ForEach-Object { $_.Value } | Sort-Object -Unique { [version](($_ -replace "^kiwix-tools_$pl-",'') -replace '\.(tar\.gz|zip)$','') } | Select-Object -Last 1
+  if (-not $f) { Bad "kiwix-tools $pl" 'not found'; continue }
+  $out = P "Kiwix-Reader/tools/$f"
+  if ((Fetch (Rel-Url "release/kiwix-tools/$f") $out) -and -not $DryRun) {
+    $dest = P "Kiwix-Reader/tools/$pl"
+    if ($f -like '*.zip') { Expand-Archive $out -DestinationPath $dest -Force } else { Expand-Tgz $out $dest }
+  }
+}
+$kd = Page "$Kiwix/release/kiwix-desktop/"
+$wz = [regex]::Matches("$kd", 'kiwix-desktop_windows_x64_[0-9][0-9.]*[0-9]\.zip') | ForEach-Object { $_.Value } | Sort-Object -Unique | Select-Object -Last 1
+if ($wz) {
+  $out = P "Kiwix-Reader/$wz"
+  if ((Fetch (Rel-Url "release/kiwix-desktop/$wz") $out) -and -not $DryRun) {
+    try { Expand-Archive $out -DestinationPath (P 'Kiwix-Reader/app') -Force } catch { Bad $wz "extract failed: $($_.Exception.Message)" }
+  }
+} else { Bad 'Kiwix desktop (Windows)' 'not found' }
+$ai = [regex]::Matches("$kd", 'kiwix-desktop_x86_64_[0-9][0-9.]*[0-9]\.appimage') | ForEach-Object { $_.Value } | Sort-Object -Unique | Select-Object -Last 1
+if ($ai) { [void](Fetch (Rel-Url "release/kiwix-desktop/$ai") (P "Kiwix-Reader/$ai")) }
+
+# ================================================================ 5-6. ZIM archives
+$zimJobs = New-Object System.Collections.ArrayList
+function Add-Zim($dirPrefix,$folder,$title){
+  $z = Latest-Zim $dirPrefix
+  if (-not $z) { Bad $title "no file matching $dirPrefix on $Kiwix"; return }
+  [void]$zimJobs.Add(@{ z = $z; folder = $folder; title = $title })
+}
+if ($Wikipedia -ne 'none') { Log "=== [5/9] Wikipedia ($Wikipedia) ==="; Add-Zim "wikipedia/wikipedia_en_all_$($Wikipedia)_" 'Wikipedia' "Wikipedia ($Wikipedia)" }
+else { Log '=== [5/9] Wikipedia SKIPPED ===' }
+Log '=== [6/9] Offline archives (Kiwix ZIM) ==='
+$catText = $null
+if ($Catalog) { $catText = Get-Content $Catalog -Raw -Encoding UTF8 }
+elseif (Test-Path (Join-Path $ScriptDir 'catalog/zims.tsv')) { $catText = Get-Content (Join-Path $ScriptDir 'catalog/zims.tsv') -Raw -Encoding UTF8 }
+else { $catText = Page "$RepoRaw/catalog/zims.tsv" }
+if (-not $catText) { Bad 'catalog' 'could not read catalog/zims.tsv' }
+foreach ($line in ("$catText" -split "`r?`n")) {
+  if (-not $line -or $line.StartsWith('#')) { continue }
+  $c = $line -split "`t"
+  if ($c.Count -lt 5) { continue }
+  if (Skipped $c[0]) { continue }
+  if ($c[3] -eq 'dupwiki' -and ($Wikipedia -eq 'maxi' -or $Wikipedia -eq 'nopic')) { continue }
+  Add-Zim $c[2] $c[1] $c[4]
+}
+Log "archives to get: $($zimJobs.Count)   (up to $Jobs at a time)"
+# Run up to $Jobs curl downloads at once
+$queue = New-Object System.Collections.Queue
+foreach ($j in $zimJobs) {
+  $n = Split-Path $j.z -Leaf
+  Log "zim: $($j.title)"
+  $prep = Prepare "$Kiwix/zim/$($j.z)" (P "$($j.folder)/$n")
+  if ($prep) { $prep.z = $j.z; $queue.Enqueue($prep) }
+}
+$running = New-Object System.Collections.ArrayList
+$finished = New-Object System.Collections.ArrayList
+while ($queue.Count -gt 0 -or $running.Count -gt 0) {
+  while ($queue.Count -gt 0 -and $running.Count -lt $Jobs) {
+    $job = $queue.Dequeue()
+    $a = "-fL -C - --retry 5 --retry-delay 5 --retry-all-errors -s -A `"$UA`" -o `"$($job.out).part`" `"$($job.url)`""
+    $proc = Start-Process -FilePath 'curl.exe' -ArgumentList $a -NoNewWindow -PassThru
+    $null = $proc.Handle     # keeps ExitCode readable after the process ends (PowerShell 5.1)
+    $job.proc = $proc; [void]$running.Add($job)
+  }
+  Start-Sleep -Seconds 2
+  foreach ($job in @($running)) {
+    if ($job.proc.HasExited) { $running.Remove($job); if (Finish $job $job.proc.ExitCode) { [void]$finished.Add($job) } }
+  }
+}
+# Kiwix's published SHA-256 for every ZIM we have (checked at the end)
+if (-not $DryRun) {
+  foreach ($j in $zimJobs) {
+    $n = Split-Path $j.z -Leaf; $zf = P "$($j.folder)/$n"
+    if (Test-Path -LiteralPath $zf) { $t = Page "$Kiwix/zim/$($j.z).sha256"; if ($t) { Set-Content -LiteralPath "$zf.sha256" -Value $t -Encoding ascii } }
+  }
+}
+
+# ================================================================ 7. PDFs
+if (-not (Skipped 'pdfs')) {
+  Log '=== [7/9] Books (PDF) ==='
+  $pdfs = @(
+    @{id='fm-21-76-us-army-survival-manual';                    n='FM 21-76 Army Survival Manual.pdf'}
+    @{id='fm-3-05.70-survival-2002';                            n='FM 3-05.70 Survival (2002).pdf'}
+    @{id='105-page-survival-field-manual';                      n='105-Page Survival Field Manual.pdf'}
+    @{id='UsArmyFirstAidManualFm4-25.11';                       n='FM 4-25.11 First Aid.pdf'}
+    @{id='Survival-FirstAidForSoldiers-AFieldManual';           n='Survival and First Aid for Soldiers.pdf'}
+    @{id='use-and-care-of-hand-tools-and-measuring-tools-1983'; n='TM 9-243 Use and Care of Hand Tools.pdf'}
+    @{id='fm-5-426-carpentry-1995';                             n='FM 5-426 Carpentry.pdf'}
+    @{id='tm-9-8000-principles-of-automotive-vehicles-1985';    n='TM 9-8000 Principles of Automotive Vehicles.pdf'}
+    @{id='u-s-army-guide-to-rigging';                           n='FM 5-125 Army Guide to Rigging.pdf'}
+    @{id='fm-90-3-desert-operations-1993';                      n='FM 90-3 Desert Operations.pdf'}
+    @{id='tm-10-412-armed-forces-recipe-service-2003';          n='TM 10-412 Armed Forces Recipe Service.pdf'}
+  )
+  foreach ($p in $pdfs) {
+    $meta = Page "https://archive.org/metadata/$($p.id)"
+    $f = $null; try { $f = ($meta | ConvertFrom-Json).files | Where-Object { $_.name -match '\.pdf$' -and $_.name -notmatch '_text\.pdf$' } | Select-Object -First 1 } catch {}
+    if ($f) { [void](Fetch "https://archive.org/download/$($p.id)/$([uri]::EscapeDataString($f.name))" (P "Manuals/ArmyFieldManuals/$($p.n)")) }
+    else { Bad $p.n "no PDF in archive.org item $($p.id)" }
+  }
+  # Hesperian health books: from Hesperian's own page at run time (their PDF names change). One PDF per chapter.
+  $hesp = 'https://languages.hesperian.org/pages/en/pdf.html'
+  $hp = Page $hesp
+  if (-not $hp) { Bad 'Hesperian' "could not read $hesp" }
+  foreach ($b in @(@('wtnd','Where There Is No Doctor (Hesperian)'), @('dent','Where There Is No Dentist (Hesperian)'))) {
+    $dir = [regex]::Matches("$hp", "uploads/pdf/en_$($b[0])_[0-9]{4}/") | ForEach-Object { $_.Value } | Sort-Object -Unique | Select-Object -Last 1
+    if (-not $dir) { Bad $b[1] "not listed on $hesp"; continue }
+    Log "pdf: $($b[1]) ($dir)"
+    $urls = [regex]::Matches("$hp", "https://hesperian\.org/wp-content/$([regex]::Escape($dir))[^`"]+\.pdf") | ForEach-Object { $_.Value } | Select-Object -Unique
+    $i = 0
+    foreach ($u in $urls) { $i++; [void](Fetch $u (P ("Medical/Manuals-PDF/$($b[1])/{0:D2}-{1}" -f $i, (Split-Path $u -Leaf)))) }
+  }
+} else { Log '=== [7/9] PDFs SKIPPED ===' }
+
+# ================================================================ 8. Maps
+if (-not $SkipMaps) {
+  Log '=== [8/9] Offline US maps (OsmAnd) ==='
+  $idx = Page 'https://download.osmand.net/get_indexes'
+  $us = @()
+  try { $us = @(([xml]$idx).osmand_regions.region | Where-Object { $_.type -eq 'map' -and $_.name -like 'us_*' } | ForEach-Object { $_.name } | Sort-Object -Unique) } catch {}
+  Log "osmand: $($us.Count) US map files"
+  if ($us.Count -eq 0) { Bad 'OsmAnd maps' 'no US maps found in the OsmAnd index' }
+  foreach ($fn in $us) { [void](Fetch "https://download.osmand.net/download.php?standard=yes&file=$fn" (P "OsmAnd/$fn")) }
+
   Log '=== [8b] Desktop map viewer (OsmAndMapCreator + portable Java) ==='
-  $mvd = Join-Path $Root 'OsmAnd\MapViewer-Desktop'
-  New-Item -ItemType Directory -Force $mvd,(Join-Path $mvd 'app') | Out-Null
-  try{
-    $mc = Join-Path $mvd 'OsmAndMapCreator.zip'
-    Log 'mapviewer: OsmAndMapCreator'
-    Fetch 'https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip' $mc
-    Expand-Archive $mc -DestinationPath (Join-Path $mvd 'app') -Force
-    # if the zip nested everything in a single subfolder, pull it up to \app
-    if(-not (Test-Path (Join-Path $mvd 'app\OsmAndMapCreator.bat'))){
-      $inner = Get-ChildItem (Join-Path $mvd 'app') -Directory | Select-Object -First 1
-      if($inner -and (Test-Path (Join-Path $inner.FullName 'OsmAndMapCreator.bat'))){
-        Get-ChildItem $inner.FullName -Force | Move-Item -Destination (Join-Path $mvd 'app') -Force
+  $mvd = P 'OsmAnd/MapViewer-Desktop'
+  $mc = Join-Path $mvd 'OsmAndMapCreator.zip'
+  if ((Fetch 'https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip' $mc) -and -not $DryRun) {
+    try {
+      Expand-Archive $mc -DestinationPath (Join-Path $mvd 'app') -Force
+      if (-not (Test-Path (Join-Path $mvd 'app/OsmAndMapCreator.bat'))) {
+        $inner = Get-ChildItem (Join-Path $mvd 'app') -Directory | Select-Object -First 1
+        if ($inner -and (Test-Path (Join-Path $inner.FullName 'OsmAndMapCreator.bat'))) { Get-ChildItem $inner.FullName -Force | Move-Item -Destination (Join-Path $mvd 'app') -Force }
       }
-    }
-    $jz = Join-Path $mvd 'jre.zip'
-    Log 'mapviewer: portable Java runtime'
-    Fetch 'https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse' $jz
-    $tmp = Join-Path $mvd '_jre_tmp'
-    if(Test-Path $tmp){ Remove-Item $tmp -Recurse -Force }
-    Expand-Archive $jz -DestinationPath $tmp -Force
-    $jreSrc = Get-ChildItem $tmp -Directory | Select-Object -First 1
-    $jreDst = Join-Path $mvd 'jre'
-    if(Test-Path $jreDst){ Remove-Item $jreDst -Recurse -Force }
-    if($jreSrc){ Move-Item $jreSrc.FullName $jreDst }
-    Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
-  }catch{ Log "mapviewer ERROR: $($_.Exception.Message)" }
-
-  # helper: unzip the downloaded .obf.zip map files into an \obf folder the viewer can read
-  $prep = @'
+    } catch { Bad 'OsmAndMapCreator' "extract failed: $($_.Exception.Message)" }
+  }
+  $jz = Join-Path $mvd 'jre.zip'
+  if ((Fetch 'https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse' $jz) -and -not $DryRun) {
+    try {
+      $tmp = Join-Path $mvd '_jre_tmp'
+      if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
+      Expand-Archive $jz -DestinationPath $tmp -Force
+      $jreSrc = Get-ChildItem $tmp -Directory | Select-Object -First 1
+      $jreDst = Join-Path $mvd 'jre'
+      if (Test-Path $jreDst) { Remove-Item $jreDst -Recurse -Force }
+      if ($jreSrc) { Move-Item $jreSrc.FullName $jreDst }
+      Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    } catch { Bad 'Java runtime' "extract failed: $($_.Exception.Message)" }
+  }
+  if (-not $DryRun) {
+    $prep = @'
 $ErrorActionPreference='Continue'
 $maps = Split-Path -Parent $PSScriptRoot      # ...\OsmAnd
 $obf  = Join-Path $maps 'obf'
@@ -234,9 +356,8 @@ foreach($z in $zips){
 }
 Write-Host "Maps ready in: $obf"
 '@
-  Set-Content -Path (Join-Path $mvd 'prepare-maps.ps1') -Value $prep -Encoding utf8
-
-  $mvbat = @"
+    Set-Content -Path (Join-Path $mvd 'prepare-maps.ps1') -Value $prep -Encoding utf8
+    $mvbat = @"
 @echo off
 title Offline Maps on PC - OsmAndMapCreator
 cd /d "%~dp0"
@@ -251,49 +372,49 @@ cd /d "%~dp0app"
 call OsmAndMapCreator.bat
 pause
 "@
-  Set-Content -Path (Join-Path $mvd 'VIEW-MAPS-ON-PC.bat') -Value $mvbat -Encoding ascii
-}
+    [System.IO.File]::WriteAllText((Join-Path $mvd 'VIEW-MAPS-ON-PC.bat'), ($mvbat -replace "`r?`n","`r`n"), [System.Text.Encoding]::ASCII)
+  }
+} else { Log '=== [8/9] Maps SKIPPED ===' }
 
 # ================================================================ phone apps
-Log '=== Phone apps (port the library to a phone) ==='
-$pa = Join-Path $Root 'Phone-Apps'
-New-Item -ItemType Directory -Force $pa | Out-Null
-# Kiwix for Android — reads ALL the .zim archives (Wikipedia, medical, repair, survival)
-try{
-  $kr = Invoke-RestMethod 'https://api.github.com/repos/kiwix/kiwix-android/releases/latest' -Headers @{'User-Agent'='ps'}
-  $ka = $kr.assets | Where-Object { $_.name -match 'universal-standalone\.apk$' } | Select-Object -First 1
-  if(-not $ka){ $ka = $kr.assets | Where-Object { $_.name -match '\.apk$' } | Select-Object -First 1 }
-  if($ka){ Log "phone app: Kiwix ($($ka.name))"; Fetch $ka.browser_download_url (Join-Path $pa $ka.name) }
-}catch{ Log "kiwix apk ERROR: $($_.Exception.Message)" }
-# OsmAnd for Android — offline maps (only if maps were downloaded)
-if(-not $SkipMaps){
-  try{
-    $api = Invoke-RestMethod 'https://f-droid.org/api/v1/packages/net.osmand.plus' -Headers @{'User-Agent'='ps'}
-    $vc = $api.suggestedVersionCode
-    Log "phone app: OsmAnd~ (net.osmand.plus_$vc)"
-    Fetch "https://f-droid.org/repo/net.osmand.plus_$vc.apk" (Join-Path $pa "OsmAnd-$vc.apk")
-  }catch{ Log "osmand apk ERROR: $($_.Exception.Message)" }
+Log '=== Phone apps (Android) ==='
+$ku = Gh-Asset 'kiwix/kiwix-android' 'universal-standalone\.apk$' -Latest
+if (-not $ku) { $ku = Gh-Asset 'kiwix/kiwix-android' '\.apk$' -Latest }
+if ($ku) { [void](Fetch $ku (P ("Phone-Apps/" + (Split-Path $ku -Leaf)))) } else { Bad 'Kiwix Android app' 'no release asset found' }
+if (-not $SkipMaps) {
+  $fd = Page 'https://f-droid.org/api/v1/packages/net.osmand.plus'
+  $vc = $null; try { $vc = ($fd | ConvertFrom-Json).suggestedVersionCode } catch {}
+  if ($vc) { [void](Fetch "https://f-droid.org/repo/net.osmand.plus_$vc.apk" (P "Phone-Apps/OsmAnd-$vc.apk")) } else { Bad 'OsmAnd Android app' 'F-Droid did not answer' }
 }
 
-# ================================================================ launchers
-Log '=== Writing launchers (.bat) ==='
-function WriteBat($path,$text){ Set-Content -Path $path -Value $text -Encoding ascii }
-$ao = Join-Path $Root 'AI-Offline'
-WriteBat (Join-Path $ao 'CHAT-3B-light.bat') @"
+if ($DryRun) {
+  Log '=== DRY RUN RESULT ==='
+  Log "Files: $($script:DryFiles)   Total download: $(GB $script:DryBytes)"
+  Remove-Item $Work -Recurse -Force -ErrorAction SilentlyContinue
+  if ($script:Failed.Count -gt 0) { Log "$($script:Failed.Count) link(s) did not work:"; $script:Failed | ForEach-Object { Log $_ }; exit 1 }
+  Log 'All links work.'; exit 0
+}
+
+# ================================================================ launchers (AI)
+function WriteBat($path,$text){ [System.IO.File]::WriteAllText($path, ($text -replace "`r?`n","`r`n"), [System.Text.Encoding]::ASCII) }
+if (-not $SkipAI) {
+  Log '=== Writing AI launchers (.bat) ==='
+  $ao = P 'AI-Offline'
+  WriteBat (Join-Path $ao 'CHAT-3B-light.bat') @"
 @echo off
 title Offline AI - Llama 3.2 3B (light)
 cd /d "%~dp0"
 "%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
 pause
 "@
-WriteBat (Join-Path $ao 'CHAT-8B-smart.bat') @"
+  WriteBat (Join-Path $ao 'CHAT-8B-smart.bat') @"
 @echo off
 title Offline AI - Llama 3.1 8B (smart)
 cd /d "%~dp0"
 "%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
 pause
 "@
-WriteBat (Join-Path $ao 'CHAT-GPU-Qwen7B.bat') @"
+  WriteBat (Join-Path $ao 'CHAT-GPU-Qwen7B.bat') @"
 @echo off
 title Offline AI - Qwen2.5 7B (GPU)
 cd /d "%~dp0"
@@ -302,7 +423,7 @@ echo number (e.g. -ngl 20) or use a CPU launcher instead.
 "%~dp0engine\vulkan-x64\llama-cli.exe" -m "%~dp0models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
 pause
 "@
-WriteBat (Join-Path $ao 'WEB-UI.bat') @"
+  WriteBat (Join-Path $ao 'WEB-UI.bat') @"
 @echo off
 title Offline AI - Web UI
 cd /d "%~dp0"
@@ -310,35 +431,29 @@ echo When it says "server listening", open a browser to http://127.0.0.1:8080
 "%~dp0engine\x64\llama-server.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 --host 127.0.0.1 --port 8080
 pause
 "@
+}
 
-# ================================================================ documentation
-Log '=== Documentation (Markdown + HTML) ==='
-# doc source: local .\docs if present (repo clone), else download pre-rendered files from GitHub raw
-$scriptDir = if($PSScriptRoot){$PSScriptRoot}else{(Get-Location).Path}
-$localDocs = Join-Path $scriptDir 'docs'
-function Get-Doc($name){
-  $lp = Join-Path $localDocs $name
-  if(Test-Path $lp){ return (Get-Content $lp -Raw) }
-  try { return (curl.exe -sL "$RepoRaw/docs/$name" -A (UA)) } catch { return $null }
+# ================================================================ documentation + drive tools
+Log '=== Documentation and drive tools ==='
+function Place($repoPath,$dest){
+  New-Item -ItemType Directory -Force (Split-Path $dest -Parent) | Out-Null
+  $local = Join-Path $ScriptDir $repoPath
+  if (Test-Path $local) { $c = [System.IO.File]::ReadAllText($local) } else { $c = Page "$RepoRaw/$repoPath" }
+  if ($null -eq $c) { Bad (Split-Path $repoPath -Leaf) "could not get it from $RepoRaw"; return }
+  if ($dest -match '\.(bat|ps1)$') { $c = $c -replace "`r?`n","`r`n" } else { $c = $c -replace "`r`n","`n" }   # .sh/.command must stay LF
+  [System.IO.File]::WriteAllText($dest, $c, (New-Object System.Text.UTF8Encoding($false)))
 }
-# both .md and .html ship in the repo /docs; just place them (no conversion needed)
-function PlaceDoc($srcName,$destPath,$title){
-  $base = $srcName -replace '\.md$',''
-  foreach($ext in '.md','.html'){
-    $c = Get-Doc ($base + $ext)
-    if($c){ [System.IO.File]::WriteAllText("$destPath$ext",$c,[System.Text.UTF8Encoding]::new($false)) }
-    else { Log "  doc missing: $base$ext" }
-  }
-}
-PlaceDoc 'START-HERE.md'            (Join-Path $Root 'START-HERE')                                  'Offline Emergency Kit - Start Here'
-PlaceDoc 'HOW-TO-RUN-OFFLINE-AI.md' (Join-Path $Root 'AI-Offline\HOW-TO-RUN-OFFLINE-AI')            'Offline AI - How To Run'
-PlaceDoc 'HOW-TO-ASK-YOUR-DOCS.md'  (Join-Path $Root 'AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS') 'Ask Your Documents - GPT4All'
-PlaceDoc 'HOW-TO-USE-KIWIX.md'      (Join-Path $Root 'Kiwix-Reader\HOW-TO-USE-KIWIX')               'How to Use Kiwix'
-PlaceDoc 'Manuals-READ-ME-FIRST.md' (Join-Path $Root 'Manuals\READ-ME-FIRST')                       'Manuals - Read Me First'
-PlaceDoc 'Medical-READ-ME-FIRST.md' (Join-Path $Root 'Medical\READ-ME-FIRST')                       'Medical - Read Me First'
-PlaceDoc 'RADIO-GUIDE.md'           (Join-Path $Root 'Manuals\Radio-Communications\RADIO-GUIDE')     'Emergency Radio Communications Guide'
-PlaceDoc 'HOW-TO-VIEW-MAPS.md'      (Join-Path $Root 'OsmAnd\HOW-TO-VIEW-MAPS')                      'Offline Maps - How to View'
-PlaceDoc 'USE-ON-PHONE.md'          (Join-Path $Root 'Phone-Apps\USE-ON-PHONE')                      'Use the Library on a Phone'
+function PlaceDoc($base,$dest){ Place "docs/$base.md" "$dest.md"; Place "docs/$base.html" "$dest.html" }
+PlaceDoc 'START-HERE'            (P 'START-HERE')
+PlaceDoc 'HOW-TO-RUN-OFFLINE-AI' (P 'AI-Offline/HOW-TO-RUN-OFFLINE-AI')
+PlaceDoc 'HOW-TO-ASK-YOUR-DOCS'  (P 'AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS')
+PlaceDoc 'HOW-TO-USE-KIWIX'      (P 'Kiwix-Reader/HOW-TO-USE-KIWIX')
+PlaceDoc 'Manuals-READ-ME-FIRST' (P 'Manuals/READ-ME-FIRST')
+PlaceDoc 'Medical-READ-ME-FIRST' (P 'Medical/READ-ME-FIRST')
+PlaceDoc 'RADIO-GUIDE'           (P 'Manuals/Radio-Communications/RADIO-GUIDE')
+PlaceDoc 'HOW-TO-VIEW-MAPS'      (P 'OsmAnd/HOW-TO-VIEW-MAPS')
+PlaceDoc 'USE-ON-PHONE'          (P 'Phone-Apps/USE-ON-PHONE')
+foreach ($f in 'OPEN-LIBRARY.command','OPEN-LIBRARY.sh','OPEN-LIBRARY.bat','CHECK-DRIVE.command','CHECK-DRIVE.sh','CHECK-DRIVE.bat','check-drive.ps1') { Place "drive/$f" (P $f) }
 
 # ================================================================ README index
 Log '=== Building README.html (full index of everything) ==='
@@ -346,37 +461,75 @@ function Esc2($s){ $s -replace '&','&amp;' -replace '<','&lt;' -replace '>','&gt
 function Rel2($full){ ($full.Substring($Root.Length)).TrimStart('\','/') -replace '\\','/' }
 function Nice2($name){ ($name -replace '\.[A-Za-z0-9]+$','') -replace '[-_]',' ' }
 function Human2($b){ if($b -ge 1GB){"{0:N2} GB" -f ($b/1GB)}elseif($b -ge 1MB){"{0:N0} MB" -f ($b/1MB)}else{"{0:N0} KB" -f ($b/1KB)} }
-$idxCss = @'
-<style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}h1{font-size:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:21px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:32px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:13px}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14.5px}th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}.muted{color:var(--muted);font-size:13px}.hero{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}</style>
-'@
-try{
-  $all = Get-ChildItem $Root -Recurse -File -ErrorAction SilentlyContinue
-  $htmlDocs = $all | Where-Object {$_.Extension -eq '.html' -and $_.Name -ne 'README.html'} | Sort-Object {Rel2 $_.FullName}
-  $mdDocs   = $all | Where-Object {$_.Extension -eq '.md'} | Sort-Object {Rel2 $_.FullName}
-  $pdfs     = $all | Where-Object {$_.Extension -eq '.pdf'} | Sort-Object {Rel2 $_.FullName}
-  $zims     = $all | Where-Object {$_.Extension -eq '.zim'} | Sort-Object {Rel2 $_.FullName}
-  $apks     = $all | Where-Object {$_.Extension -eq '.apk'} | Sort-Object {Rel2 $_.FullName}
-  $progs    = $all | Where-Object {$e=$_.Extension.ToLower(); ($e -in @('.bat','.sh','.command','.appimage','.run','.dmg')) -or ($e -eq '.exe' -and $_.Name -match 'installer|kiwix-desktop')} | Sort-Object {Rel2 $_.FullName}
-  $data     = $all | Where-Object {$_.Name -like '*.bz2' -or $_.Name -like '*.obf.zip'} | Sort-Object {Rel2 $_.FullName}
+$idxCss = '<style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}h1{font-size:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:21px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:32px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14.5px}th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}.muted{color:var(--muted);font-size:13px}.hero{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}</style>'
+try {
+  $all   = Get-ChildItem $Root -Recurse -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '._*' }
+  $htmlD = $all | Where-Object { $_.Extension -eq '.html' -and $_.Name -ne 'README.html' -and $_.FullName -notmatch '[\\/](app|MapViewer-Desktop)[\\/]' } | Sort-Object { Rel2 $_.FullName }
+  $pdfs  = $all | Where-Object { $_.Extension -eq '.pdf' } | Sort-Object { Rel2 $_.FullName }
+  $zims  = $all | Where-Object { $_.Extension -eq '.zim' } | Sort-Object { Rel2 $_.FullName }
+  $apks  = $all | Where-Object { $_.Extension -eq '.apk' } | Sort-Object { Rel2 $_.FullName }
+  $progs = $all | Where-Object { $e = $_.Extension.ToLower(); ($e -in @('.bat','.sh','.command','.appimage','.run','.dmg') -or ($e -eq '.exe' -and $_.Name -match 'installer')) -and $_.FullName -notmatch '[\\/]app[\\/]' -and ((Rel2 $_.FullName).Split('/').Count -le 3) } | Sort-Object { Rel2 $_.FullName }
+  $maps  = $all | Where-Object { $_.Name -like '*.obf.zip' }
   $sb = New-Object System.Text.StringBuilder
   [void]$sb.Append("<!DOCTYPE html><html lang=`"en`"><head><meta charset=`"utf-8`"><meta name=`"viewport`" content=`"width=device-width,initial-scale=1`"><title>Offline Emergency Library - Full Index</title>$idxCss</head><body><div class=`"wrap`">")
   [void]$sb.Append("<h1>&#128703; Offline Emergency Library &mdash; Full Index</h1>")
-  [void]$sb.Append("<div class='hero'>Every guide, document, manual, archive, app and data file on this drive, with links.<br><span class='muted'>Generated $(Get-Date -Format 'yyyy-MM-dd HH:mm')</span></div>")
-  if(Test-Path (Join-Path $Root 'START-HERE.html')){ [void]$sb.Append("<p>&#128073; New here? Start with <a href='START-HERE.html'><b>START-HERE.html</b></a>.</p>") }
+  [void]$sb.Append("<div class='hero'>Every guide, document, manual, archive, app and data file on this drive, with links.<br>To read the archives, run <b>OPEN-LIBRARY</b> (.bat on Windows, .command on Mac, .sh on Linux).<br><span class='muted'>Generated $(Get-Date -Format 'yyyy-MM-dd HH:mm')</span></div>")
+  if (Test-Path (P 'START-HERE.html')) { [void]$sb.Append("<p>&#128073; New here? Start with <a href='START-HERE.html'><b>START-HERE.html</b></a>.</p>") }
   [void]$sb.Append("<h2>&#128214; Guides &amp; Documentation</h2><table><tr><th>Guide</th><th>Folder</th><th>Open</th></tr>")
-  foreach($h in $htmlDocs){ $rel=Rel2 $h.FullName; $dir=Split-Path $rel -Parent; if(-not $dir){$dir='(root)'}; $mdRel=$rel -replace '\.html$','.md'; $mdLink=if(Test-Path (Join-Path $Root $mdRel)){" &middot; <a href='$mdRel'>md</a>"}else{''}; [void]$sb.Append("<tr><td>$(Esc2 (Nice2 $h.Name))</td><td class='muted'>$dir</td><td><a href='$rel'>HTML</a>$mdLink</td></tr>") }
+  foreach ($h in $htmlD) { $rel = Rel2 $h.FullName; $dir = Split-Path $rel -Parent; if (-not $dir) { $dir = '(root)' }; $mdRel = $rel -replace '\.html$','.md'; $mdLink = if (Test-Path (P $mdRel)) { " &middot; <a href='$mdRel'>md</a>" } else { '' }; [void]$sb.Append("<tr><td>$(Esc2 (Nice2 $h.Name))</td><td class='muted'>$dir</td><td><a href='$rel'>HTML</a>$mdLink</td></tr>") }
   [void]$sb.Append("</table>")
-  if($pdfs){ [void]$sb.Append("<h2>&#128218; Manuals &amp; Books (PDF)</h2><table><tr><th>Document</th><th>Folder</th><th>Size</th><th>Open</th></tr>"); foreach($p in $pdfs){ $rel=Rel2 $p.FullName; [void]$sb.Append("<tr><td>$(Esc2 (Nice2 $p.Name))</td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $p.Length)</td><td><a href='$rel'>PDF</a></td></tr>") }; [void]$sb.Append("</table>") }
-  if($zims){ [void]$sb.Append("<h2>&#127760; Offline Archives (ZIM &mdash; open with Kiwix)</h2><table><tr><th>Archive</th><th>Folder</th><th>Size</th><th>File</th></tr>"); foreach($z in $zims){ $rel=Rel2 $z.FullName; [void]$sb.Append("<tr><td>$(Esc2 (Nice2 $z.Name))</td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $z.Length)</td><td><a href='$rel'>open</a></td></tr>") }; [void]$sb.Append("</table>") }
-  if($progs){ [void]$sb.Append("<h2>&#9881; Programs &amp; Launchers</h2><table><tr><th>Item</th><th>Folder</th></tr>"); foreach($x in $progs){ $rel=Rel2 $x.FullName; $dir=Split-Path $rel -Parent; if(-not $dir){$dir='(root)'}; [void]$sb.Append("<tr><td><a href='$rel'>$(Esc2 $x.Name)</a></td><td class='muted'>$dir</td></tr>") }; [void]$sb.Append("</table>") }
-  if($apks){ [void]$sb.Append("<h2>&#128241; Phone Apps (Android APK)</h2><table><tr><th>App</th><th>Folder</th><th>Size</th></tr>"); foreach($a in $apks){ $rel=Rel2 $a.FullName; [void]$sb.Append("<tr><td><a href='$rel'>$(Esc2 $a.Name)</a></td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $a.Length)</td></tr>") }; [void]$sb.Append("</table>") }
-  if($data){ [void]$sb.Append("<h2>&#128451; Data</h2><table><tr><th>Item</th><th>Folder</th><th>Size</th></tr>"); foreach($d in ($data|Where-Object{$_.Name -like '*.bz2'})){ $rel=Rel2 $d.FullName; [void]$sb.Append("<tr><td>$(Esc2 $d.Name) <span class='muted'>(Wikipedia)</span></td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $d.Length)</td></tr>") }; $maps=$data|Where-Object{$_.Name -like '*.obf.zip'}; if($maps){ $sum=($maps|Measure-Object Length -Sum).Sum; [void]$sb.Append("<tr><td>Offline US maps - $($maps.Count) files</td><td class='muted'>OsmAnd</td><td>$(Human2 $sum)</td></tr>") }; [void]$sb.Append("</table>") }
+  if ($pdfs) { [void]$sb.Append("<h2>&#128218; Manuals &amp; Books (PDF)</h2><table><tr><th>Document</th><th>Folder</th><th>Size</th><th>Open</th></tr>"); foreach ($x in $pdfs) { $rel = Rel2 $x.FullName; [void]$sb.Append("<tr><td>$(Esc2 (Nice2 $x.Name))</td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $x.Length)</td><td><a href='$rel'>PDF</a></td></tr>") }; [void]$sb.Append("</table>") }
+  if ($zims) { [void]$sb.Append("<h2>&#127760; Offline Archives (ZIM &mdash; open with OPEN-LIBRARY or Kiwix)</h2><table><tr><th>Archive</th><th>Folder</th><th>Size</th></tr>"); foreach ($x in $zims) { $rel = Rel2 $x.FullName; [void]$sb.Append("<tr><td>$(Esc2 (Nice2 $x.Name))</td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $x.Length)</td></tr>") }; [void]$sb.Append("</table>") }
+  if ($progs) { [void]$sb.Append("<h2>&#9881; Programs &amp; Launchers</h2><table><tr><th>Item</th><th>Folder</th></tr>"); foreach ($x in $progs) { $rel = Rel2 $x.FullName; $dir = Split-Path $rel -Parent; if (-not $dir) { $dir = '(root)' }; [void]$sb.Append("<tr><td><a href='$rel'>$(Esc2 $x.Name)</a></td><td class='muted'>$dir</td></tr>") }; [void]$sb.Append("</table>") }
+  if ($apks) { [void]$sb.Append("<h2>&#128241; Phone Apps (Android APK)</h2><table><tr><th>App</th><th>Folder</th><th>Size</th></tr>"); foreach ($x in $apks) { $rel = Rel2 $x.FullName; [void]$sb.Append("<tr><td><a href='$rel'>$(Esc2 $x.Name)</a></td><td class='muted'>$(Split-Path $rel -Parent)</td><td>$(Human2 $x.Length)</td></tr>") }; [void]$sb.Append("</table>") }
+  if ($maps) { $sum = ($maps | Measure-Object Length -Sum).Sum; [void]$sb.Append("<h2>&#128451; Maps</h2><table><tr><th>Item</th><th>Folder</th><th>Size</th></tr><tr><td>Offline US maps - $($maps.Count) files</td><td class='muted'>OsmAnd</td><td>$(Human2 $sum)</td></tr></table>") }
   [void]$sb.Append("</div></body></html>")
-  [System.IO.File]::WriteAllText((Join-Path $Root 'README.html'), $sb.ToString(), [System.Text.UTF8Encoding]::new($false))
-  Log "README.html index written."
-}catch{ Log "README index ERROR: $($_.Exception.Message)" }
+  [System.IO.File]::WriteAllText((P 'README.html'), $sb.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+} catch { Bad 'README.html' $_.Exception.Message }
 
-Log '=== DONE. Open README.html (full index) or START-HERE.html ==='
+# ================================================================ checksums
+# One fingerprint per file, so CHECK-DRIVE can prove nothing has rotted.
+# Same format on every OS: "<lowercase sha256>  ./path/with/forward/slashes".
+Log '=== Fingerprinting every file (SHA256SUMS.txt) - this takes a while ==='
+$skipRe = '(^|/)(\._[^/]*|\.DS_Store|_[^/]*|SHA256SUMS\.txt[^/]*|[^/]*\.part|[^/]*\.sha256)$|^(\.Spotlight-V100|\.fseventsd|\.Trashes|System Volume Information)/'
+$files = Get-ChildItem $Root -Recurse -File -Force -ErrorAction SilentlyContinue |
+  ForEach-Object { @{ full = $_.FullName; rel = Rel2 $_.FullName } } |
+  Where-Object { $_.rel -notmatch $skipRe }
+$sumsList = New-Object System.Collections.Generic.List[string]
+$byRel = @{}
+foreach ($f in $files) {
+  try { $h = (Get-FileHash -LiteralPath $f.full -Algorithm SHA256).Hash.ToLower(); $sumsList.Add("$h  ./$($f.rel)"); $byRel["./$($f.rel)"] = $h }
+  catch { Bad $f.rel "could not read it for the checksum list" }
+}
+# sort by path in ordinal (byte) order, like LC_ALL=C sort on Mac/Linux
+$arr = $sumsList.ToArray(); $keys = @($arr | ForEach-Object { $_.Substring(66) })
+[System.Array]::Sort([string[]]$keys, [string[]]$arr, [System.StringComparer]::Ordinal)
+$sumsText = if ($arr.Count) { ($arr -join "`n") + "`n" } else { '' }
+[System.IO.File]::WriteAllText((P 'SHA256SUMS.txt'), $sumsText, (New-Object System.Text.UTF8Encoding($false)))
+Log "SHA256SUMS.txt: $($arr.Count) files"
+
+Log "=== Checking archives against Kiwix's published fingerprints ==="
+$zok = 0; $znone = 0
+foreach ($z in (Get-ChildItem $Root -Recurse -File -Filter '*.zim' -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '._*' })) {
+  $s = "$($z.FullName).sha256"
+  if (-not (Test-Path -LiteralPath $s)) { $znone++; continue }
+  $want = ((Get-Content -LiteralPath $s -TotalCount 1) -split '\s+')[0].ToLower()
+  $got = $byRel["./$(Rel2 $z.FullName)"]
+  if ($want -and $want -eq $got) { $zok++ }
+  elseif ($want) { Bad $z.Name "does not match Kiwix's fingerprint (damaged download). Deleted it - run the script again."; Remove-Item -LiteralPath $z.FullName -Force }
+}
+Log "archives matching Kiwix's fingerprint: $zok   (no published fingerprint: $znone)"
+
+Remove-Item $Work -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item (P '_running.pid') -Force -ErrorAction SilentlyContinue
 Write-Host ''
-Write-Host "  Finished. Your offline library is in: $Root" -ForegroundColor Green
-Write-Host "  Open README.html for a full index, or START-HERE.html to begin." -ForegroundColor Green
+if ($script:Failed.Count -gt 0) {
+  Log "=== FINISHED WITH $($script:Failed.Count) PROBLEM(S) ==="
+  $script:Failed | ForEach-Object { Log $_ }
+  Log 'Run the same command again. It keeps what worked and retries the rest.'
+  exit 1
+}
+Log '=== DONE. Everything downloaded and checked. ==='
+Write-Host "  Your offline library is in: $Root" -ForegroundColor Green
+Write-Host '  Open README.html for a full index. Run OPEN-LIBRARY to read the archives.' -ForegroundColor Green
+Write-Host '  Run CHECK-DRIVE once a year to prove nothing has rotted.' -ForegroundColor Green
