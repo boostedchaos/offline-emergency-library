@@ -10,7 +10,7 @@
   Options:
     -Wikipedia maxi|nopic|mini|none   which Wikipedia (default nopic = all articles, no images)
     -SkipGroups medicine,survival,diy,food,education,computing,pdfs
-    -SkipWikipedia -SkipMaps -SkipModels -SkipAI
+    -SkipWikipedia -SkipMaps -SkipModels (small AI model only) -SkipAI
     -Catalog FILE    another ZIM list (default catalog/zims.tsv)
     -Jobs N          archives downloaded at the same time (default 4; 2 with aria2)
   Faster: aria2c.exe (shipped inside Kiwix desktop, which this script downloads) fetches
@@ -178,38 +178,81 @@ function Rel-Url($path){
   foreach ($b in $script:Mirrors) { if ((HeadInfo "$b/$path")[0] -eq '200') { return "$b/$path" } }
   return "$Kiwix/$path"
 }
-function Expand-Tgz($file,$dest){ New-Item -ItemType Directory -Force $dest | Out-Null; & tar.exe -xzf $file -C $dest 2>$null; if ($LASTEXITCODE -ne 0) { & tar -xzf $file -C $dest } }
+# Expand-Tgz: unpack a .tar.gz with symlinks turned into real files. exFAT has no symlinks and
+# Windows tar often cannot create them, so unpack to a temp folder, replace each link with a
+# copy of its target, then copy the result onto the drive.
+function Expand-Tgz($file,$dest){
+  $tarExe = if (Get-Command tar.exe -ErrorAction SilentlyContinue) { 'tar.exe' } else { 'tar' }
+  $t = Join-Path $Work 'untar'
+  if (Test-Path $t) { Remove-Item $t -Recurse -Force }
+  New-Item -ItemType Directory -Force $t, $dest | Out-Null
+  & $tarExe -xzf $file -C $t 2>$null
+  $links = @(& $tarExe -tvzf $file | Where-Object { $_ -match '^l' -and $_ -match ' -> ' })
+  for ($pass = 0; $pass -lt 5; $pass++) {          # links can point at links: repeat
+    foreach ($l in $links) {
+      $m = [regex]::Match($l, '\s(\S+) -> (\S+)$'); if (-not $m.Success) { continue }
+      $lp = Join-Path $t $m.Groups[1].Value
+      $tp = Join-Path (Split-Path $lp -Parent) $m.Groups[2].Value
+      $item = Get-Item -LiteralPath $lp -Force -ErrorAction SilentlyContinue
+      if ($item -and $item.LinkType) { Remove-Item -LiteralPath $lp -Force; $item = $null }
+      if (-not $item -and (Test-Path -LiteralPath $tp -PathType Leaf)) { Copy-Item -LiteralPath $tp $lp }
+    }
+  }
+  Copy-Item (Join-Path $t '*') $dest -Recurse -Force
+  Remove-Item $t -Recurse -Force -ErrorAction SilentlyContinue
+}
 
 # free space
 if (-not $DryRun) { try { $freeGB = [math]::Round(((Get-Item $Root).PSDrive.Free)/1GB,1); Log "Destination: $Root   (free space: $freeGB GB)" } catch { Log "Destination: $Root" } }
 if ($DryRun) { Log 'DRY RUN: checking every link and adding up sizes. Nothing is downloaded.' }
 Log "Wikipedia: $Wikipedia   Skip groups: $(if($SkipGroups){$SkipGroups -join ','}else{'none'})"
 
-# ================================================================ 1-3. AI
+# ================================================================ 1-2. Offline AI (every platform)
+# llama.cpp builds for Windows, macOS and Linux, all from ONE build so they match. Its
+# llama-server includes a chat web page that also reads PDFs (replaces GPT4All, whose last
+# release was 2025-02 and cannot load current models).
+$LlamaAssets = @('win-cpu-x64.zip','win-cpu-arm64.zip','win-vulkan-x64.zip','macos-arm64.tar.gz','macos-x64.tar.gz','ubuntu-x64.tar.gz','ubuntu-arm64.tar.gz','ubuntu-vulkan-x64.tar.gz')
+# Models: small + medium, both Apache-2.0. File names are also used by the AI-CHAT launchers.
+$Models = @(
+  @{ repo = 'unsloth/Qwen3.5-4B-GGUF';            file = 'Qwen3.5-4B-Q4_K_M.gguf';        big = $false }
+  @{ repo = 'google/gemma-4-12B-it-qat-q4_0-gguf'; file = 'gemma-4-12b-it-qat-q4_0.gguf';  big = $true }
+)
 if (-not $SkipAI) {
-  Log '=== [1/9] Offline AI engine (llama.cpp, CPU + GPU) ==='
-  foreach ($spec in @(@('x64','bin-win-cpu-x64\.zip$'), @('arm64','bin-win-cpu-arm64\.zip$'), @('vulkan-x64','bin-win-vulkan-x64\.zip$'))) {
-    $u = Gh-Asset 'ggml-org/llama.cpp' $spec[1]
-    if (-not $u) { Bad "llama.cpp ($($spec[0]))" 'no release asset found'; continue }
-    $zip = P ("AI-Offline/engine/" + (Split-Path $u -Leaf))
-    if ((Fetch $u $zip) -and -not $DryRun) {
-      try { Expand-Archive $zip -DestinationPath (P "AI-Offline/engine/$($spec[0])") -Force } catch { Bad (Split-Path $zip -Leaf) "extract failed: $($_.Exception.Message)" }
+  Log '=== [1/9] Offline AI engine (llama.cpp) for Windows, macOS and Linux ==='
+  $rels = $null; try { $rels = Invoke-RestMethod 'https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20' -Headers @{'User-Agent'='oel'} } catch {}
+  $lt = $null
+  foreach ($r in @($rels)) {
+    $names = @($r.assets | ForEach-Object { $_.name })
+    $ok = $true; foreach ($x in $LlamaAssets) { if ($names -notcontains "llama-$($r.tag_name)-bin-$x") { $ok = $false; break } }
+    if ($ok) { $lt = $r.tag_name; break }
+  }
+  if (-not $lt) { Bad 'llama.cpp' 'no recent build has all 8 platform files' }
+  else {
+    Log "llama.cpp build: $lt"
+    foreach ($x in $LlamaAssets) {
+      $d = $x -replace '\.(zip|tar\.gz)$',''
+      $out = P "AI-Offline/engine/$x"
+      if ((Fetch "https://github.com/ggml-org/llama.cpp/releases/download/$lt/llama-$lt-bin-$x" $out) -and -not $DryRun) {
+        $dest = P "AI-Offline/engine/$d"
+        if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }     # fresh unpack: no stale files from an older build
+        try { if ($x -like '*.zip') { Expand-Archive $out -DestinationPath $dest -Force } else { Expand-Tgz $out $dest } }
+        catch { Bad $x "could not unpack it: $($_.Exception.Message)" }
+      }
+    }
+    if (-not $DryRun) { Set-Content -Path (P 'AI-Offline/engine/BUILD.txt') -Value $lt -Encoding ascii }
+  }
+  Log '=== [2/9] AI chat models (GGUF) ==='
+  foreach ($m in $Models) {
+    if ($SkipModels -and $m.big) { Log "model (skipped): $($m.file)"; continue }
+    $u = "https://huggingface.co/$($m.repo)/resolve/main/$($m.file)"
+    $out = P "AI-Offline/models/$($m.file)"
+    if ((Fetch $u $out) -and -not $DryRun) {
+      # Hugging Face publishes each file's SHA-256 in the x-linked-etag header (checked at the end)
+      $h = (& curl.exe -sI --max-time 60 -A $UA $u | Where-Object { $_ -match '^(?i)x-linked-etag:\s*"?([0-9a-f]{64})' } | ForEach-Object { $Matches[1] } | Select-Object -First 1)
+      if ($h) { Set-Content -LiteralPath "$out.sha256" -Value "$h  $($m.file)" -Encoding ascii }
     }
   }
-  Log '=== [2/9] AI chat models (GGUF, Q4_K_M) ==='
-  $models = @(
-    @{n='Llama-3.2-3B-Instruct-Q4_K_M.gguf';      u='https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf'; big=$false}
-    @{n='Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'; u='https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'; big=$true}
-    @{n='Qwen2.5-7B-Instruct-Q4_K_M.gguf';        u='https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf'; big=$true}
-  )
-  foreach ($m in $models) {
-    if ($SkipModels -and $m.big) { Log "model (skipped): $($m.n)"; continue }
-    [void](Fetch $m.u (P "AI-Offline/models/$($m.n)"))
-  }
-  Log '=== [3/9] GPT4All (offline document Q&A) ==='
-  $u = Gh-Asset 'nomic-ai/gpt4all' 'installer-win64-v.*\.exe$' -Latest
-  if ($u) { [void](Fetch $u (P ("AI-Offline/DocReader-GPT4All/" + (Split-Path $u -Leaf)))) } else { Bad 'GPT4All' 'no release asset found' }
-} else { Log '=== [1-3/9] Offline AI SKIPPED ===' }
+} else { Log '=== [1-2/9] Offline AI SKIPPED ===' }
 
 # ================================================================ 4. readers for every platform
 Log '=== [4/9] Library readers for Windows, macOS and Linux (Kiwix) ==='
@@ -464,44 +507,6 @@ if ($DryRun) {
   Log 'All links work.'; exit 0
 }
 
-# ================================================================ launchers (AI)
-function WriteBat($path,$text){ [System.IO.File]::WriteAllText($path, ($text -replace "`r?`n","`r`n"), [System.Text.Encoding]::ASCII) }
-if (-not $SkipAI) {
-  Log '=== Writing AI launchers (.bat) ==='
-  $ao = P 'AI-Offline'
-  WriteBat (Join-Path $ao 'CHAT-3B-light.bat') @"
-@echo off
-title Offline AI - Llama 3.2 3B (light)
-cd /d "%~dp0"
-"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
-pause
-"@
-  WriteBat (Join-Path $ao 'CHAT-8B-smart.bat') @"
-@echo off
-title Offline AI - Llama 3.1 8B (smart)
-cd /d "%~dp0"
-"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
-pause
-"@
-  WriteBat (Join-Path $ao 'CHAT-GPU-Qwen7B.bat') @"
-@echo off
-title Offline AI - Qwen2.5 7B (GPU)
-cd /d "%~dp0"
-echo If this errors with out-of-memory, your GPU is too small - change -ngl 99 to a lower
-echo number (e.g. -ngl 20) or use a CPU launcher instead.
-"%~dp0engine\vulkan-x64\llama-cli.exe" -m "%~dp0models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
-pause
-"@
-  WriteBat (Join-Path $ao 'WEB-UI.bat') @"
-@echo off
-title Offline AI - Web UI
-cd /d "%~dp0"
-echo When it says "server listening", open a browser to http://127.0.0.1:8080
-"%~dp0engine\x64\llama-server.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 --host 127.0.0.1 --port 8080
-pause
-"@
-}
-
 # ================================================================ documentation + drive tools
 Log '=== Documentation and drive tools ==='
 function Place($repoPath,$dest){
@@ -515,7 +520,7 @@ function Place($repoPath,$dest){
 function PlaceDoc($base,$dest){ Place "docs/$base.md" "$dest.md"; Place "docs/$base.html" "$dest.html" }
 PlaceDoc 'START-HERE'            (P 'START-HERE')
 PlaceDoc 'HOW-TO-RUN-OFFLINE-AI' (P 'AI-Offline/HOW-TO-RUN-OFFLINE-AI')
-PlaceDoc 'HOW-TO-ASK-YOUR-DOCS'  (P 'AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS')
+PlaceDoc 'HOW-TO-ASK-YOUR-DOCS'  (P 'AI-Offline/HOW-TO-ASK-YOUR-DOCS')
 PlaceDoc 'HOW-TO-USE-KIWIX'      (P 'Kiwix-Reader/HOW-TO-USE-KIWIX')
 PlaceDoc 'Manuals-READ-ME-FIRST' (P 'Manuals/READ-ME-FIRST')
 PlaceDoc 'Medical-READ-ME-FIRST' (P 'Medical/READ-ME-FIRST')
@@ -523,6 +528,7 @@ PlaceDoc 'RADIO-GUIDE'           (P 'Manuals/Radio-Communications/RADIO-GUIDE')
 PlaceDoc 'HOW-TO-VIEW-MAPS'      (P 'OsmAnd/HOW-TO-VIEW-MAPS')
 PlaceDoc 'USE-ON-PHONE'          (P 'Phone-Apps/USE-ON-PHONE')
 foreach ($f in 'OPEN-LIBRARY.command','OPEN-LIBRARY.sh','OPEN-LIBRARY.bat','CHECK-DRIVE.command','CHECK-DRIVE.sh','CHECK-DRIVE.bat','check-drive.ps1') { Place "drive/$f" (P $f) }
+if (-not $SkipAI) { foreach ($f in 'AI-CHAT.command','AI-CHAT.sh','AI-CHAT.bat') { Place "drive/$f" (P $f) } }
 
 # ================================================================ README index
 Log '=== Building README.html (full index of everything) ==='
@@ -603,18 +609,18 @@ $sumsText = if ($arr.Count) { ($arr -join "`n") + "`n" } else { '' }
 [System.IO.File]::WriteAllText((P 'SHA256SUMS.txt'), $sumsText, (New-Object System.Text.UTF8Encoding($false)))
 Log "SHA256SUMS.txt: $($arr.Count) files"
 
-Log "=== Checking archives against Kiwix's published fingerprints ==="
+Log "=== Checking files against their publishers' fingerprints (Kiwix, Hugging Face) ==="
 $zok = 0; $znone = 0
-foreach ($z in (Get-ChildItem $Root -Recurse -File -Filter '*.zim' -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '._*' })) {
+foreach ($z in (Get-ChildItem $Root -Recurse -File -ErrorAction SilentlyContinue | Where-Object { ($_.Extension -eq '.zim' -or $_.Extension -eq '.gguf') -and $_.Name -notlike '._*' })) {
   if (Test-Path -LiteralPath "$($z.FullName).aria2") { continue }   # unfinished aria2 download: already listed as a problem
   $s = "$($z.FullName).sha256"
-  if (-not (Test-Path -LiteralPath $s)) { $znone++; continue }
+  if (-not (Test-Path -LiteralPath $s)) { if ($z.Extension -eq '.zim') { $znone++ }; continue }
   $want = ((Get-Content -LiteralPath $s -TotalCount 1) -split '\s+')[0].ToLower()
   $got = $byRel["./$(Rel2 $z.FullName)"]
   if ($want -and $want -eq $got) { $zok++ }
-  elseif ($want) { Bad $z.Name "does not match Kiwix's fingerprint (damaged download). Deleted it - run the script again."; Remove-Item -LiteralPath $z.FullName -Force }
+  elseif ($want) { Bad $z.Name "does not match its publisher's fingerprint (damaged download). Deleted it - run the script again."; Remove-Item -LiteralPath $z.FullName -Force }
 }
-Log "archives matching Kiwix's fingerprint: $zok   (no published fingerprint: $znone)"
+Log "files matching their publisher's fingerprint: $zok   (archives with no published fingerprint: $znone)"
 
 Remove-Item $Work -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item (P '_running.pid') -Force -ErrorAction SilentlyContinue

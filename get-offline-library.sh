@@ -9,7 +9,7 @@
 # Options:
 #   --wikipedia maxi|nopic|mini|none   which Wikipedia (default: nopic = all articles, no images)
 #   --skip-groups a,b                  skip content groups: medicine,survival,diy,food,education,computing,pdfs
-#   --skip-wikipedia  --skip-maps  --skip-models  --skip-ai
+#   --skip-wikipedia  --skip-maps  --skip-models (small AI model only)  --skip-ai
 #   --catalog FILE                     use another ZIM list (default: catalog/zims.tsv)
 #   --jobs N                           archives downloaded at the same time (default 4; 2 with aria2)
 # Faster: install aria2 (brew install aria2 / apt install aria2). Then each archive is
@@ -112,6 +112,14 @@ EOF
   if [ -n "$want" ] && [ "$got" != "$want" ]; then bad "$name" "got $got bytes, server says $want. Run again to resume."; return 1; fi
   mv -f "$out.part" "$out"; log "  done $name"
 }
+# untar_real ARCHIVE DEST - unpack, turning symlinks into real files. exFAT has no symlinks:
+# macOS fakes them with "XSym" files only macOS can read, and Linux cannot make them at all.
+# So unpack on the computer's own disk first, then copy with links followed (cp -RL).
+untar_real(){
+  t="$WORK/untar"; rm -rf "$t"; mkdir -p "$t" "$2"
+  tar -xzf "$1" -C "$t" && cp -RL "$t/." "$2/"; rc=$?
+  rm -rf "$t"; return $rc
+}
 # web page / API text (follows redirects)
 page(){ curl -fsL --max-time 120 --retry 3 -A "$UA" "$1"; }
 gh_asset(){ # repo regex [latest] -> first matching asset url
@@ -205,35 +213,53 @@ if [ "$HAVE_ARIA" = 1 ]; then log "aria2 found: archives use many mirrors at onc
 else log "TIP: install aria2 for much faster archive downloads (brew install aria2 / apt install aria2)"; fi
 [ "$HAVE_UNZIP" = 0 ] && log "NOTE: 'unzip' not found - the desktop map viewer and Windows reader need it."
 
-# ================================================================ 1. AI engine
+# ================================================================ 1-2. Offline AI (every platform)
+# llama.cpp builds for Windows, macOS and Linux, all from ONE build so they match.
+# Its llama-server includes a chat web page that also reads PDFs (replaces GPT4All,
+# whose last release was 2025-02 and cannot load current models).
+LLAMA_ASSETS="win-cpu-x64.zip win-cpu-arm64.zip win-vulkan-x64.zip macos-arm64.tar.gz macos-x64.tar.gz ubuntu-x64.tar.gz ubuntu-arm64.tar.gz ubuntu-vulkan-x64.tar.gz"
+# Models: small + medium, both Apache-2.0. File names are also used by AI-CHAT launchers.
+SMALL_REPO="unsloth/Qwen3.5-4B-GGUF";           SMALL_FILE="Qwen3.5-4B-Q4_K_M.gguf"
+MEDIUM_REPO="google/gemma-4-12B-it-qat-q4_0-gguf"; MEDIUM_FILE="gemma-4-12b-it-qat-q4_0.gguf"
 if [ "$SKIP_AI" = 0 ]; then
-log "=== [1/9] Offline AI engine (llama.cpp) ==="
+log "=== [1/9] Offline AI engine (llama.cpp) for Windows, macOS and Linux ==="
 E="$ROOT/AI-Offline/engine"
-if [ "$PLAT" = mac ]; then set -- "metal:bin-macos-${CPU}\\.tar\\.gz$"
-else set -- "cpu:bin-ubuntu-${CPU}\\.tar\\.gz$" "gpu:bin-ubuntu-vulkan-${CPU}\\.tar\\.gz$"; fi
-for spec in "$@"; do
-  sub="${spec%%:*}"; u="$(gh_asset ggml-org/llama.cpp "${spec#*:}")"
-  if [ -z "$u" ]; then bad "llama.cpp ($sub)" "no release asset found"; continue; fi
-  fetch "$u" "$E/$sub.tar.gz" && real && [ "$HAVE_TAR" = 1 ] && { mkdir -p "$E/$sub"; tar -xzf "$E/$sub.tar.gz" -C "$E/$sub"; }
+page "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20" > "$WORK/llama.json"
+grep -oE '"browser_download_url"[ ]*:[ ]*"[^"]+"' "$WORK/llama.json" | sed -E 's/.*"(https[^"]+)"/\1/' > "$WORK/llama.urls"
+LT=""
+for t in $(grep -oE '"tag_name"[ ]*:[ ]*"[^"]+"' "$WORK/llama.json" | sed -E 's/.*"([^"]+)"$/\1/'); do
+  ok=1; for a in $LLAMA_ASSETS; do grep -q "/download/$t/llama-$t-bin-$a\$" "$WORK/llama.urls" || { ok=0; break; }; done
+  [ "$ok" = 1 ] && { LT="$t"; break; }
 done
-set --
+if [ -z "$LT" ]; then bad "llama.cpp" "no recent build has all 8 platform files"
+else
+  log "llama.cpp build: $LT"
+  for a in $LLAMA_ASSETS; do
+    d="${a%.zip}"; d="${d%.tar.gz}"
+    if fetch "https://github.com/ggml-org/llama.cpp/releases/download/$LT/llama-$LT-bin-$a" "$E/$a" && real; then
+      [ -n "$d" ] && rm -rf "${E:?}/$d"; mkdir -p "$E/$d"     # fresh unpack: no stale files from an older build
+      case "$a" in
+        *.zip)    if [ "$HAVE_UNZIP" = 1 ]; then unzip -o -q "$E/$a" -d "$E/$d"; else log "  $a: install unzip to unpack it"; fi ;;
+        *.tar.gz) untar_real "$E/$a" "$E/$d" || bad "$a" "could not unpack it" ;;
+      esac
+    fi
+  done
+  real && echo "$LT" > "$E/BUILD.txt"
+fi
 
-# ================================================================ 2. AI models
 log "=== [2/9] AI chat models (GGUF) ==="
 M="$ROOT/AI-Offline/models"
-fetch "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf" "$M/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
-if [ "$SKIP_MODELS" = 0 ]; then
-  fetch "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" "$M/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
-  fetch "https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf" "$M/Qwen2.5-7B-Instruct-Q4_K_M.gguf"
-else log "models: large models skipped"; fi
-
-# ================================================================ 3. GPT4All
-log "=== [3/9] GPT4All (offline document Q&A) ==="
-if [ "$PLAT" = mac ]; then u="$(gh_asset nomic-ai/gpt4all 'installer-macos-v.*\.dmg$' latest)"
-else u="$(gh_asset nomic-ai/gpt4all 'installer-linux-v.*\.run$' latest)"; fi
-if [ -n "$u" ]; then fetch "$u" "$ROOT/AI-Offline/DocReader-GPT4All/$(basename "$u")" && chmod +x "$ROOT/AI-Offline/DocReader-GPT4All/$(basename "$u")" 2>/dev/null
-else bad "GPT4All" "no release asset found"; fi
-else log "=== [1-3/9] Offline AI SKIPPED ==="; fi
+# get_model REPO FILE - download, then save Hugging Face's published SHA-256 (checked at the end)
+get_model(){
+  u="https://huggingface.co/$1/resolve/main/$2"
+  fetch "$u" "$M/$2" || return
+  real || return
+  h="$(curl -sI --max-time 60 -A "$UA" "$u" | tr -d '\r' | awk 'tolower($1)=="x-linked-etag:"{gsub(/"/,"",$2); print $2}')"
+  case "$h" in [0-9a-f][0-9a-f]*) [ ${#h} = 64 ] && printf '%s  %s\n' "$h" "$2" > "$M/$2.sha256";; esac
+}
+get_model "$SMALL_REPO" "$SMALL_FILE"
+if [ "$SKIP_MODELS" = 0 ]; then get_model "$MEDIUM_REPO" "$MEDIUM_FILE"; else log "models: medium model skipped"; fi
+else log "=== [1-2/9] Offline AI SKIPPED ==="; fi
 
 # ================================================================ 4. Library readers (every platform)
 log "=== [4/9] Library readers for Windows, macOS and Linux (Kiwix) ==="
@@ -247,7 +273,7 @@ for p in win-x86_64 macos-arm64 macos-x86_64 linux-x86_64 linux-aarch64; do
   mkdir -p "$KT/$p"
   case "$f" in
     *.zip)    [ "$HAVE_UNZIP" = 1 ] && unzip -o -q "$KT/$f" -d "$KT/$p" ;;
-    *.tar.gz) tar -xzf "$KT/$f" -C "$KT/$p" ;;
+    *.tar.gz) untar_real "$KT/$f" "$KT/$p" || bad "$f" "could not unpack it" ;;
   esac
 done
 page "$KIWIX/release/kiwix-desktop/" > "$WORK/kiwix-desktop.html"
@@ -337,7 +363,7 @@ if [ "$SKIP_MAPS" = 0 ]; then
       real && unzip -o -q "$MVD/OsmAndMapCreator.zip" -d "$MVD/app"
     jos="$PLAT"; [ "$PLAT" = linux ] || jos=mac
     if fetch "https://api.adoptium.net/v3/binary/latest/21/ga/${jos}/${JARCH}/jre/hotspot/normal/eclipse" "$MVD/jre.tar.gz" && real; then
-      mkdir -p "$MVD/_jre"; tar -xzf "$MVD/jre.tar.gz" -C "$MVD/_jre" 2>/dev/null
+      mkdir -p "$MVD/_jre"; untar_real "$MVD/jre.tar.gz" "$MVD/_jre"
       rm -rf "$MVD/jre"; mv "$MVD/_jre"/*/ "$MVD/jre" 2>/dev/null; rm -rf "$MVD/_jre"
     fi
     if real; then
@@ -384,48 +410,6 @@ if [ "$DRY" = 1 ]; then
   log "All links work."; rm -rf "$WORK"; exit 0
 fi
 
-# ================================================================ launchers (AI)
-if [ "$SKIP_AI" = 0 ]; then
-log "=== Writing AI launchers ==="
-AO="$ROOT/AI-Offline"
-make_launcher(){ # file model extra-args
-cat > "$AO/$1" <<EOS
-#!/usr/bin/env bash
-DIR="\$(cd "\$(dirname "\$0")" && pwd)"
-CLI="\$(find "\$DIR/engine" -name llama-cli -type f 2>/dev/null | head -n1)"
-[ -z "\$CLI" ] && { echo "AI engine not found in \$DIR/engine"; exit 1; }
-LIBDIR="\$(dirname "\$CLI")"
-export LD_LIBRARY_PATH="\$LIBDIR:\${LD_LIBRARY_PATH:-}"
-export DYLD_LIBRARY_PATH="\$LIBDIR:\${DYLD_LIBRARY_PATH:-}"
-exec "\$CLI" -m "\$DIR/models/$2" -c 4096 $3 -cnv
-EOS
-chmod +x "$AO/$1" 2>/dev/null
-}
-make_launcher "chat-3B-light.sh" "Llama-3.2-3B-Instruct-Q4_K_M.gguf" ""
-make_launcher "chat-8B-smart.sh" "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" ""
-if [ "$PLAT" = linux ]; then
-  cat > "$AO/chat-GPU-Qwen7B.sh" <<'EOS'
-#!/usr/bin/env bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
-CLI="$(find "$DIR/engine/gpu" -name llama-cli -type f 2>/dev/null | head -n1)"
-[ -z "$CLI" ] && CLI="$(find "$DIR/engine" -name llama-cli -type f 2>/dev/null | head -n1)"
-LIBDIR="$(dirname "$CLI")"; export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}"
-exec "$CLI" -m "$DIR/models/Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
-EOS
-  chmod +x "$AO/chat-GPU-Qwen7B.sh" 2>/dev/null
-fi
-cat > "$AO/web-ui.sh" <<'EOS'
-#!/usr/bin/env bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
-SRV="$(find "$DIR/engine" -name llama-server -type f 2>/dev/null | head -n1)"
-[ -z "$SRV" ] && { echo "server not found"; exit 1; }
-LIBDIR="$(dirname "$SRV")"; export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}"; export DYLD_LIBRARY_PATH="$LIBDIR:${DYLD_LIBRARY_PATH:-}"
-echo "Open http://127.0.0.1:8080 when it says 'server listening'"
-exec "$SRV" -m "$DIR/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 --host 127.0.0.1 --port 8080
-EOS
-chmod +x "$AO/web-ui.sh" 2>/dev/null
-fi
-
 # ================================================================ documentation + drive tools
 log "=== Documentation and drive tools ==="
 place(){ # repo-path dest-path
@@ -438,7 +422,7 @@ place(){ # repo-path dest-path
 place_doc(){ place "docs/$1.md" "$2.md"; place "docs/$1.html" "$2.html"; }
 place_doc "START-HERE"            "$ROOT/START-HERE"
 place_doc "HOW-TO-RUN-OFFLINE-AI" "$ROOT/AI-Offline/HOW-TO-RUN-OFFLINE-AI"
-place_doc "HOW-TO-ASK-YOUR-DOCS"  "$ROOT/AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS"
+place_doc "HOW-TO-ASK-YOUR-DOCS"  "$ROOT/AI-Offline/HOW-TO-ASK-YOUR-DOCS"
 place_doc "HOW-TO-USE-KIWIX"      "$ROOT/Kiwix-Reader/HOW-TO-USE-KIWIX"
 place_doc "Manuals-READ-ME-FIRST" "$ROOT/Manuals/READ-ME-FIRST"
 place_doc "Medical-READ-ME-FIRST" "$ROOT/Medical/READ-ME-FIRST"
@@ -448,6 +432,7 @@ place_doc "USE-ON-PHONE"          "$ROOT/Phone-Apps/USE-ON-PHONE"
 for f in OPEN-LIBRARY.command OPEN-LIBRARY.sh OPEN-LIBRARY.bat CHECK-DRIVE.command CHECK-DRIVE.sh CHECK-DRIVE.bat check-drive.ps1; do
   place "drive/$f" "$ROOT/$f"
 done
+if [ "$SKIP_AI" = 0 ]; then for f in AI-CHAT.command AI-CHAT.sh AI-CHAT.bat; do place "drive/$f" "$ROOT/$f"; done; fi
 chmod +x "$ROOT"/*.command "$ROOT"/*.sh 2>/dev/null
 
 # ================================================================ README index
@@ -506,7 +491,8 @@ if [ -n "$KM" ]; then
   ( cd "$ROOT" && find . -type f -name '*.zim' ! -name '._*' | sed 's#^\./##' | LC_ALL=C sort |
       while IFS= read -r z; do [ -f "$z.aria2" ] || printf '%s\0' "$z"; done > "$WORK/zimlist0"
     rm -f library.xml.new
-    if [ -s "$WORK/zimlist0" ] && xargs -0 "$KM" library.xml.new add < "$WORK/zimlist0" >/dev/null 2>&1; then
+    if [ ! -s "$WORK/zimlist0" ]; then rm -f library.xml; exit 0; fi     # no archives: nothing to list
+    if xargs -0 "$KM" library.xml.new add < "$WORK/zimlist0" >/dev/null 2>&1; then
       mv -f library.xml.new library.xml
     else rm -f library.xml.new; exit 1; fi ) || bad "library.xml" "kiwix-manage could not build it (OPEN-LIBRARY will scan the drive instead)"
   [ -f "$ROOT/library.xml" ] && log "library.xml: $(grep -c '<book ' "$ROOT/library.xml") archives"
@@ -525,7 +511,7 @@ mv -f "$ROOT/SHA256SUMS.txt.new" "$ROOT/SHA256SUMS.txt"
 log "SHA256SUMS.txt: $(wc -l < "$ROOT/SHA256SUMS.txt" | tr -d ' ') files"
 
 # Compare each ZIM with the SHA-256 that Kiwix publishes for it.
-log "=== Checking archives against Kiwix's published fingerprints ==="
+log "=== Checking files against their publishers' fingerprints (Kiwix, Hugging Face) ==="
 zok=0; znone=0
 while IFS= read -r s; do
   z="${s%.sha256}"; rel="./${z#"$ROOT"/}"
@@ -533,11 +519,11 @@ while IFS= read -r s; do
   want="$(awk '{print $1; exit}' "$s" | tr 'A-F' 'a-f')"
   got="$(awk -v p="$rel" 'substr($0, 67) == p {print $1; exit}' "$ROOT/SHA256SUMS.txt")"
   if [ -n "$want" ] && [ "$want" = "$got" ]; then zok=$((zok+1))
-  elif [ -n "$want" ] && [ -f "$z" ]; then bad "$(basename "$z")" "does not match Kiwix's fingerprint (damaged download). Deleted it - run the script again."; rm -f "$z"
+  elif [ -n "$want" ] && [ -f "$z" ]; then bad "$(basename "$z")" "does not match its publisher's fingerprint (damaged download). Deleted it - run the script again."; rm -f "$z"
   fi
-done < <(find "$ROOT" -type f -name '*.zim.sha256' ! -name '._*')
+done < <(find "$ROOT" -type f \( -name '*.zim.sha256' -o -name '*.gguf.sha256' \) ! -name '._*')
 while IFS= read -r z; do [ -f "$z.sha256" ] || [ -f "$z.aria2" ] || znone=$((znone+1)); done < <(find "$ROOT" -type f -name '*.zim' ! -name '._*')
-log "archives matching Kiwix's fingerprint: $zok   (no published fingerprint: $znone)"
+log "files matching their publisher's fingerprint: $zok   (archives with no published fingerprint: $znone)"
 
 echo ""
 if [ "$(nfails)" -gt 0 ]; then

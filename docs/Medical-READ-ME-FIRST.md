@@ -26,9 +26,9 @@ Also relevant: the **Army first-aid manuals** in `Manuals/ArmyFieldManuals/`.
 
 ## Ask an AI about the PDFs
 
-Use **GPT4All** (`AI-Offline/DocReader-GPT4All/`, see `HOW-TO-ASK-YOUR-DOCS`) and add
-`Medical/Manuals-PDF` as a collection, then ask things like *"how do I treat a burn?"*
-It answers from the books and cites the source. Browse the medical archives with **OPEN-LIBRARY**.
+Start **AI-CHAT** (top folder of the drive), click **+**, attach one chapter from
+`Medical/Manuals-PDF`, then ask things like *"how do I treat a burn?"* It answers from
+that chapter. See `AI-Offline/HOW-TO-ASK-YOUR-DOCS`. Browse the medical archives with **OPEN-LIBRARY**.
 
 ---
 

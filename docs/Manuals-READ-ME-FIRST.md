@@ -35,6 +35,6 @@ buy them from the publisher.
 
 ## Want to ask an AI about these?
 
-Use **GPT4All** (`E:\AI-Offline\DocReader-GPT4All\`) to point an AI at the **PDF**
-folders and ask questions (e.g. *"how do I stop heavy bleeding?"*). See
-`HOW-TO-ASK-YOUR-DOCS`. (The `.zim` archives are browsed in Kiwix, not GPT4All.)
+Start **AI-CHAT** (top folder of the drive), click **+** and attach a PDF from these
+folders, then ask (e.g. *"how do I stop heavy bleeding?"*). See
+`AI-Offline/HOW-TO-ASK-YOUR-DOCS`. (The `.zim` archives are searched with OPEN-LIBRARY.)

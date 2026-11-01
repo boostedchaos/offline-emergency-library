@@ -35,7 +35,7 @@ publishes new builds often, so sizes move a little over time. Run `--dry-run` fo
 | **Computing** | Python, JavaScript, Linux, Docker, Git docs; Arduino, Raspberry Pi, electronics Q&A | 5.1 GB |
 | **Books (PDF)** | 11 public-domain US Army manuals + Hesperian's *Where There Is No Doctor* and *Where There Is No Dentist* | 0.2 GB |
 | **Maps** | All 83 OsmAnd US map files + desktop map viewer + Android app | 17.9 GB |
-| **Offline AI** | llama.cpp engine + 3 chat models (3B, 8B, 7B) + GPT4All | 11.9 GB |
+| **Offline AI** | Qwen 3.5 4B (small) + Gemma 4 12B (medium), both Apache-2.0; llama.cpp for Windows, macOS and Linux (CPU + GPU); browser chat that also reads PDFs | 9.9 GB |
 | **Readers** | Kiwix readers for Windows, macOS (Intel + Apple) and Linux (x64 + ARM), Kiwix desktop app, Kiwix Android app | 0.8 GB |
 | **Total** | with `--wikipedia maxi` / default `nopic` | **243 GB / about 168 GB** |
 
@@ -178,7 +178,7 @@ Every item below was reproduced on 2026-11-01 before it was fixed.
   the original one-command downloader, guides and folder layout.
 - **[Kiwix](https://kiwix.org)** and its mirror hosts — the ZIM archives and readers.
 - **[OsmAnd](https://osmand.net)**, **[llama.cpp](https://github.com/ggml-org/llama.cpp)**,
-  **[GPT4All](https://github.com/nomic-ai/gpt4all)**, **[Hesperian](https://hesperian.org)**,
+  **[Qwen](https://huggingface.co/Qwen)**, **[Gemma](https://huggingface.co/google)**, **[Hesperian](https://hesperian.org)**,
   and the US Army manuals on the [Internet Archive](https://archive.org).
 
 ## ⚠️ Disclaimers

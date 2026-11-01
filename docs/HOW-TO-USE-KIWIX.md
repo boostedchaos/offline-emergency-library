@@ -63,6 +63,6 @@ blank, wait a few seconds and refresh.
 
 - **Fully offline.** Kiwix and the `.zim` files need no internet.
 - `.zim` files are **already compressed**. Don't unzip them; open them directly.
-- For AI answers from your **PDFs**, use **GPT4All** (see
-  `AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS`). Kiwix is for browsing and
+- For AI answers from your **PDFs**, use **AI-CHAT** and attach the PDF (see
+  `AI-Offline/HOW-TO-ASK-YOUR-DOCS`). Kiwix is for browsing and
   searching the archives.

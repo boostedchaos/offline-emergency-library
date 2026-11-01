@@ -2,8 +2,8 @@
 name: offline-emergency-library
 description: >
   Download a complete offline, no-internet "emergency library" to a drive the user
-  chooses: an offline AI (chat models + CPU/GPU engine), an offline document-Q&A app
-  (GPT4All), full Wikipedia (Kiwix ZIM), offline US maps (OsmAnd), 60 Kiwix archives
+  chooses: an offline AI (two chat models + engines for every OS, with a browser chat that
+  reads PDFs), full Wikipedia (Kiwix ZIM), offline US maps (OsmAnd), 60 Kiwix archives
   (medicine, survival, DIY/repair, food & garden, education, computing),
   public-domain US Army field manuals + medical PDFs, the Kiwix reader, launchers, and
   full documentation (Markdown + HTML). Invoke for requests like "download the offline
@@ -46,8 +46,8 @@ When this skill is invoked, your job is simple:
   several hours. It is **resumable** — if interrupted, run the same command again.
 - When it finishes it prints any failures and exits non-zero. Report those to the user;
   do not say it succeeded unless the log ends with `DONE. Everything downloaded and checked.`
-- The script auto-resolves the **latest** versions (llama.cpp engine, Kiwix reader,
-  GPT4All, and the ZIM archives) so it keeps working over time.
+- The script auto-resolves the **latest** versions (llama.cpp engine, Kiwix reader
+  and the ZIM archives) so it keeps working over time.
 - Platform: **Windows** (PowerShell + curl, built in) or **macOS / Linux** (bash + curl +
   tar, built in; `unzip` enables the desktop map viewer). Pick the installer matching the
   user's OS.

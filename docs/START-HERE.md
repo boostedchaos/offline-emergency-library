@@ -4,11 +4,12 @@ This drive is a self-contained **offline library + AI**. Everything works with
 **no internet**, on Windows, macOS and Linux. This page tells you what is here and how
 to open each part.
 
-## The two buttons you need
+## The buttons you need
 
 | To do this | Open this file (in the top folder) |
 |---|---|
 | **Read the library** — Wikipedia, medical, survival, repair, education | **OPEN-LIBRARY** — `.bat` on Windows, `.command` on Mac, `.sh` on Linux. Your web browser opens at `http://localhost:8095`. Search everything there. Close the black window to stop. |
+| **Ask the offline AI** — questions, or about a PDF you attach | **AI-CHAT** — same three versions. Pick small (any laptop) or medium (16 GB memory). Opens at `http://localhost:8098`. |
 | **Check the drive** — prove no file has rotted | **CHECK-DRIVE** — same three versions. Takes 10–40 minutes. |
 
 - **PDFs and these guides (`.html`)** open in any web browser. No software needed.
@@ -29,7 +30,7 @@ to open each part.
 | `Education/` | Wikibooks, Wikiversity, LibreTexts textbooks, TED talks | OPEN-LIBRARY |
 | `Computing/` | Programming docs, electronics and Raspberry Pi Q&A | OPEN-LIBRARY |
 | `OsmAnd/` | Offline US maps | Phone app, or `MapViewer-Desktop/` — see `OsmAnd/HOW-TO-VIEW-MAPS.html` |
-| `AI-Offline/` | Offline AI chat + GPT4All (if downloaded) | See `AI-Offline/HOW-TO-RUN-OFFLINE-AI.html` |
+| `AI-Offline/` | Offline AI: 2 models + the AI program for every system | AI-CHAT — see `AI-Offline/HOW-TO-RUN-OFFLINE-AI.html` |
 | `Kiwix-Reader/` | The readers OPEN-LIBRARY uses, plus the Kiwix desktop app | See `Kiwix-Reader/HOW-TO-USE-KIWIX.html` |
 | `Phone-Apps/` | Android apps (Kiwix, OsmAnd) to copy onto a phone | See `Phone-Apps/USE-ON-PHONE.html` |
 
@@ -57,7 +58,7 @@ to open each part.
 - **Store it in a media-rated safe (UL Class 125).** A normal fire safe (Class 350) can
   get hot enough inside to ruin a drive.
 - **Practice now.** Open the library and the maps once, so you know how in an emergency.
-- Set up anything that needs a one-time online step (GPT4All's installer, iPhone apps)
+- Set up anything that needs a one-time online step (iPhone apps)
   **now, while you have internet**.
 
 ## ⚠️ Reminders
