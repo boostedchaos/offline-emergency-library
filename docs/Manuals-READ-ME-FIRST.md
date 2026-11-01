@@ -3,8 +3,8 @@
 Practical manuals for survival, repair, and self-sufficiency. **Two kinds of files:**
 
 - **PDFs** → open in **Edge or any web browser**. **No software needed.**
-- **`.zim` archives** → open with **Kiwix** (portable, in `E:\Kiwix-Reader\`). See
-  `E:\Kiwix-Reader\HOW-TO-USE-KIWIX`.
+- **`.zim` archives** → open with **OPEN-LIBRARY** in the top folder of the drive (see
+  `Kiwix-Reader/HOW-TO-USE-KIWIX`).
 
 ---
 
@@ -15,8 +15,11 @@ Practical manuals for survival, repair, and self-sufficiency. **Two kinds of fil
 | `ArmyFieldManuals\` | Browser (PDF) | US Army field/technical manuals (public domain): survival, first aid, hand tools, carpentry, **auto mechanics (TM 9-8000)**, rigging, desert ops, field cooking |
 | `Repair-iFixit\` | Kiwix (.zim) | iFixit repair guides — **cars, appliances, electronics, phones, tools** |
 | `DIY-Appropedia\` | Kiwix (.zim) | Appropedia — **plumbing, electrical/wiring, construction, energy, water, food, farming** |
-| `Survival-Water-Food\` | Kiwix (.zim) | Post-disaster survival, water purification, food preparation, knots |
-| `Radio-Communications\` | Browser (md/html) | How ham, CB & shortwave radio work + emergency comms |
+| `Survival-Water-Food\` | Kiwix (.zim) | Post-disaster survival, water purification, food preparation, knots, Ready.gov, outdoors Q&A, off-grid and appropriate-technology libraries |
+| `Survival-Videos\` | Kiwix (.zim) | Prepper video channels (winter prepping, bug-out, food storage) |
+| `DIY-Repair\` | Kiwix (.zim) | DIY & home improvement, woodworking and car-maintenance Q&A |
+| `Food-Garden\` | Kiwix (.zim) | Cooking, gardening, homesteading videos, agriculture books |
+| `Radio-Communications\` | Browser + Kiwix | How ham, CB & shortwave radio work + emergency comms; amateur radio Q&A (.zim) |
 
 ---
 

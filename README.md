@@ -1,184 +1,167 @@
 # 🛟 Offline Emergency Library
 
-**A complete, offline, no-internet "survival knowledge" kit you can download with a single
-command.** Built for emergencies, grid-down scenarios, remote areas, or anyone who wants a
-self-contained offline reference + AI on a drive.
+**An offline "survival knowledge" drive you can build with one command.** It holds
+Wikipedia, medical and survival references, repair guides, maps, books and an offline AI.
+After the download, everything works with **no internet**, on **any computer**
+(Windows, macOS, Linux) and on Android phones.
 
-One command asks you **only one thing — where to save the files — then downloads
-everything** and writes all the documentation (Markdown **and** HTML). After that, it all
-works with **no internet**.
+The installer asks one question (where to save), then downloads, checks and indexes
+everything. It is made for a drive you keep somewhere safe, such as a lockbox.
+
+> **This is a fork** of [elhajahmadj/offline-emergency-library](https://github.com/elhajahmadj/offline-emergency-library).
+> See [What this fork changed](#what-this-fork-changed) below.
 
 ---
 
 ## What you get
 
-| Component | What it is | Size (approx) | Needs to run |
-|---|---|---|---|
-| **Offline AI chat** | 3 local AI models (Llama 3.2 3B, Llama 3.1 8B, Qwen2.5 7B) + CPU & GPU engines (llama.cpp) | ~11 GB | CPU only (GPU optional) |
-| **Offline doc-Q&A** | GPT4All — ask an AI questions about your PDFs, with citations | ~0.7 GB | CPU, one-time install |
-| **Wikipedia** | Full English Wikipedia article text (compressed) | ~24 GB | Kiwix (or archival) |
-| **Offline US maps** | Every US state/region map (OsmAnd `.obf`) + **bundled desktop viewer** (OsmAndMapCreator + portable Java) + **bundled Android app (APK)** | ~17 GB (+~0.4 GB tools) | **PC (no phone) or phone** |
-| **Repair archive** | iFixit — cars, appliances, electronics, phones | ~3.4 GB | Kiwix |
-| **DIY archive** | Appropedia — plumbing, electrical, construction, energy, water, food | ~0.6 GB | Kiwix |
-| **Medical** | Offline medical Wikipedia (WikiMed) + curated medical guide | ~1.8 GB | Kiwix |
-| **Survival** | Post-disaster, water, food prep, knots (zimgit) | ~0.8 GB | Kiwix |
-| **Army manuals** | Public-domain US Army field/technical manuals (survival, first aid, hand tools, carpentry, auto mechanics, rigging, field cooking) | ~0.2 GB | Any browser (PDF) |
-| **Medical books** | *Where There Is No Doctor / No Dentist*, *Ship's Medicine Chest* | ~45 MB | Any browser (PDF) |
-| **Radio guide** | How ham/CB/shortwave/GMRS radio works + emergency comms | tiny | Any browser |
-| **Kiwix reader** | Portable app to read all `.zim` archives (no install) | ~0.15 GB | — |
-| **Phone apps** | Bundled Android APKs (Kiwix + OsmAnd) to port the library to a phone offline | ~0.4 GB | sideload on Android |
-| **Total** | | **≈ 60 GB** | |
+Sizes come from a full dry run on 2026-11-01 (`--dry-run --wikipedia maxi`). Kiwix
+publishes new builds often, so sizes move a little over time. Run `--dry-run` for today's numbers.
 
-Everything is **free and legally redistributable** — open-weight AI models, openly-licensed
-Kiwix archives, and public-domain US-government manuals. **No piracy.**
+| Part | What it is | Size |
+|---|---|---|
+| **Wikipedia** | All English articles, in Kiwix format. Pick the version with `--wikipedia`: `maxi` (with images), `nopic` (default, no images), `mini` (intro of each article), `none` | maxi 127.4 GB · nopic 52.7 GB · mini 14.4 GB |
+| **Medicine** | Field and military medicine, CDC, NHS medicines A–Z, MedlinePlus, LibreTexts medicine, LibrePathology (+ WikiMed if you skip full Wikipedia) | 3.6 GB |
+| **Survival** | Water, food, knots, post-disaster library, Ready.gov, outdoors and ham-radio Q&A, off-grid and appropriate-technology libraries, prepper video channels | 15.0 GB |
+| **DIY & repair** | iFixit, Appropedia, home-improvement, woodworking and car-maintenance Q&A | 6.7 GB |
+| **Food & garden** | Cooking sites, gardening and cooking Q&A, homesteading videos, Gutenberg agriculture books | 9.7 GB |
+| **Education** | Wikibooks, Wikiversity, LibreTexts (math, physics, chemistry, biology, engineering, more), TED-Ed and TED talks | 44.7 GB |
+| **Computing** | Python, JavaScript, Linux, Docker, Git docs; Arduino, Raspberry Pi, electronics Q&A | 5.1 GB |
+| **Books (PDF)** | 11 public-domain US Army manuals + Hesperian's *Where There Is No Doctor* and *Where There Is No Dentist* | 0.2 GB |
+| **Maps** | All 83 OsmAnd US map files + desktop map viewer + Android app | 17.9 GB |
+| **Offline AI** | llama.cpp engine + 3 chat models (3B, 8B, 7B) + GPT4All | 11.9 GB |
+| **Readers** | Kiwix readers for Windows, macOS (Intel + Apple) and Linux (x64 + ARM), Kiwix desktop app, Kiwix Android app | 0.8 GB |
+| **Total** | with `--wikipedia maxi` / default `nopic` | **243 GB / about 168 GB** |
 
----
-
-## 📦 Storage requirements — what kind of drive do I need?
-
-The full library is **~60 GB**. Always leave headroom (for the AI's temp files, GPT4All
-install, and future updates), so plan for more than 60 GB.
-
-| Drive | Recommendation |
-|---|---|
-| **Minimum** | **128 GB** drive (full library + working room) |
-| **Comfortable** | **256 GB** drive (room to add your own files, Survivor Library, etc.) |
-| **USB flash drive** | Works for **storage + reading** PDFs/Wikipedia/maps. Use **USB 3.0+ / 128 GB+**. Cheap flash drives are slow — fine for reading, slow for AI. |
-| **External SSD** ⭐ | **Best choice.** Running the AI models from an SSD is far faster than from a flash drive or spinning disk. A 256 GB+ USB-C SSD is ideal. |
-| **Internal HDD/SSD** | Perfect if you're keeping it on a PC. |
-
-> **Tip:** If you only want the reference material (no AI), you can skip the big pieces
-> with `-SkipModels` and still get Wikipedia, maps, and all manuals in ~30 GB. If you also
-> skip Wikipedia and maps (`-SkipWikipedia -SkipMaps`), the AI + manuals fit in ~20 GB.
+Choose a drive with room to spare: **256 GB** for the default, **500 GB** for
+Wikipedia with images. An **external SSD** is much faster than a flash drive.
 
 ---
 
-## 💻 Hardware requirements — what machine do I need to USE it?
+## 🚀 How to download
 
-**To download:** any 64-bit **Windows, macOS, or Linux** computer with internet.
-- Windows: uses `curl` + PowerShell (both built in).
-- macOS/Linux: uses `curl` + `tar` (built in); `unzip` enables the desktop map viewer.
+### macOS / Linux
 
-Downloading ~60 GB can take a few hours.
-
-**To use it afterward (offline):**
-
-| Task | Needs |
-|---|---|
-| Read PDFs, HTML guides, Wikipedia, maps | **Any computer** with a web browser. Even an old/weak PC. |
-| Read `.zim` archives | **Kiwix** (bundled, portable). Any Windows PC. |
-| **Offline AI — small model (3B)** | Any 64-bit PC, **~4 GB RAM**. Works on CPU; no graphics card needed. |
-| **Offline AI — big model (8B)** | **~8 GB RAM** recommended. CPU only. |
-| **Offline AI — GPU model (Qwen 7B)** | A graphics card with **~6 GB VRAM** (NVIDIA/AMD/Intel) for a big speed boost. Optional. |
-| **GPT4All doc-Q&A** | 64-bit PC, ~8 GB RAM recommended. CPU only. Self-contained (no Python/CUDA). |
-| **Maps on a computer** | **No phone needed** — bundled desktop viewer (OsmAndMapCreator) + bundled portable Java. First use unzips maps (~30 GB). |
-| **Maps on a phone** | Android: bundled **OsmAnd~ APK** (sideload offline). iPhone/iPad: install **OsmAnd** from the App Store while online. |
-
-**Key points:**
-- **No GPU is required** for the AI — it runs on an ordinary CPU (just slower). A 6 GB GPU
-  is a bonus.
-- The AI engine ships **x64, ARM64, and Vulkan-GPU** builds, so it runs on Intel/AMD and
-  ARM Windows machines.
-- The whole kit is **portable** — copy the `OfflineLibrary` folder to any PC and use it.
-
----
-
-## 🚀 How to download (pick one)
-
-### A) Easiest — double-click `install.bat`
-Download/clone the repo, then **double-click `install.bat`**. It opens a window, asks you
-where to save, and downloads everything. No commands, no PowerShell knowledge needed.
-(If Windows SmartScreen warns, click **More info → Run anyway**.)
-
-### B) In Claude Code (one prompt)
-Install this repo's skill, then say:
-```
-/offline-emergency-library
-```
-It will ask **only**: *"Where would you like to save these files?"* — then download
-everything.
-
-### C) Windows — PowerShell one-liner (no Claude needed)
-```powershell
-irm https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/Get-OfflineLibrary.ps1 | iex
-```
-It will prompt you for the save location, then download everything.
-
-### D) macOS / Linux — one-liner
 ```bash
-curl -fsSL https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/get-offline-library.sh | bash
+curl -fsSL https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main/get-offline-library.sh | bash
 ```
-It will prompt you for the save location, then download everything.
-(Requires `curl` and `tar`; `unzip` enables the desktop map viewer. All are standard.)
 
-### E) Clone and run
+Or clone and run with options:
+
 ```bash
-git clone https://github.com/elhajahmadj/offline-emergency-library.git
+git clone https://github.com/boostedchaos/offline-emergency-library.git
 cd offline-emergency-library
-# Windows:
-./Get-OfflineLibrary.ps1 -Destination "E:\"
-# macOS / Linux:
-./get-offline-library.sh -d /path/to/drive
+./get-offline-library.sh --dry-run --wikipedia maxi          # check links + size first
+./get-offline-library.sh -d /Volumes/MyDrive --wikipedia maxi
 ```
 
-**All methods are resumable** — if the download is interrupted, run the same command again
-and it continues where it left off.
+### Windows
 
-### Platform support
-| | Windows | macOS | Linux |
-|---|---|---|---|
-| Installer | `Get-OfflineLibrary.ps1` / `install.bat` | `get-offline-library.sh` | `get-offline-library.sh` |
-| Offline AI chat | ✅ (x64/ARM + Vulkan GPU) | ✅ (Metal GPU) | ✅ (x64/ARM + Vulkan GPU) |
-| GPT4All doc-Q&A | ✅ `.exe` | ✅ `.dmg` | ✅ `.run` |
-| Kiwix desktop | ✅ bundled portable | App Store / kiwix.org | ✅ bundled AppImage (x64) |
-| Maps on PC | ✅ bundled viewer+Java | ✅ bundled viewer+Java | ✅ bundled viewer+Java |
-| All content (Wikipedia, ZIM, PDF, maps, APKs) | ✅ | ✅ | ✅ |
+Double-click **`install.bat`**, or paste this into PowerShell:
+
+```powershell
+$s="$env:TEMP\Get-OfflineLibrary.ps1"; curl.exe -sL https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main/Get-OfflineLibrary.ps1 -o $s; powershell -NoProfile -ExecutionPolicy Bypass -File $s
+```
+
+With options: `.\Get-OfflineLibrary.ps1 -Destination E:\ -Wikipedia maxi`
+
+### Claude Code
+
+Install the skill in `skills/offline-emergency-library/`, then say `/offline-emergency-library`.
+
+### Options
+
+| Mac/Linux | Windows | Effect |
+|---|---|---|
+| `--wikipedia maxi\|nopic\|mini\|none` | `-Wikipedia ...` | Which Wikipedia (default `nopic`) |
+| `--skip-groups a,b` | `-SkipGroups a,b` | Skip groups: `medicine,survival,diy,food,education,computing,pdfs` |
+| `--skip-maps` | `-SkipMaps` | No maps |
+| `--skip-models` | `-SkipModels` | Only the small AI model |
+| `--skip-ai` | `-SkipAI` | No AI at all |
+| `--dry-run` | `-DryRun` | Check every link and add up the size. Downloads nothing |
+| `--jobs N` | `-Jobs N` | Archives downloaded at the same time (default 4) |
+
+**Resumable:** if it stops, run the same command again. It keeps finished files and
+continues the rest. Run it again later to add newer builds.
+
+**Speed:** Kiwix's mirrors gave about 3 MB/s per file on 2026-11-01, so the
+script downloads 4 archives at once. Plan on several hours for the full set.
 
 ---
 
 ## 🧭 After it finishes
 
-The installer writes a **`README.html`** at the root of the download folder — a full,
-clickable **index of every guide, document, manual, archive, app and data file** on the
-drive (auto-generated by scanning the folders). Open that first for a complete map of
-everything, or **`START-HERE.html`** for a guided intro.
+On the drive, in `OfflineLibrary/`:
 
-(You can regenerate the index any time with `build-readme-index.ps1 -Root "<folder>"`.)
+| Open this | To do this |
+|---|---|
+| **`README.html`** | See a clickable index of everything on the drive |
+| **`START-HERE.html`** | Read a guided intro |
+| **`OPEN-LIBRARY`** (`.command` Mac, `.bat` Windows, `.sh` Linux) | Read every archive (Wikipedia, medical, survival…) in your web browser. Nothing to install |
+| **`CHECK-DRIVE`** (`.command` / `.bat` / `.sh`) | Prove every file is still exactly as downloaded |
 
-Both pages link to each component's guide:
-
-- `AI-Offline\HOW-TO-RUN-OFFLINE-AI.html` — run the offline AI chat
-- `AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS.html` — ask AI about your PDFs
-- `Kiwix-Reader\HOW-TO-USE-KIWIX.html` — read the `.zim` archives
-- `Manuals\READ-ME-FIRST.html` and `Medical\READ-ME-FIRST.html`
-- `Manuals\Radio-Communications\RADIO-GUIDE.html` — emergency radio comms
+The script ends with a list of anything that failed and exits with an error, so a
+partial download is never silent.
 
 ---
 
-## Options (optional, for small drives)
+## 🔒 Keeping the drive in a lockbox
 
-| Flag | Effect | Saves |
-|---|---|---|
-| `-SkipWikipedia` | Don't download the 24 GB Wikipedia dump | ~24 GB |
-| `-SkipMaps` | Don't download the US OsmAnd maps | ~17 GB |
-| `-SkipModels` | Skip the large 8B/7B AI models (keeps the small 3B) | ~9 GB |
+- **Format the drive as exFAT.** Windows, macOS, Linux and Android can all read it.
+  (FAT32 cannot hold files over 4 GB; APFS and NTFS are not readable everywhere.)
+- **Use a media-rated safe (UL Class 125).** A normal "Class 350" fire safe only keeps
+  the inside under 350 °F, which can ruin a drive. Class 125 keeps it under 125 °F.
+- **Plug it in once a year and run CHECK-DRIVE.** SSDs left without power slowly lose
+  data. The JEDEC standard for consumer SSDs only promises 1 year without power for a
+  worn drive at 30 °C; new drives usually last longer, but check.
+- **Keep two copies** in two places. Re-run the installer on a spare drive each year to
+  refresh content.
+- **Practice now.** Open the library and the maps once, so you know how in an emergency.
 
-Example: `./Get-OfflineLibrary.ps1 -Destination "F:\" -SkipWikipedia -SkipMaps`
+---
+
+## What this fork changed
+
+Every item below was reproduced on 2026-11-01 before it was fixed.
+
+- **Mac/Linux got 0 archives and 0 maps.** Kiwix listings redirect and the script did not
+  follow redirects; OsmAnd renamed `US_` maps to `Us_`. Both fixed.
+- **Wikipedia could not be read.** It was the raw 25.8 GB XML dump; Kiwix cannot open
+  it. It is now a Kiwix archive.
+- **Failed downloads were saved as files.** Two medical PDFs are borrow-only on
+  archive.org (HTTP 401), and the error page was saved as `.pdf`. Downloads now fail on
+  HTTP errors, check the size, resume, and are listed at the end.
+- **Archives are checked** against the SHA-256 fingerprint Kiwix publishes; a damaged one
+  is deleted and fetched again on the next run. `SHA256SUMS.txt` + `CHECK-DRIVE` cover the
+  whole drive.
+- **Any computer can read the drive:** readers for every platform are included, plus
+  `OPEN-LIBRARY` launchers. Before, a Mac had no reader.
+- **Much more content:** 60 archives in 6 groups (`catalog/zims.tsv`), adapted from
+  [Project NOMAD](https://github.com/Crosstalk-Solutions/project-nomad)'s curated lists.
+  The newest build is picked automatically, because Kiwix deletes old ones.
+- **Faster:** program files come from the first working Kiwix mirror (the default server
+  gave 62 KB/s); archives download 4 at a time.
+- `--dry-run`, one run per folder at a time, and `curl | bash` no longer eats its own input.
+- The HTML guides are rebuilt from the Markdown (`tools/render-docs.sh`); the old ones
+  showed garbled emoji and dashes.
 
 ---
 
 ## ⚠️ Disclaimers
 
-- Offline AIs and older manuals **can be wrong or outdated**. Verify anything
-  safety-critical (medical, electrical, structural) against authoritative sources when
-  possible. This kit is reference material, **not** professional advice.
-- Modern copyrighted code books (NEC/UPC) and brand auto manuals (Haynes/Chilton) are
-  **not** included. Their topics are covered by the openly-licensed iFixit/Appropedia
-  archives and public-domain Army technical manuals.
-- Respect your local laws for radio transmission (listening is always fine; see the radio
-  guide).
+- Offline AIs and older manuals **can be wrong or outdated**. Check anything
+  safety-critical (medical, electrical, structural) against current sources when you can.
+  This kit is reference material, **not** professional advice.
+- **Licences.** The scripts download each item from its publisher onto your own drive.
+  Kiwix archives keep their own licences (mostly Creative Commons). US Army manuals are
+  US-government works. AI models keep their model licences. **Hesperian's books** are
+  free to download for personal use, but Hesperian asks for permission before you share
+  them digitally — so download your own copy, and do not redistribute the drive's
+  Hesperian folder.
+- Modern code books (NEC/UPC) and brand auto manuals are copyrighted and **not** included.
+- Follow your local laws for radio transmission (listening is always fine).
 
 ## License
-Code and documentation in this repo: **MIT** (see `LICENSE`). Downloaded content retains
-its original licenses (open-weight model licenses, CC licenses for Kiwix content, public
-domain for US-government works).
+
+Code and documentation in this repo: **MIT** (see `LICENSE`). `catalog/zims.tsv` is
+adapted from Project NOMAD's `collections/kiwix-categories.json` (Apache-2.0); see `NOTICE`.

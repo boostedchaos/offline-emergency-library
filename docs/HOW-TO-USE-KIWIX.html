@@ -1,87 +1,117 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How to Read the Offline Archives â€” Kiwix</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
-<h1>How to Read the Offline Archives â€” Kiwix</h1>
-<p>Several parts of this kit are <strong><code>.zim</code> files</strong> â€” compressed offline copies of entire</p>
-<p>websites (Wikipedia-medicine, iFixit repair guides, Appropedia DIY, survival guides).</p>
-<p>To read a <code>.zim</code> file you use <strong>Kiwix</strong>, a free offline reader. This is the **only</p>
-<p>dependency<strong> in the whole kit, and it's </strong>portable â€” no installation required**.</p>
-<p>PDF manuals do <strong>not</strong> need Kiwix; they open in Edge or any browser.</p>
-<hr>
-<h2>What needs Kiwix (the .zim files)</h2>
-<table><thead><tr>
-<th>File / folder</th>
-<th>Contents</th>
-</tr></thead><tbody>
-<tr>
-<td><code>E:\Medical\WikiMed\</code></td>
-<td>Offline medical Wikipedia (with images)</td>
-</tr>
-<tr>
-<td><code>E:\Medical\zimgit-medicine\</code></td>
-<td>Curated medical/first-aid guide</td>
-</tr>
-<tr>
-<td><code>E:\Manuals\Repair-iFixit\</code></td>
-<td>iFixit repair guides (auto, appliances, electronics, phones)</td>
-</tr>
-<tr>
-<td><code>E:\Manuals\DIY-Appropedia\</code></td>
-<td>DIY: plumbing, electrical, construction, energy, water, food</td>
-</tr>
-<tr>
-<td><code>E:\Manuals\Survival-Water-Food\</code></td>
-<td>Survival (post-disaster), water, food prep, knots</td>
-</tr>
-<tr>
-<td><code>E:\Wikipedia\</code> (if converted to ZIM)</td>
-<td>Full Wikipedia</td>
-</tr>
-</tbody></table>
-<hr>
-<h2>Option A â€” Portable app (no install) â€” recommended</h2>
-<ol>
-<li>Open <code>E:\Kiwix-Reader\app\</code>.</li>
-<li>Double-click <strong><code>kiwix-desktop.exe</code></strong>.</li>
-</ol>
-<p>   (If Windows SmartScreen warns, click <strong>More info â†’ Run anyway</strong>.)</p>
-<ol>
-<li>In Kiwix: <strong>File â†’ Open file</strong> (or the "Open" button), then browse to a <code>.zim</code> file,</li>
-</ol>
-<p>   e.g. <code>E:\Medical\WikiMed\wikipedia_en_medicine_maxi_2026-10.zim</code>.</p>
-<ol>
-<li>The archive opens like a website. Use the <strong>search box</strong> to find any article â€”</li>
-</ol>
-<p>   it searches the full text offline.</p>
-<ol>
-<li>Open each <code>.zim</code> the same way. You can open several; Kiwix remembers your library.</li>
-</ol>
-<blockquote>Tip: Open every <code>.zim</code> once so they all appear in your Kiwix <strong>Library</strong> for quick access later.</blockquote>
-<hr>
-<h2>Option B â€” Read in your web browser (kiwix-serve)</h2>
-<p>If you prefer to read in Edge/Chrome, Kiwix can serve the archives locally:</p>
-<ol>
-<li>Open a Command Prompt (Windows key â†’ type <code>cmd</code> â†’ Enter).</li>
-<li>Run (adjust path/filename):</li>
-</ol>
-<pre><code>
-   "E:\Kiwix-Reader\app\kiwix-serve.exe" --port 8090 "E:\Medical\WikiMed\wikipedia_en_medicine_maxi_2026-10.zim"
-</code></pre>
-<p>   To serve several at once, list multiple <code>.zim</code> paths at the end.</p>
-<ol>
-<li>Open a browser to <strong>http://localhost:8090</strong> â€” browse and search offline.</li>
-<li>Close the Command Prompt window to stop serving.</li>
-</ol>
-<hr>
-<h2>Phones / tablets (optional, for emergencies)</h2>
-<p>The <strong>Kiwix</strong> app is free on Android and iOS. You can copy a <code>.zim</code> file to a phone and</p>
-<p>read it there too â€” handy if you need a grab-and-go medical reference. (The app itself</p>
-<p>is downloaded from the app store while you have internet.)</p>
-<hr>
-<h2>Notes</h2>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How to Read the Offline Archives — Kiwix</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
+<h1 id="how-to-read-the-offline-archives--kiwix">How to Read the Offline
+Archives — Kiwix</h1>
+<p>Most of this library is <strong><code>.zim</code> files</strong>:
+compressed offline copies of whole websites (Wikipedia, medical sites,
+iFixit, Q&amp;A sites, textbooks). You read them with
+<strong>Kiwix</strong>, a free offline reader. The drive carries Kiwix
+for <strong>Windows, macOS and Linux</strong>, so <strong>nothing needs
+to be installed</strong>.</p>
+<p>PDF books do <strong>not</strong> need Kiwix; they open in any web
+browser.</p>
+<hr />
+<h2 id="option-a--open-library-recommended-every-computer">Option A —
+OPEN-LIBRARY (recommended, every computer)</h2>
+<ol type="1">
+<li>In the top folder of the drive, open:
 <ul>
-<li><strong>Fully offline.</strong> Kiwix and the <code>.zim</code> files need no internet.</li>
-<li><code>.zim</code> files are <strong>already compressed</strong> â€” don't unzip them; open them directly.</li>
-<li>For AI Q&amp;A over your <strong>PDFs</strong>, use <strong>GPT4All</strong> instead (see</li>
+<li><strong>Windows:</strong> <code>OPEN-LIBRARY.bat</code></li>
+<li><strong>Mac:</strong> <code>OPEN-LIBRARY.command</code> (if blocked:
+<strong>System Settings → Privacy &amp; Security → Open
+Anyway</strong>)</li>
+<li><strong>Linux:</strong> run <code>bash OPEN-LIBRARY.sh</code> in a
+terminal</li>
+</ul></li>
+<li>A window opens and finds every <code>.zim</code> on the drive. Your
+browser then opens at <strong><a
+href="http://localhost:8095">http://localhost:8095</a></strong>.</li>
+<li>Click an archive, or use the <strong>search box</strong> to search
+its full text offline.</li>
+<li>To stop, close the OPEN-LIBRARY window.</li>
+</ol>
+<p>It uses <code>kiwix-serve</code> from
+<code>Kiwix-Reader/tools/&lt;your system&gt;/</code>. If the browser
+page is blank, wait a few seconds and refresh.</p>
+<hr />
+<h2 id="option-b--kiwix-desktop-app">Option B — Kiwix desktop app</h2>
+<ul>
+<li><strong>Windows:</strong>
+<code>Kiwix-Reader/app/kiwix-desktop.exe</code> (portable). Use
+<strong>File → Open file</strong> and pick a <code>.zim</code>.</li>
+<li><strong>Linux (x64):</strong>
+<code>Kiwix-Reader/kiwix-desktop_x86_64_*.appimage</code> — make it
+executable, then run it.</li>
+<li><strong>Mac:</strong> use Option A. (The Mac desktop app comes only
+from the App Store.)</li>
 </ul>
-<p>  <code>E:\AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS</code>). Kiwix is for browsing and</p>
-<p>  searching the big wiki/repair archives.</p>
+<hr />
+<h2 id="option-c--phones-and-tablets">Option C — Phones and tablets</h2>
+<ul>
+<li><strong>Android:</strong> install <code>Phone-Apps/*.apk</code>
+(Kiwix), copy <code>.zim</code> files to the phone, open them in the
+app. See <code>Phone-Apps/USE-ON-PHONE</code>.</li>
+<li><strong>iPhone/iPad:</strong> install <strong>Kiwix</strong> from
+the App Store <strong>while online</strong>, then import
+<code>.zim</code> files with the Files app.</li>
+</ul>
+<hr />
+<h2 id="where-the-archives-are">Where the archives are</h2>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Wikipedia/</code></td>
+<td>All of English Wikipedia</td>
+</tr>
+<tr>
+<td><code>Medical/</code></td>
+<td>Medical library, military medicine, CDC, NHS medicines, MedlinePlus,
+textbooks</td>
+</tr>
+<tr>
+<td><code>Manuals/Repair-iFixit/</code>,
+<code>Manuals/DIY-Appropedia/</code>,
+<code>Manuals/DIY-Repair/</code></td>
+<td>Repair and DIY</td>
+</tr>
+<tr>
+<td><code>Manuals/Survival-Water-Food/</code>,
+<code>Manuals/Survival-Videos/</code></td>
+<td>Survival, water, food, knots, prepping</td>
+</tr>
+<tr>
+<td><code>Manuals/Food-Garden/</code></td>
+<td>Cooking, gardening, homesteading</td>
+</tr>
+<tr>
+<td><code>Manuals/Radio-Communications/</code></td>
+<td>Amateur radio Q&amp;A</td>
+</tr>
+<tr>
+<td><code>Education/</code></td>
+<td>Wikibooks, Wikiversity, LibreTexts, TED</td>
+</tr>
+<tr>
+<td><code>Computing/</code></td>
+<td>Programming docs, electronics Q&amp;A</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="notes">Notes</h2>
+<ul>
+<li><strong>Fully offline.</strong> Kiwix and the <code>.zim</code>
+files need no internet.</li>
+<li><code>.zim</code> files are <strong>already compressed</strong>.
+Don't unzip them; open them directly.</li>
+<li>For AI answers from your <strong>PDFs</strong>, use
+<strong>GPT4All</strong> (see
+<code>AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS</code>). Kiwix
+is for browsing and searching the archives.</li>
+</ul>
 </div></body></html>

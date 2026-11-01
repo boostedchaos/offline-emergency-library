@@ -1,0 +1,10 @@
+Offline Emergency Library (fork: boostedchaos/offline-emergency-library)
+
+catalog/zims.tsv is adapted from Project NOMAD's collections/kiwix-categories.json
+  Copyright Crosstalk Solutions, LLC
+  Licensed under the Apache License, Version 2.0
+  https://github.com/Crosstalk-Solutions/project-nomad
+Changes: converted to a tab-separated list of Kiwix directory + file-name prefixes,
+fixed renamed archives, removed duplicates and non-ZIM sources, added Appropedia.
+
+Downloaded content is not part of this repository and keeps its own licence.

@@ -113,9 +113,8 @@ and several code/office formats. (See Section 6 for ZIM and the Wikipedia XML.)
   `E:\Medical`) are **not** read by GPT4All. Open those in the **Kiwix** reader
   instead (see `E:\Kiwix-Reader\HOW-TO-USE-KIWIX`). Kiwix has its own fast full-text
   search across all articles.
-- The **Wikipedia dump** (`E:\Wikipedia\...xml.bz2`) is a single 24 GB compressed file
-  — too large to feed to GPT4All directly. Read Wikipedia via Kiwix instead (or the raw
-  file is for archival/processing).
+- **Wikipedia** (`Wikipedia/*.zim`) is a Kiwix archive too — read and search it with
+  OPEN-LIBRARY, not GPT4All.
 - **For AI Q&A, point GPT4All at the PDF/text folders** (`ArmyFieldManuals`,
   `Medical\Manuals-PDF`, `Radio-Communications`, and any notes you add).
 

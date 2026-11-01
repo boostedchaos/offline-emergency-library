@@ -1,70 +1,68 @@
 # How to Read the Offline Archives — Kiwix
 
-Several parts of this kit are **`.zim` files** — compressed offline copies of entire
-websites (Wikipedia-medicine, iFixit repair guides, Appropedia DIY, survival guides).
-To read a `.zim` file you use **Kiwix**, a free offline reader. This is the **only
-dependency** in the whole kit, and it's **portable — no installation required**.
+Most of this library is **`.zim` files**: compressed offline copies of whole websites
+(Wikipedia, medical sites, iFixit, Q&A sites, textbooks). You read them with **Kiwix**,
+a free offline reader. The drive carries Kiwix for **Windows, macOS and Linux**, so
+**nothing needs to be installed**.
 
-PDF manuals do **not** need Kiwix; they open in Edge or any browser.
+PDF books do **not** need Kiwix; they open in any web browser.
 
 ---
 
-## What needs Kiwix (the .zim files)
+## Option A — OPEN-LIBRARY (recommended, every computer)
 
-| File / folder | Contents |
+1. In the top folder of the drive, open:
+   - **Windows:** `OPEN-LIBRARY.bat`
+   - **Mac:** `OPEN-LIBRARY.command` (if blocked: **System Settings → Privacy & Security → Open Anyway**)
+   - **Linux:** run `bash OPEN-LIBRARY.sh` in a terminal
+2. A window opens and finds every `.zim` on the drive. Your browser then opens at
+   **<http://localhost:8095>**.
+3. Click an archive, or use the **search box** to search its full text offline.
+4. To stop, close the OPEN-LIBRARY window.
+
+It uses `kiwix-serve` from `Kiwix-Reader/tools/<your system>/`. If the browser page is
+blank, wait a few seconds and refresh.
+
+---
+
+## Option B — Kiwix desktop app
+
+- **Windows:** `Kiwix-Reader/app/kiwix-desktop.exe` (portable). Use **File → Open file**
+  and pick a `.zim`.
+- **Linux (x64):** `Kiwix-Reader/kiwix-desktop_x86_64_*.appimage` — make it executable,
+  then run it.
+- **Mac:** use Option A. (The Mac desktop app comes only from the App Store.)
+
+---
+
+## Option C — Phones and tablets
+
+- **Android:** install `Phone-Apps/*.apk` (Kiwix), copy `.zim` files to the phone, open
+  them in the app. See `Phone-Apps/USE-ON-PHONE`.
+- **iPhone/iPad:** install **Kiwix** from the App Store **while online**, then import
+  `.zim` files with the Files app.
+
+---
+
+## Where the archives are
+
+| Folder | Contents |
 |---|---|
-| `E:\Medical\WikiMed\` | Offline medical Wikipedia (with images) |
-| `E:\Medical\zimgit-medicine\` | Curated medical/first-aid guide |
-| `E:\Manuals\Repair-iFixit\` | iFixit repair guides (auto, appliances, electronics, phones) |
-| `E:\Manuals\DIY-Appropedia\` | DIY: plumbing, electrical, construction, energy, water, food |
-| `E:\Manuals\Survival-Water-Food\` | Survival (post-disaster), water, food prep, knots |
-| `E:\Wikipedia\` (if converted to ZIM) | Full Wikipedia |
-
----
-
-## Option A — Portable app (no install) — recommended
-
-1. Open `E:\Kiwix-Reader\app\`.
-2. Double-click **`kiwix-desktop.exe`**.
-   (If Windows SmartScreen warns, click **More info → Run anyway**.)
-3. In Kiwix: **File → Open file** (or the "Open" button), then browse to a `.zim` file,
-   e.g. `E:\Medical\WikiMed\wikipedia_en_medicine_maxi_2026-10.zim`.
-4. The archive opens like a website. Use the **search box** to find any article —
-   it searches the full text offline.
-5. Open each `.zim` the same way. You can open several; Kiwix remembers your library.
-
-> Tip: Open every `.zim` once so they all appear in your Kiwix **Library** for quick
-> access later.
-
----
-
-## Option B — Read in your web browser (kiwix-serve)
-
-If you prefer to read in Edge/Chrome, Kiwix can serve the archives locally:
-
-1. Open a Command Prompt (Windows key → type `cmd` → Enter).
-2. Run (adjust path/filename):
-   ```
-   "E:\Kiwix-Reader\app\kiwix-serve.exe" --port 8090 "E:\Medical\WikiMed\wikipedia_en_medicine_maxi_2026-10.zim"
-   ```
-   To serve several at once, list multiple `.zim` paths at the end.
-3. Open a browser to **http://localhost:8090** — browse and search offline.
-4. Close the Command Prompt window to stop serving.
-
----
-
-## Phones / tablets (optional, for emergencies)
-
-The **Kiwix** app is free on Android and iOS. You can copy a `.zim` file to a phone and
-read it there too — handy if you need a grab-and-go medical reference. (The app itself
-is downloaded from the app store while you have internet.)
+| `Wikipedia/` | All of English Wikipedia |
+| `Medical/` | Medical library, military medicine, CDC, NHS medicines, MedlinePlus, textbooks |
+| `Manuals/Repair-iFixit/`, `Manuals/DIY-Appropedia/`, `Manuals/DIY-Repair/` | Repair and DIY |
+| `Manuals/Survival-Water-Food/`, `Manuals/Survival-Videos/` | Survival, water, food, knots, prepping |
+| `Manuals/Food-Garden/` | Cooking, gardening, homesteading |
+| `Manuals/Radio-Communications/` | Amateur radio Q&A |
+| `Education/` | Wikibooks, Wikiversity, LibreTexts, TED |
+| `Computing/` | Programming docs, electronics Q&A |
 
 ---
 
 ## Notes
 
 - **Fully offline.** Kiwix and the `.zim` files need no internet.
-- `.zim` files are **already compressed** — don't unzip them; open them directly.
-- For AI Q&A over your **PDFs**, use **GPT4All** instead (see
-  `E:\AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS`). Kiwix is for browsing and
-  searching the big wiki/repair archives.
+- `.zim` files are **already compressed**. Don't unzip them; open them directly.
+- For AI answers from your **PDFs**, use **GPT4All** (see
+  `AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS`). Kiwix is for browsing and
+  searching the archives.

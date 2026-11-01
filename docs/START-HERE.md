@@ -1,72 +1,66 @@
 # 🛟 Offline Emergency Kit — START HERE
 
-This drive is a self-contained **offline survival library + AI**. Everything works with
-**no internet**. This page explains what's here and how to open each part.
+This drive is a self-contained **offline library + AI**. Everything works with
+**no internet**, on Windows, macOS and Linux. This page tells you what is here and how
+to open each part.
 
-> **Windows vs macOS/Linux:** launchers are `.bat` files on Windows and `.sh` files on
-> macOS/Linux (run them from a terminal). The content, PDFs, HTML guides, and phone apps
-> are identical on every platform.
+## The two buttons you need
 
-> **Two things to read things on this drive:**
-> - **PDFs and these guides (.html)** open in **Edge or any web browser** — no software.
-> - **`.zim` archives** open in **Kiwix** (portable, no install) — see
->   `E:\Kiwix-Reader\`.
-> - **AI that answers from your PDFs** = **GPT4All** — see `E:\AI-Offline\`.
+| To do this | Open this file (in the top folder) |
+|---|---|
+| **Read the library** — Wikipedia, medical, survival, repair, education | **OPEN-LIBRARY** — `.bat` on Windows, `.command` on Mac, `.sh` on Linux. Your web browser opens at `http://localhost:8095`. Search everything there. Close the black window to stop. |
+| **Check the drive** — prove no file has rotted | **CHECK-DRIVE** — same three versions. Takes 10–40 minutes. |
+
+- **PDFs and these guides (`.html`)** open in any web browser. No software needed.
+- **`README.html`** lists every file on the drive with links.
+
+> **Mac:** if macOS blocks a `.command` file, open **System Settings → Privacy & Security** and click **Open Anyway**.
+> **Windows:** if SmartScreen warns, click **More info → Run anyway**.
 
 ---
 
 ## What's on this drive
 
-| Folder | What it is | How to open | Guide |
-|---|---|---|---|
-| `AI-Offline\` | Offline AI chat (3 models, CPU + GPU) | Double-click a `CHAT-*.bat` | `AI-Offline\HOW-TO-RUN-OFFLINE-AI.html` |
-| `AI-Offline\DocReader-GPT4All\` | AI that reads your PDFs & answers questions | Install once, then offline | `...\HOW-TO-ASK-YOUR-DOCS.html` |
-| `Manuals\` | Survival & repair manuals (Army FMs, iFixit, Appropedia, survival/water/food) | PDF→browser, ZIM→Kiwix | `Manuals\READ-ME-FIRST.html` |
-| `Manuals\Radio-Communications\` | How ham/CB/shortwave radio works + emergency comms | Browser | `RADIO-GUIDE.html` |
-| `Medical\` | Offline medical Wikipedia + first-aid books | ZIM→Kiwix, PDF→browser | `Medical\READ-ME-FIRST.html` |
-| `Wikipedia\` | Full Wikipedia article text (compressed) | Via Kiwix / archival | — |
-| `OsmAnd\` | Offline US maps — view on **PC (no phone)** or phone | PC: `MapViewer-Desktop\VIEW-MAPS-ON-PC.bat`; phone: bundled APK | `OsmAnd\HOW-TO-VIEW-MAPS.html` |
-| `Kiwix-Reader\` | The reader for all `.zim` archives | Portable app | `Kiwix-Reader\HOW-TO-USE-KIWIX.html` |
-| `Phone-Apps\` | Android apps (Kiwix + OsmAnd) to port the library to a phone, offline | Sideload the APKs | `Phone-Apps\USE-ON-PHONE.html` |
+| Folder | What it is | How to open |
+|---|---|---|
+| `Wikipedia/` | All of English Wikipedia | OPEN-LIBRARY |
+| `Medical/` | Medical archives + *Where There Is No Doctor / Dentist* (PDF chapters) | OPEN-LIBRARY; PDFs in a browser — see `Medical/READ-ME-FIRST.html` |
+| `Manuals/` | Army field manuals (PDF), iFixit, Appropedia, DIY, survival, food & garden, radio | OPEN-LIBRARY; PDFs in a browser — see `Manuals/READ-ME-FIRST.html` |
+| `Education/` | Wikibooks, Wikiversity, LibreTexts textbooks, TED talks | OPEN-LIBRARY |
+| `Computing/` | Programming docs, electronics and Raspberry Pi Q&A | OPEN-LIBRARY |
+| `OsmAnd/` | Offline US maps | Phone app, or `MapViewer-Desktop/` — see `OsmAnd/HOW-TO-VIEW-MAPS.html` |
+| `AI-Offline/` | Offline AI chat + GPT4All (if downloaded) | See `AI-Offline/HOW-TO-RUN-OFFLINE-AI.html` |
+| `Kiwix-Reader/` | The readers OPEN-LIBRARY uses, plus the Kiwix desktop app | See `Kiwix-Reader/HOW-TO-USE-KIWIX.html` |
+| `Phone-Apps/` | Android apps (Kiwix, OsmAnd) to copy onto a phone | See `Phone-Apps/USE-ON-PHONE.html` |
 
 ---
 
 ## Quick start by need
 
-- **I want to chat with an AI offline:** `AI-Offline\` → double-click `CHAT-3B-light.bat`.
-- **I want the AI to answer from my manuals:** set up `DocReader-GPT4All` (see its guide),
-  point it at `Manuals\ArmyFieldManuals` and `Medical\Manuals-PDF`, ask away.
-- **I need to fix something (car/appliance/plumbing/electrical):** open Kiwix →
-  `Manuals\Repair-iFixit` and `Manuals\DIY-Appropedia`.
-- **Medical / first aid:** open Kiwix → `Medical\WikiMed`; or read the PDFs in
-  `Medical\Manuals-PDF`; Army first aid in `Manuals\ArmyFieldManuals`.
-- **Survival / water / food:** Kiwix → `Manuals\Survival-Water-Food`; plus the Army
-  survival PDFs.
-- **Communicate by radio:** read `Manuals\Radio-Communications\RADIO-GUIDE.html`.
-- **Look something up:** Wikipedia (via Kiwix) and the maps (`OsmAnd\HOW-TO-VIEW-MAPS.html`
-  — works on a PC with no phone).
+- **Medical / first aid:** OPEN-LIBRARY → search, or open the *Where There Is No Doctor*
+  chapters in `Medical/Manuals-PDF/`. Army first aid: `Manuals/ArmyFieldManuals/`.
+- **Fix something (car, appliance, plumbing, electrical):** OPEN-LIBRARY → iFixit,
+  Appropedia, DIY Q&A.
+- **Water, food, shelter:** OPEN-LIBRARY → survival archives; plus the Army survival PDFs.
+- **Grow or cook food:** OPEN-LIBRARY → gardening, cooking, homesteading.
+- **Radio:** `Manuals/Radio-Communications/RADIO-GUIDE.html`, and the ham-radio Q&A.
+- **Find your way:** `OsmAnd/HOW-TO-VIEW-MAPS.html`.
+- **Chat with an AI offline:** `AI-Offline/HOW-TO-RUN-OFFLINE-AI.html`.
 
 ---
 
-## Dependencies — kept to a minimum
+## Look after the drive
 
-| Content | Needs | Bundled here? |
-|---|---|---|
-| PDFs & `.html` guides | A web browser (Edge is on Windows) | n/a — already on Windows |
-| `.zim` archives | **Kiwix** (portable, no install) | ✅ `E:\Kiwix-Reader\app` |
-| Offline AI chat | Nothing extra (self-contained engine) | ✅ `E:\AI-Offline\engine` |
-| AI doc-Q&A | **GPT4All** (one-time install; self-contained, CPU) | ✅ installer in `DocReader-GPT4All` |
-| Maps on a computer | Bundled desktop viewer + portable Java (no phone needed) | ✅ `OsmAnd\MapViewer-Desktop` |
-| Maps on Android | Bundled **OsmAnd~ APK** (sideload offline) | ✅ `OsmAnd\PhoneApp-Android` |
-| Maps on iPhone/iPad | OsmAnd from the App Store | app store (get while online) |
-
-Everything that needs a one-time online step (GPT4All's first run, phone apps) should be
-set up **now, while you still have internet**, so the kit is fully usable offline later.
-
----
+- **Once a year:** plug it in and run **CHECK-DRIVE**. SSDs left without power slowly
+  lose data; a yearly check finds damage while your second copy is still good.
+- **Keep two copies** in two places.
+- **Store it in a media-rated safe (UL Class 125).** A normal fire safe (Class 350) can
+  get hot enough inside to ruin a drive.
+- **Practice now.** Open the library and the maps once, so you know how in an emergency.
+- Set up anything that needs a one-time online step (GPT4All's installer, iPhone apps)
+  **now, while you have internet**.
 
 ## ⚠️ Reminders
 
-- Offline AIs and old manuals **can be wrong**. Verify anything safety-critical.
-- Keep the drive **backed up** (a second copy on another drive/USB is wise).
-- **Practice** using each tool now so it's familiar in an actual emergency.
+- Offline AIs and old manuals **can be wrong**. Check anything safety-critical.
+- This is reference information, **not** a substitute for a doctor or a professional.

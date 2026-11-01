@@ -3,8 +3,8 @@ name: offline-emergency-library
 description: >
   Download a complete offline, no-internet "emergency library" to a drive the user
   chooses: an offline AI (chat models + CPU/GPU engine), an offline document-Q&A app
-  (GPT4All), full Wikipedia article text, offline US maps (OsmAnd), survival/repair/
-  medical archives (Kiwix ZIM: iFixit, Appropedia, WikiMed, survival/water/food/knots),
+  (GPT4All), full Wikipedia (Kiwix ZIM), offline US maps (OsmAnd), 60 Kiwix archives
+  (medicine, survival, DIY/repair, food & garden, education, computing),
   public-domain US Army field manuals + medical PDFs, the Kiwix reader, launchers, and
   full documentation (Markdown + HTML). Invoke for requests like "download the offline
   emergency library", "/offline-emergency-library", "set up my offline survival kit",
@@ -27,14 +27,14 @@ When this skill is invoked, your job is simple:
      Or standalone:
      ```powershell
      $s = Join-Path $env:TEMP 'Get-OfflineLibrary.ps1'
-     curl.exe -sL https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/Get-OfflineLibrary.ps1 -o $s
+     curl.exe -sL https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main/Get-OfflineLibrary.ps1 -o $s
      powershell -NoProfile -ExecutionPolicy Bypass -File $s -Destination "<path>"
      ```
    - **macOS / Linux**:
      ```bash
      ./get-offline-library.sh -d "<the path the user gave>"
      # or standalone:
-     curl -fsSL https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/get-offline-library.sh | bash -s -- -d "<path>"
+     curl -fsSL https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main/get-offline-library.sh | bash -s -- -d "<path>"
      ```
 3. The script creates `<path>\OfflineLibrary\`, downloads everything (resumable), writes
    the launcher `.bat` files, and generates all docs as Markdown **and** HTML. It logs to
@@ -42,17 +42,21 @@ When this skill is invoked, your job is simple:
 4. When it finishes, tell the user to open **`START-HERE.html`** in the destination.
 
 ## Notes for the assistant
-- The full library is **~60 GB** and can take hours depending on the connection. It is
-  **resumable** — if interrupted, just run the same command again.
+- The default library is **about 168 GB** (243 GB with `--wikipedia maxi`) and takes
+  several hours. It is **resumable** — if interrupted, run the same command again.
+- When it finishes it prints any failures and exits non-zero. Report those to the user;
+  do not say it succeeded unless the log ends with `DONE. Everything downloaded and checked.`
 - The script auto-resolves the **latest** versions (llama.cpp engine, Kiwix reader,
   GPT4All, and the ZIM archives) so it keeps working over time.
 - Platform: **Windows** (PowerShell + curl, built in) or **macOS / Linux** (bash + curl +
   tar, built in; `unzip` enables the desktop map viewer). Pick the installer matching the
   user's OS.
-- Everything downloaded is **free and legally redistributable**: open-weight AI models,
-  openly-licensed Kiwix archives, and public-domain US-government manuals. No piracy.
+- Every item is downloaded from its publisher onto the user's drive. Kiwix archives keep
+  their own (mostly Creative Commons) licences; Hesperian's books are for personal use.
 - If the user is low on disk space, you *may* mention the optional flags
-  `-SkipWikipedia`, `-SkipMaps`, `-SkipModels` — but do not prompt for them unless asked.
+  `--wikipedia nopic|mini|none`, `--skip-groups`, `--skip-maps`, `--skip-models`,
+  `--skip-ai` (Windows: `-Wikipedia`, `-SkipGroups`, `-SkipMaps`, `-SkipModels`, `-SkipAI`)
+  — but do not prompt for them unless asked. `--dry-run` / `-DryRun` shows the total size.
 
 See `README.md` for the full contents list, storage/hardware requirements, and how to
 use each component after downloading.
