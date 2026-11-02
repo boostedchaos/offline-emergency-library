@@ -87,7 +87,7 @@ gh_asset_latest(){ # repo regex -> asset url from the 'latest' release
    | grep -oE '"browser_download_url"[ ]*:[ ]*"[^"]+"' | sed -E 's/.*"(https[^"]+)"/\1/' \
    | grep -E "$2" | head -n1
 }
-latest_zim(){ curl -s -A "$UA" "$1" | grep -oE "$2[^\"<]*\.zim" | sort -u | tail -n1; }
+latest_zim(){ curl -sL -A "$UA" "$1" | grep -oE "$2[^\"<]*\.zim" | sort -u | tail -n1; }
 
 # ================================================================ 1. AI engine
 log "=== [1/8] Offline AI engine (llama.cpp) ==="
