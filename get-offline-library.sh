@@ -6,11 +6,12 @@
 #   ./get-offline-library.sh                 # asks where to save
 #   ./get-offline-library.sh -d /mnt/usb     # non-interactive
 #   flags: --skip-wikipedia  --skip-maps  --skip-models
+#   opt-in: --browser-maps   street maps in any web browser (US states, ~16.5 GB for all of the US)
 
 REPO_RAW="https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main"
 DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0
 REGION="US"; LISTREGIONS=0; FILTER=""
-EDU=0; EDULANG="en"; KOLIBRI=0
+EDU=0; EDULANG="en"; KOLIBRI=0; BROWSER_MAPS=0
 CONTINENTS="africa asia australia-oceania centralamerica europe northamerica southamerica"
 # Map common names / ISO codes to the OsmAnd region token. Unknown input passes through.
 alias_region(){
@@ -64,6 +65,7 @@ while [ $# -gt 0 ]; do
     --education)      EDU=1; shift;;
     --edu-lang)       EDULANG="$2"; shift 2;;
     --kolibri)        KOLIBRI=1; shift;;
+    --browser-maps)   BROWSER_MAPS=1; shift;;
     --skip-wikipedia) SKIP_WIKI=1; shift;;
     --skip-maps)      SKIP_MAPS=1; shift;;
     --skip-models)    SKIP_MODELS=1; shift;;
@@ -338,6 +340,88 @@ EOS
     log "desktop map viewer: skipped (install 'unzip' then re-run to enable)"
   fi
 else log "=== [8/8] Maps SKIPPED ==="; fi
+
+# ================================================================ 8c. Browser maps (opt-in)
+# Street maps in any web browser on Windows, macOS and Linux - no app, no Java. Protomaps
+# state maps made by Project NOMAD (MIT; map data (c) OpenStreetMap contributors, ODbL),
+# NOMAD's style/fonts/symbols, the MapLibre GL JS viewer (BSD-3) and Caddy (Apache-2.0) as a
+# local web server. NOMAD has US states only; any region also gets a low-detail world map.
+if [ "$SKIP_MAPS" = 0 ] && [ "$BROWSER_MAPS" = 1 ]; then
+  log "=== [8c] Browser maps (Project NOMAD / Protomaps + MapLibre + Caddy) ==="
+  MB="$ROOT/Maps-Browser"; mkdir -p "$MB/pmtiles" "$MB/viewer/lib" "$MB/server"
+  NM="https://github.com/Crosstalk-Solutions/project-nomad-maps/raw/refs/heads/master"
+  # which states: US / world / northamerica = all; Us_<state>[_<area>] = that state.
+  # (functions, not inline: bash 3.2 on macOS misreads "case" inside $( ... ))
+  nomad_want(){ printf '%s\n' "$REGION" | tr ',;' '  ' | tr ' ' '\n' | while IFS= read -r tok; do   # \n: read skips a last line without one
+    [ -z "$tok" ] && continue
+    t="$(alias_region "$tok" | tr 'A-Z' 'a-z')"
+    case "$t" in us|world|northamerica) echo ALL ;; us_*) printf '%s\n' "${t#us_}" | tr '-' '_' ;; esac
+  done; }
+  nomad_keep(){ # map-name  wanted... -> exit 0 if the map is wanted
+    r="$1"; shift
+    case "$r" in global*) return 0 ;; esac
+    for w in "$@"; do case "$w" in ALL|"$r"|"$r"_*) return 0 ;; esac; done
+    return 1
+  }
+  want="$(nomad_want)"
+  names="$(curl -sL -H "User-Agent: oel" "https://api.github.com/repos/Crosstalk-Solutions/project-nomad-maps/contents/pmtiles" \
+    | grep -oE '"name"[ ]*:[ ]*"[a-z_-]+_[0-9]{4}-[0-9]{2}\.pmtiles"' | sed -E 's/.*"([^"]+)"$/\1/' | LC_ALL=C sort)"
+  # newest file per map (names end _YYYY-MM.pmtiles); the world map first so states draw over it
+  list="$(printf '%s\n' "$names" | sed -E 's/_[0-9]{4}-[0-9]{2}\.pmtiles$//' | sort -u | while IFS= read -r r; do
+    [ -n "$r" ] && nomad_keep "$r" $want && printf '%s\n' "$names" | grep -E "^${r}_[0-9]{4}-[0-9]{2}\.pmtiles$" | tail -n1
+  done | awk '/^global/{print; next} {rest=rest $0 "\n"} END{printf "%s", rest}')"
+  ns="$(printf '%s\n' "$list" | grep -c -v -e '^global' -e '^$')"
+  [ "$ns" = 0 ] && log "browser maps: no US state in region '$REGION' (these maps cover the US) - adding the world map only"
+  log "browser maps: $(printf '%s\n' "$list" | grep -c .) map files ($ns US states)"
+  : > "$MB/_ok.txt"
+  printf '%s\n' "$list" | while IFS= read -r fn; do
+    [ -z "$fn" ] && continue
+    log "map: $fn"; fetch "$NM/pmtiles/$fn" "$MB/pmtiles/$fn"
+    # no published fingerprints: check the PMTiles header (the file starts with "PMTiles")
+    if [ "$(head -c 7 "$MB/pmtiles/$fn" 2>/dev/null)" = "PMTiles" ]; then echo "$fn" >> "$MB/_ok.txt"
+    else log "  WARN: $fn is not a PMTiles file (removed) - run again"; rm -f "$MB/pmtiles/$fn"; fi
+  done
+  if [ -s "$MB/_ok.txt" ]; then printf '[%s]\n' "$(sed 's/.*/"&"/' "$MB/_ok.txt" | paste -sd, -)" > "$MB/regions.json"; fi
+  rm -f "$MB/_ok.txt"
+  # map style, fonts and symbols (one archive, no symlinks inside)
+  fetch "$NM/base-assets.tar.gz" "$MB/base-assets.tar.gz"
+  rm -rf "$MB/assets-new"; mkdir -p "$MB/assets-new"
+  if tar -xzf "$MB/base-assets.tar.gz" -C "$MB/assets-new" 2>/dev/null && [ -f "$MB/assets-new/tozip/nomad-base-styles.json" ]; then
+    rm -rf "$MB/assets"; mv "$MB/assets-new/tozip" "$MB/assets"
+  else log "  WARN: could not unpack the map style and fonts (base-assets.tar.gz)"; fi
+  rm -rf "$MB/assets-new"
+  # map viewer libraries (pinned versions)
+  for u in maplibre-gl@4.7.1/dist/maplibre-gl.js maplibre-gl@4.7.1/dist/maplibre-gl.css pmtiles@4.4.0/dist/pmtiles.js; do
+    f="$MB/viewer/lib/$(basename "$u")"; fetch "https://unpkg.com/$u" "$f"
+    grep -q -i -E 'maplibregl|pmtiles' "$f" 2>/dev/null || { log "  WARN: $(basename "$u") did not download (removed)"; rm -f "$f"; }
+  done
+  # Caddy web server for every platform (one release); folder = <os>-<arch>
+  crel="$(curl -sL -H "User-Agent: oel" "https://api.github.com/repos/caddyserver/caddy/releases/latest")"
+  for ck in windows_amd64.zip windows_arm64.zip mac_arm64.tar.gz mac_amd64.tar.gz linux_amd64.tar.gz linux_arm64.tar.gz; do
+    cu="$(printf '%s' "$crel" | grep -oE '"browser_download_url"[ ]*:[ ]*"[^"]+_'"$ck"'"' | sed -E 's/.*"(https[^"]+)"$/\1/' | head -n1)"
+    [ -z "$cu" ] && { log "  WARN: caddy $ck not in the latest Caddy release"; continue; }
+    cd_="${ck%.zip}"; cd_="${cd_%.tar.gz}"; cd_="$(printf '%s' "$cd_" | tr '_' '-')"
+    log "caddy: $(basename "$cu")"; fetch "$cu" "$MB/server/$(basename "$cu")"
+    rm -rf "$MB/server/$cd_"; mkdir -p "$MB/server/$cd_"   # keeps Caddy's LICENSE (Apache-2.0)
+    case "$ck" in
+      *.zip)    if [ "$HAVE_UNZIP" = 1 ]; then unzip -o -q "$MB/server/$(basename "$cu")" -d "$MB/server/$cd_"; else log "  $ck: install 'unzip' to unpack it"; fi ;;
+      *.tar.gz) tar -xzf "$MB/server/$(basename "$cu")" -C "$MB/server/$cd_" || log "  WARN: could not unpack $ck" ;;
+    esac
+  done
+  # viewer page + OPEN-MAPS launchers: from the repo (local clone, else GitHub). The .bat gets
+  # Windows line ends and the .sh Unix line ends, whatever the source had.
+  SD="$(cd "$(dirname "$0")" && pwd)"
+  for f in index.html OPEN-MAPS.sh OPEN-MAPS.bat; do
+    if [ -f "$SD/maps-viewer/$f" ]; then cp "$SD/maps-viewer/$f" "$MB/_$f"; else curl -sL -A "$UA" "$REPO_RAW/maps-viewer/$f" -o "$MB/_$f"; fi
+  done
+  mv -f "$MB/_index.html" "$MB/viewer/index.html"
+  tr -d '\r' < "$MB/_OPEN-MAPS.sh" > "$MB/OPEN-MAPS.sh"; chmod +x "$MB/OPEN-MAPS.sh" 2>/dev/null
+  tr -d '\r' < "$MB/_OPEN-MAPS.bat" | sed 's/$/\r/' > "$MB/OPEN-MAPS.bat"
+  rm -f "$MB/_OPEN-MAPS.sh" "$MB/_OPEN-MAPS.bat"
+  log "browser maps: run Maps-Browser/OPEN-MAPS (.bat on Windows, .sh on macOS/Linux)"
+else
+  log "=== [8c] Browser maps not selected - add --browser-maps to include (~16.5 GB for the US) ==="
+fi
 
 # ================================================================ phone apps
 log "=== Phone apps (port the library to a phone) ==="

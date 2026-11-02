@@ -5,6 +5,27 @@
 <p>(no phone needed)<strong> or </strong>on a phone/tablet<strong>. Both work with </strong>no internet**. Dependencies</p>
 <p>for each are bundled or explained below.</p>
 <hr>
+<h2>Street maps in a web browser (opt-in: <code>-BrowserMaps</code> / <code>--browser-maps</code>)</h2>
+<p>Add <code>-BrowserMaps</code> (Windows) or <code>--browser-maps</code> (macOS/Linux) when you run the installer to also get</p>
+<p><strong>street maps that open in any web browser</strong>, on Windows, macOS or Linux. No app and no Java are needed.</p>
+<ol>
+<li>Open the <code>Maps-Browser\</code> folder.</li>
+<li><strong>Windows:</strong> double-click <code>OPEN-MAPS.bat</code>. <strong>macOS / Linux:</strong> run <code>bash OPEN-MAPS.sh</code> in a terminal.</li>
+<li>Your browser opens at <strong>http://localhost:8097/viewer/</strong>. Zoom with the mouse wheel, or pick a state in</li>
+</ol>
+<p>   <strong>Go to a state</strong>. To stop, close the OPEN-MAPS window.</p>
+<ul>
+<li><strong>US only.</strong> These are the US state maps made by Project NOMAD (Protomaps). With <code>US</code> (the default) you get</li>
+</ul>
+<p>  all 50 states (~16.5 GB). With <code>-Region US_texas</code> you get only Texas. Every drive also gets a low-detail</p>
+<p>  world map (~0.2 GB). For other countries, use the OsmAnd maps below.</p>
+<ul>
+<li>They show streets, towns, parks and water. They cannot plan a route; use OsmAnd for directions.</li>
+<li>Map data © OpenStreetMap contributors (ODbL); maps by <a href="https://github.com/Crosstalk-Solutions/project-nomad-maps">Project NOMAD</a></li>
+</ul>
+<p>  (MIT) from <a href="https://github.com/protomaps/basemaps">Protomaps</a>; viewer <a href="https://maplibre.org">MapLibre GL JS</a> (BSD-3);</p>
+<p>  local web server <a href="https://caddyserver.com">Caddy</a> (Apache-2.0).</p>
+<hr>
 <h2>Choosing your country / region (at download time)</h2>
 <p>By default the installer downloads <strong>US</strong> maps. To get a different country, region, or</p>
 <p>continent, pass <code>-Region</code> (Windows) or <code>--region</code> (macOS/Linux) when you run the installer.</p>

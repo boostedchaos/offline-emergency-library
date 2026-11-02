@@ -18,6 +18,11 @@ urls=(
   "https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF"
   "https://f-droid.org/api/v1/packages/net.osmand.plus"
   "https://archive.org/metadata/fm-21-76-us-army-survival-manual"
+  "https://api.github.com/repos/Crosstalk-Solutions/project-nomad-maps/contents/pmtiles"
+  "https://github.com/Crosstalk-Solutions/project-nomad-maps/raw/refs/heads/master/base-assets.tar.gz"
+  "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"
+  "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+  "https://unpkg.com/pmtiles@4.4.0/dist/pmtiles.js"
 )
 
 check() { # url
@@ -51,6 +56,7 @@ gh_has_asset "ggml-org/llama.cpp"   "releases?per_page=20" "bin-win-cpu-x64\\.zi
 gh_has_asset "ggml-org/llama.cpp"   "releases?per_page=20" "bin-ubuntu-x64\\.tar\\.gz"    "llama.cpp Linux build"
 gh_has_asset "nomic-ai/gpt4all"     "releases/latest"      "installer-win64-v.*\\.exe"    "GPT4All Windows installer"
 gh_has_asset "kiwix/kiwix-android"  "releases/latest"      "universal-standalone\\.apk"   "Kiwix Android APK"
+gh_has_asset "caddyserver/caddy"    "releases/latest"      "_mac_arm64\\.tar\\.gz"       "Caddy web server (browser maps)"
 gh_has_asset "learningequality/kolibri" "releases/latest"  "windows-setup\\.exe"          "Kolibri app installer"
 
 echo ""

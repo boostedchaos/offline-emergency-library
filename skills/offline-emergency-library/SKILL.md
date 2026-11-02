@@ -60,6 +60,9 @@ When this skill is invoked, your job is simple:
   videos; `-EduLang`/`--edu-lang` en|es|fr). `-Kolibri` / `--kolibri` adds the **Kolibri**
   learning app, where the user picks subjects + video quality in-app (tens of GB). Only add
   either if the user asks for courses/education.
+- **Browser maps are opt-in.** `-BrowserMaps` / `--browser-maps` adds US street maps that open in
+  any web browser (`Maps-Browser\OPEN-MAPS`; ~16.5 GB for all states, follows `-Region`). Only add it
+  if the user asks for maps on a computer without an app.
 - **Maps default to the US.** If the user wants another area, pass `-Region <name>`
   (Windows) / `--region <name>` (macOS/Linux) — e.g. `France`, `"Germany,Austria"`,
   `Europe`, `US_texas`, or `world`. To discover exact names, run with `-ListRegions` /

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline Maps</title>
+<link rel="icon" href="data:,">  <!-- no favicon request (it would 404) -->
+
+<!--
+  Offline map viewer for the Offline Emergency Library.
+  Served by OPEN-MAPS (Caddy) from the Maps-Browser folder:
+    /viewer/      this page + lib/ (MapLibre GL JS 4.7.1, PMTiles 4.4.0)
+    /pmtiles/     map files (Protomaps basemap extracts made by Project NOMAD)
+    /assets/      NOMAD's base style, fonts and map symbols
+    /regions.json list of map files, written by the installer (world first)
+  Source: maps-viewer/index.html in the repo; the installer copies it to Maps-Browser/viewer/.
+  The style is NOMAD's template with every layer repeated per map file, ordered layer by
+  layer (all states' water, then all states' roads, ... then labels) so one state never
+  covers another state's labels.
+-->
+<link rel="stylesheet" href="lib/maplibre-gl.css">
+<style>
+  :root { --panel: #ffffff; --ink: #1d2733; --muted: #5b6b7d; --line: #d5dde6; }
+  @media (prefers-color-scheme: dark) { :root { --panel: #18202b; --ink: #e8eef5; --muted: #9fb0c3; --line: #2c3a4b; } }
+  html, body, #map { margin: 0; height: 100%; }
+  body { font: 15px/1.4 -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); }
+  #panel { position: absolute; top: 10px; left: 10px; z-index: 2; background: var(--panel); border: 1px solid var(--line);
+           border-radius: 10px; padding: 8px 10px; box-shadow: 0 2px 8px rgba(0,0,0,.2); max-width: calc(100% - 80px); }
+  #panel select { font: inherit; max-width: 100%; margin-top: 4px; }
+  #status { color: var(--muted); font-size: 13px; }
+</style>
+<script src="lib/maplibre-gl.js"></script>
+<script src="lib/pmtiles.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <b>Offline Maps</b> <span id="status">Loading…</span><br>
+  <select id="jump" aria-label="Go to a state"><option value="">Go to a state…</option></select>
+</div>
+<script>
+(async () => {
+  const status = document.getElementById("status");
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol("pmtiles", protocol.tile);
+  const origin = location.origin;
+  const regions = await (await fetch("../regions.json")).json();
+  const tpl = await (await fetch("../assets/nomad-base-styles.json")).json();
+  const attribution = '<a href="https://github.com/protomaps/basemaps">Protomaps</a> © ' +
+    '<a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL) · ' +
+    'state maps by <a href="https://github.com/Crosstalk-Solutions/project-nomad-maps">Project NOMAD</a>';
+  const ids = regions.map(r => r.replace(/\.pmtiles$/, ""));
+  const style = {
+    version: 8, sources: {},
+    glyphs: origin + "/assets/basemaps-assets/fonts/{fontstack}/{range}.pbf",
+    sprite: origin + "/assets/basemaps-assets/sprites/v4/light",
+    layers: tpl.layers.filter(l => !l.source)
+  };
+  regions.forEach((r, i) => {
+    style.sources[ids[i]] = { type: "vector", url: "pmtiles://" + origin + "/pmtiles/" + r, attribution };
+  });
+  for (const l of tpl.layers.filter(l => l.source)) {
+    for (const id of ids) style.layers.push({ ...l, id: l.id + "-" + id, source: id });
+  }
+  const map = new maplibregl.Map({ container: "map", style, center: [-98.5, 39.8], zoom: 3.4, hash: true });
+  map.addControl(new maplibregl.NavigationControl());
+  map.addControl(new maplibregl.ScaleControl({ unit: "imperial" }));
+  map.on("error", e => console.error("map error:", e.error && e.error.message));
+  map.on("load", () => {
+    status.textContent = regions.length + " map files, " + style.layers.length + " layers";
+    window.__mapReady = true;
+  });
+  // "Go to a state": bounds from each file's PMTiles header
+  const jump = document.getElementById("jump");
+  const bounds = {};
+  for (const [i, r] of regions.entries()) {
+    if (ids[i].startsWith("global")) continue;
+    try {
+      const h = await new pmtiles.PMTiles(origin + "/pmtiles/" + r).getHeader();
+      bounds[ids[i]] = [[h.minLon, h.minLat], [h.maxLon, h.maxLat]];
+      const name = ids[i].replace(/_\d{4}-\d{2}$/, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      jump.add(new Option(name, ids[i]));
+    } catch (e) { console.error("header", r, e.message); }
+  }
+  jump.onchange = () => { if (bounds[jump.value]) map.fitBounds(bounds[jump.value], { padding: 30 }); };
+})().catch(e => { document.getElementById("status").textContent = "Error: " + e.message; console.error(e); });
+</script>
+</body>
+</html>

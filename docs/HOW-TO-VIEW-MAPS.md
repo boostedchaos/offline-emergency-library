@@ -7,6 +7,26 @@ for each are bundled or explained below.
 
 ---
 
+## Street maps in a web browser (opt-in: `-BrowserMaps` / `--browser-maps`)
+
+Add `-BrowserMaps` (Windows) or `--browser-maps` (macOS/Linux) when you run the installer to also get
+**street maps that open in any web browser**, on Windows, macOS or Linux. No app and no Java are needed.
+
+1. Open the `Maps-Browser\` folder.
+2. **Windows:** double-click `OPEN-MAPS.bat`. **macOS / Linux:** run `bash OPEN-MAPS.sh` in a terminal.
+3. Your browser opens at **http://localhost:8097/viewer/**. Zoom with the mouse wheel, or pick a state in
+   **Go to a state**. To stop, close the OPEN-MAPS window.
+
+- **US only.** These are the US state maps made by Project NOMAD (Protomaps). With `US` (the default) you get
+  all 50 states (~16.5 GB). With `-Region US_texas` you get only Texas. Every drive also gets a low-detail
+  world map (~0.2 GB). For other countries, use the OsmAnd maps below.
+- They show streets, towns, parks and water. They cannot plan a route; use OsmAnd for directions.
+- Map data © OpenStreetMap contributors (ODbL); maps by [Project NOMAD](https://github.com/Crosstalk-Solutions/project-nomad-maps)
+  (MIT) from [Protomaps](https://github.com/protomaps/basemaps); viewer [MapLibre GL JS](https://maplibre.org) (BSD-3);
+  local web server [Caddy](https://caddyserver.com) (Apache-2.0).
+
+---
+
 ## Choosing your country / region (at download time)
 
 By default the installer downloads **US** maps. To get a different country, region, or

@@ -24,6 +24,7 @@ works with **no internet**.
 | **Offline AI chat** | 3 local AI models (Llama 3.2 3B, Llama 3.1 8B, Qwen2.5 7B) + CPU & GPU engines (llama.cpp) | ~11 GB | CPU only (GPU optional) |
 | **Offline doc-Q&A** | GPT4All — ask an AI questions about your PDFs, with citations | ~0.7 GB | CPU, one-time install |
 | **Wikipedia** | Full English Wikipedia (all articles, no images) — Kiwix-readable | ~49 GB | Kiwix |
+| **Browser maps** *(opt-in)* | US street maps that open in **any web browser** (Project NOMAD / Protomaps + MapLibre viewer + Caddy), `-BrowserMaps` / `--browser-maps` | US ≈16.5 GB (one state: less) | **Any computer** with a browser |
 | **Offline maps** | Maps for the region you pick (**default US**; any country/region/continent — see below) + **bundled desktop viewer** (OsmAndMapCreator + portable Java) + **bundled Android app (APK)** | US ≈17 GB; varies by region (+~0.4 GB tools) | **PC (no phone) or phone** |
 | **Repair archive** | iFixit — cars, appliances, electronics, phones | ~3.4 GB | Kiwix |
 | **DIY archive** | Appropedia — plumbing, electrical, construction, energy, water, food | ~0.6 GB | Kiwix |
@@ -164,6 +165,7 @@ runs 100% offline afterward:
 | Kiwix reader + ZIM archives | download.kiwix.org |
 | Wikipedia | download.kiwix.org |
 | Maps + desktop viewer | download.osmand.net |
+| Browser maps (optional) | github.com/Crosstalk-Solutions/project-nomad-maps (maps, style), unpkg.com (MapLibre GL JS, pmtiles.js), github.com/caddyserver/caddy (web server) |
 | Portable Java | api.adoptium.net (Eclipse Temurin) |
 | Manuals (PDF) | archive.org |
 | Phone apps (APK) | github.com/kiwix/kiwix-android, f-droid.org |
@@ -238,6 +240,7 @@ Both pages link to each component's guide:
 - `AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS.html` — ask AI about your PDFs
 - `Kiwix-Reader\HOW-TO-USE-KIWIX.html` — read the `.zim` archives
 - `OsmAnd\HOW-TO-VIEW-MAPS.html` — view maps on a PC (no phone) or phone
+- `Maps-Browser\OPEN-MAPS.bat` / `OPEN-MAPS.sh` — street maps in a web browser (opt-in)
 - `Phone-Apps\USE-ON-PHONE.html` — port the library to a phone
 - `Manuals\READ-ME-FIRST.html` and `Medical\READ-ME-FIRST.html`
 - `Manuals\Radio-Communications\RADIO-GUIDE.html` — emergency radio comms
@@ -254,6 +257,7 @@ Both pages link to each component's guide:
 | `-ListRegions` / `--list-regions [filter]` | List available map regions, then exit (no download) |
 | `-Education` / `--education` | **Add Khan Academy** archive (Kiwix ZIM, ~168 GB with videos) — off by default |
 | `-EduLang <en\|es\|fr>` / `--edu-lang <…>` | Khan Academy language (default `en`) |
+| `-BrowserMaps` / `--browser-maps` | **Add street maps for any web browser** (US states, ~16.5 GB for all; follows `-Region`) — off by default |
 | `-Kolibri` / `--kolibri` | **Add the Kolibri learning app** (pick subjects + low-res in-app; tens of GB) — off by default |
 | `-SkipWikipedia` / `--skip-wikipedia` | Don't download the 24 GB Wikipedia dump (~24 GB saved) |
 | `-SkipMaps` / `--skip-maps` | Don't download the maps (~17 GB saved for US) |

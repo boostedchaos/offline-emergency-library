@@ -25,6 +25,7 @@ param(
   [switch]$Education,        # OPT-IN: add Khan Academy (Kiwix ZIM, ~168 GB with videos)
   [string]$EduLang = 'en',   # Khan Academy language: en, es, or fr
   [switch]$Kolibri,          # OPT-IN: add the Kolibri learning app (pick subjects/low-res in-app)
+  [switch]$BrowserMaps,      # OPT-IN: street maps in any web browser (US states, ~16.5 GB for all of the US)
   [switch]$NoAria            # force curl even if aria2c is installed
 )
 
@@ -355,6 +356,89 @@ pause
 "@
   Set-Content -Path (Join-Path $mvd 'VIEW-MAPS-ON-PC.bat') -Value $mvbat -Encoding ascii
 }
+
+# ================================================================ 8c. Browser maps (opt-in)
+# Street maps in any web browser on Windows, macOS and Linux - no app, no Java. Protomaps
+# state maps made by Project NOMAD (MIT; map data (c) OpenStreetMap contributors, ODbL),
+# NOMAD's style/fonts/symbols, the MapLibre GL JS viewer (BSD-3) and Caddy (Apache-2.0) as a
+# local web server. NOMAD has US states only; any region also gets a low-detail world map.
+if((-not $SkipMaps) -and $BrowserMaps){
+  Log '=== [8c] Browser maps (Project NOMAD / Protomaps + MapLibre + Caddy) ==='
+  $mb = Join-Path $Root 'Maps-Browser'
+  foreach($d in 'pmtiles','viewer\lib','server'){ New-Item -ItemType Directory -Force (Join-Path $mb $d) | Out-Null }
+  $nm = 'https://github.com/Crosstalk-Solutions/project-nomad-maps/raw/refs/heads/master'
+  try{
+    # which states: US / world / northamerica = all; Us_<state>[_<area>] = that state
+    $want = @(($Region -split '[,; ]') | ForEach-Object { $_.Trim() } | Where-Object { $_ } | ForEach-Object {
+      $t = (Resolve-RegionToken $_).ToLower()
+      if(@('us','world','northamerica') -contains $t){ 'ALL' } elseif($t.StartsWith('us_')){ $t.Substring(3).Replace('-','_') }
+    })
+    $names = @((Invoke-RestMethod 'https://api.github.com/repos/Crosstalk-Solutions/project-nomad-maps/contents/pmtiles' -Headers @{'User-Agent'='ps'}) |
+      ForEach-Object { $_.name } | Where-Object { $_ -cmatch '^[a-z_-]+_\d{4}-\d{2}\.pmtiles$' } | Sort-Object)
+    # newest file per map (names end _YYYY-MM.pmtiles); the world map first so states draw over it
+    $list = @()
+    foreach($g in ($names | Group-Object { $_ -replace '_\d{4}-\d{2}\.pmtiles$','' } | Sort-Object Name)){
+      $r = $g.Name
+      $keep = $r.StartsWith('global')
+      foreach($w in $want){ if($w -eq 'ALL' -or $w -eq $r -or $w.StartsWith($r + '_')){ $keep = $true } }
+      if($keep){ $list += ($g.Group | Sort-Object | Select-Object -Last 1) }
+    }
+    $list = @($list | Where-Object { $_.StartsWith('global') }) + @($list | Where-Object { -not $_.StartsWith('global') })
+    $ns = @($list | Where-Object { -not $_.StartsWith('global') }).Count
+    if($ns -eq 0){ Log "browser maps: no US state in region '$Region' (these maps cover the US) - adding the world map only" }
+    Log "browser maps: $($list.Count) map files ($ns US states)"
+    $ok = @()
+    foreach($fn in $list){
+      $out = Join-Path $mb "pmtiles\$fn"
+      Log "map: $fn"; Fetch "$nm/pmtiles/$fn" $out
+      # no published fingerprints: check the PMTiles header (the file starts with "PMTiles")
+      $hdr = ''; if(Test-Path $out){ $fs = [System.IO.File]::OpenRead($out); $buf = New-Object byte[] 7; [void]$fs.Read($buf,0,7); $fs.Close(); $hdr = [System.Text.Encoding]::ASCII.GetString($buf) }
+      if($hdr -eq 'PMTiles'){ $ok += $fn } else { Log "  WARN: $fn is not a PMTiles file (removed) - run again"; Remove-Item -LiteralPath $out -Force -ErrorAction SilentlyContinue }
+    }
+    if($ok.Count){ [System.IO.File]::WriteAllText((Join-Path $mb 'regions.json'), ('[' + (($ok | ForEach-Object { '"' + $_ + '"' }) -join ',') + "]`n"), [System.Text.UTF8Encoding]::new($false)) }
+    # map style, fonts and symbols (one archive, no symlinks inside)
+    $ba = Join-Path $mb 'base-assets.tar.gz'; Fetch "$nm/base-assets.tar.gz" $ba
+    $new = Join-Path $mb 'assets-new'; if(Test-Path $new){ Remove-Item $new -Recurse -Force }; New-Item -ItemType Directory -Force $new | Out-Null
+    $tarExe = if(Get-Command tar.exe -ErrorAction SilentlyContinue){ 'tar.exe' } else { 'tar' }
+    & $tarExe -xzf $ba -C $new 2>$null
+    if(Test-Path (Join-Path $new 'tozip\nomad-base-styles.json')){
+      $old = Join-Path $mb 'assets'; if(Test-Path $old){ Remove-Item $old -Recurse -Force }
+      Move-Item (Join-Path $new 'tozip') $old
+    } else { Log '  WARN: could not unpack the map style and fonts (base-assets.tar.gz)' }
+    Remove-Item $new -Recurse -Force -ErrorAction SilentlyContinue
+    # map viewer libraries (pinned versions)
+    foreach($u in 'maplibre-gl@4.7.1/dist/maplibre-gl.js','maplibre-gl@4.7.1/dist/maplibre-gl.css','pmtiles@4.4.0/dist/pmtiles.js'){
+      $f = Join-Path $mb ('viewer\lib\' + (Split-Path $u -Leaf)); Fetch "https://unpkg.com/$u" $f
+      if(-not ((Test-Path $f) -and (Select-String -Path $f -Pattern 'maplibregl|pmtiles' -Quiet))){ Log "  WARN: $(Split-Path $u -Leaf) did not download (removed)"; Remove-Item $f -Force -ErrorAction SilentlyContinue }
+    }
+    # Caddy web server for every platform (one release); folder = <os>-<arch>
+    $crel = Invoke-RestMethod 'https://api.github.com/repos/caddyserver/caddy/releases/latest' -Headers @{'User-Agent'='ps'}
+    foreach($ck in 'windows_amd64.zip','windows_arm64.zip','mac_arm64.tar.gz','mac_amd64.tar.gz','linux_amd64.tar.gz','linux_arm64.tar.gz'){
+      $a = $crel.assets | Where-Object { $_.name -like "*_$ck" } | Select-Object -First 1
+      if(-not $a){ Log "  WARN: caddy $ck not in the latest Caddy release"; continue }
+      $dir = ($ck -replace '\.(zip|tar\.gz)$','') -replace '_','-'
+      $out = Join-Path $mb "server\$($a.name)"; $dest = Join-Path $mb "server\$dir"
+      Log "caddy: $($a.name)"; Fetch $a.browser_download_url $out
+      if(Test-Path $dest){ Remove-Item $dest -Recurse -Force }; New-Item -ItemType Directory -Force $dest | Out-Null   # keeps Caddy's LICENSE (Apache-2.0)
+      try{ if($ck -like '*.zip'){ Expand-Archive $out -DestinationPath $dest -Force } else { & $tarExe -xzf $out -C $dest } }catch{ Log "  WARN: could not unpack ${ck}: $($_.Exception.Message)" }
+    }
+    # viewer page + OPEN-MAPS launchers: from the repo (local clone, else GitHub). The .bat gets
+    # Windows line ends and the .sh Unix line ends, whatever the source had.
+    $sd = if($PSScriptRoot){$PSScriptRoot}else{(Get-Location).Path}
+    foreach($f in 'index.html','OPEN-MAPS.sh','OPEN-MAPS.bat'){
+      $lp = Join-Path $sd "maps-viewer\$f"; $tmp = Join-Path $mb "_$f"
+      if(Test-Path $lp){ Copy-Item $lp $tmp -Force } else { curl.exe -sL "$RepoRaw/maps-viewer/$f" -A (UA) -o $tmp }
+    }
+    Move-Item (Join-Path $mb '_index.html') (Join-Path $mb 'viewer\index.html') -Force
+    $utf8 = [System.Text.UTF8Encoding]::new($false)
+    $sh = [System.IO.File]::ReadAllText((Join-Path $mb '_OPEN-MAPS.sh')).Replace("`r`n","`n")
+    [System.IO.File]::WriteAllText((Join-Path $mb 'OPEN-MAPS.sh'), $sh, $utf8)
+    $bat = [System.IO.File]::ReadAllText((Join-Path $mb '_OPEN-MAPS.bat')).Replace("`r`n","`n").Replace("`n","`r`n")
+    [System.IO.File]::WriteAllText((Join-Path $mb 'OPEN-MAPS.bat'), $bat, $utf8)
+    Remove-Item (Join-Path $mb '_OPEN-MAPS.sh'),(Join-Path $mb '_OPEN-MAPS.bat') -Force
+    Log 'browser maps: run Maps-Browser\OPEN-MAPS (.bat on Windows, .sh on macOS/Linux)'
+  }catch{ Log "browser maps ERROR: $($_.Exception.Message)" }
+} else { Log "=== [8c] Browser maps not selected - add -BrowserMaps to include (~16.5 GB for the US) ===" }
 
 # ================================================================ phone apps
 Log '=== Phone apps (port the library to a phone) ==='
