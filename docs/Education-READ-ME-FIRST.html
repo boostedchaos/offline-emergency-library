@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Education â€” Khan Academy Offline</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
+<h1>Education â€” Khan Academy Offline</h1>
+<p>This folder holds <strong>Khan Academy</strong> as an offline archive you can browse with **no</p>
+<p>internet** â€” thousands of lessons and videos across math, science, economics, history, and</p>
+<p>more. It's great for keeping kids (or adults) learning during a long outage, or anywhere</p>
+<p>without a connection.</p>
+<p>It opens in the <strong>Kiwix</strong> reader (already bundled in <code>Kiwix-Reader/</code> â€” no extra software).</p>
+<hr>
+<h2>Is it here?</h2>
+<p>Khan Academy is <strong>opt-in</strong> because it's <strong>large (~168 GB with videos)</strong> â€” far bigger than</p>
+<p>the rest of the library. It is <strong>only downloaded if you asked for it</strong> when running the</p>
+<p>installer.</p>
+<ul>
+<li>If you see a <code>.zim</code> file in <code>Education\KhanAcademy\</code>, it's installed â€” jump to "How to</li>
+</ul>
+<p>  open" below.</p>
+<ul>
+<li>If this folder only has this guide, Khan Academy wasn't downloaded. See "How to add it."</li>
+</ul>
+<hr>
+<h2>How to add it (re-run the installer with the education flag)</h2>
+<pre><code>
+# Windows
+./Get-OfflineLibrary.ps1 -Destination "E:\" -Education
+./Get-OfflineLibrary.ps1 -Destination "E:\" -Education -EduLang es   # Spanish
+# macOS / Linux
+./get-offline-library.sh -d /mnt/usb --education
+./get-offline-library.sh -d /mnt/usb --education --edu-lang fr       # French
+</code></pre>
+<ul>
+<li>Languages available: <strong><code>en</code></strong> (English, default), <strong><code>es</code></strong> (Spanish), <strong><code>fr</code></strong> (French).</li>
+<li><strong>~168 GB</strong> â€” make sure your drive has room (a 256 GB+ drive is recommended if you add</li>
+</ul>
+<p>  this). The download is resumable; re-run the same command to continue.</p>
+<hr>
+<h2>How to open it</h2>
+<ol>
+<li>Open the <strong>Kiwix</strong> reader (<code>Kiwix-Reader/app/</code>, or the Android app). See</li>
+</ol>
+<p>   <code>Kiwix-Reader/HOW-TO-USE-KIWIX</code>.</p>
+<ol>
+<li><strong>File â†’ Open file</strong>, then pick the <code>.zim</code> in <code>Education\KhanAcademy\</code>.</li>
+<li>Browse or search lessons; videos play inside Kiwix â€” fully offline.</li>
+</ol>
+<p>On a phone, copy the <code>.zim</code> to the device and open it in the <strong>Kiwix</strong> app (bundled APK in</p>
+<p><code>Phone-Apps/</code>).</p>
+<hr>
+<h2>Notes</h2>
+<ul>
+<li>Khan Academy content is free and openly licensed (CC BY-NC-SA); the offline build is made</li>
+</ul>
+<p>  by the Kiwix project.</p>
+<ul>
+<li>Because it includes video, it's the single biggest item available in this kit â€” only add</li>
+</ul>
+<p>  it if you specifically want courses/video. The text references (Wikipedia, WikiMed,</p>
+<p>  iFixit, manuals) cover knowledge far more compactly.</p>
+</div></body></html>

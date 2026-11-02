@@ -19,6 +19,7 @@ PDF manuals do **not** need Kiwix; they open in Edge or any browser.
 | `E:\Manuals\DIY-Appropedia\` | DIY: plumbing, electrical, construction, energy, water, food |
 | `E:\Manuals\Survival-Water-Food\` | Survival (post-disaster), water, food prep, knots |
 | `E:\Wikipedia\` (if converted to ZIM) | Full Wikipedia |
+| `E:\Education\KhanAcademy\` | Khan Academy courses + videos (opt-in) |
 
 ---
 
