@@ -58,14 +58,17 @@ PDFs and these HTML guides open in the built-in **Files** app. Nothing else to i
 
 ### 2. Read the archives straight from the drive (no copying)
 Kiwix opens a `.zim` where it is, so even full Wikipedia works without filling the phone.
-1. Open Kiwix → **Open** → pick the drive → tap a `.zim` file.
+1. Open Kiwix → tap the **open file** button → pick the drive → tap a `.zim` file.
 2. Repeat for each archive you want.
 3. Keep the drive plugged in while you read. Unplug it and Kiwix can't read those archives
    until you plug it back in.
 
 ### 3. Maps
 OsmAnd keeps its maps **inside the phone**, so import only the region you need:
-in **Files**, tap the `.obf.zip` to unzip it, then share the `.obf` file to **OsmAnd**.
+1. In **Files**, tap the `.obf.zip` to unzip it.
+2. Copy the `.obf` file to **On My iPhone/iPad → OsmAnd** (the top OsmAnd folder, not a
+   subfolder).
+3. Close and reopen OsmAnd. The map shows under **Menu → Maps & Resources**.
 
 ### What does not work on iPhone / iPad
 The launchers in this kit (`.bat`, `.sh`, `.command` — desktop reader, AI chat, map viewer)
