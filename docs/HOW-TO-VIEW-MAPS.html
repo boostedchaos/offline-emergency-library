@@ -1,121 +1,118 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline Maps — How to View Them (PC or Phone)</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
-<h1 id="offline-maps--how-to-view-them-pc-or-phone">Offline Maps — How
-to View Them (PC or Phone)</h1>
-<p>The <code>OsmAnd\</code> folder contains offline maps of every US
-state/region (<code>.obf.zip</code> files). You can use them <strong>on
-a computer (no phone needed)</strong> or <strong>on a
-phone/tablet</strong>. Both work with <strong>no internet</strong>.
-Dependencies for each are bundled or explained below.</p>
-<hr />
-<h2
-id="option-1--on-a-computer-no-phone-white_check_mark-recommended-if-you-have-no-phone">Option
-1 — On a computer (no phone) ✅ recommended if you have no phone</h2>
-<p>Everything you need is bundled — <strong>no separate install, no Java
-to set up.</strong></p>
-<ol type="1">
-<li>Open <code>OsmAnd\MapViewer-Desktop\</code>.</li>
-<li><strong>Windows:</strong> double-click
-<strong><code>VIEW-MAPS-ON-PC.bat</code></strong>. <strong>macOS /
-Linux:</strong> run <strong><code>./VIEW-MAPS-ON-PC.sh</code></strong>
-from a terminal in that folder.
-<ul>
-<li>The <strong>first run</strong> unzips the map files into
-<code>OsmAnd\obf\</code> (this can take several minutes and uses extra
-space — see note below), then opens the viewer.</li>
-<li>Later runs skip straight to the viewer.</li>
-</ul></li>
-<li>The <strong>OsmAndMapCreator</strong> window opens. Your maps are
-the <code>.obf</code> files in <code>OsmAnd\obf\</code>. Use the app's
-menus to open/browse a map, zoom, and search.</li>
-</ol>
-<p><strong>Dependencies: fully handled.</strong> This folder includes a
-<strong>portable Java runtime</strong> (<code>jre\</code>) and the
-<strong>OsmAndMapCreator</strong> app (<code>app\</code>). Nothing else
-is required — it runs on any 64-bit Windows PC, offline.</p>
-<blockquote>
-<p><strong>Space note:</strong> the maps download as compressed
-<code>.obf.zip</code> (~17 GB). Desktop viewing needs them
-<strong>unzipped</strong> to <code>.obf</code> (~30 GB), so the first
-run roughly doubles the map space. Make sure the drive has ~30 GB free
-before using desktop maps. (If space is tight, you can delete
-<code>OsmAnd\obf\</code> afterward; re-running the <code>.bat</code>
-recreates it.)</p>
-</blockquote>
-<hr />
-<h2 id="option-2--on-an-android-phonetablet">Option 2 — On an Android
-phone/tablet</h2>
-<p>No app store or internet needed — the app is bundled.</p>
-<ol type="1">
-<li>Copy the OsmAnd APK from <code>Phone-Apps\</code> (e.g.
-<code>OsmAnd-XXXXXX.apk</code>) to your Android device. (See
-<code>Phone-Apps\USE-ON-PHONE</code> for the full phone setup, including
-Kiwix.)</li>
-<li>On the device, tap the APK to install. You may need to allow
-<strong>"Install unknown apps"</strong> for your file manager/browser
-(Settings → Apps → special access).</li>
-<li>Copy the <strong><code>.obf.zip</code></strong> map files (from
-<code>OsmAnd\</code>) into the OsmAnd maps folder on the device:
-typically <code>Android/data/net.osmand.plus/files/</code> — or in the
-OsmAnd app use <strong>Menu → Configure map / Download maps →
-Import</strong> and point it at the files.</li>
-<li>Open OsmAnd. The maps work fully offline (navigation, search,
-routing).</li>
-</ol>
-<p><strong>Dependency:</strong> the <strong>OsmAnd app</strong> —
-bundled here as the <strong>OsmAnd~ APK</strong> (the free,
-full-featured F-Droid build), so you can install it offline.</p>
-<hr />
-<h2 id="option-3--on-an-iphoneipad-warning">Option 3 — On an iPhone/iPad
-⚠️</h2>
-<p>Apple does <strong>not</strong> allow installing apps offline from a
-file. So:</p>
-<ol type="1">
-<li><strong>While you still have internet,</strong> install
-<strong>OsmAnd Maps</strong> from the <strong>App Store</strong> (free).
-Do this now as part of preparing your kit.</li>
-<li>Later, import the <code>.obf</code> map files into OsmAnd on iOS
-(via Files / iTunes file sharing), or download the regions inside the
-OsmAnd app while you still have a connection.</li>
-</ol>
-<p>This is an Apple platform limitation — there's no offline sideloading
-like Android.</p>
-<hr />
-<h2 id="which-should-i-use">Which should I use?</h2>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline Maps — How to View Them</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
+<h1 id="offline-maps--how-to-view-them">Offline Maps — How to View
+Them</h1>
+<p>This drive has <strong>two kinds of offline US maps</strong>. Both
+work with <strong>no internet</strong>.</p>
 <table>
 <thead>
 <tr>
 <th>You have…</th>
 <th>Use</th>
-<th>Dependency status</th>
+<th>Where</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>A computer, no phone</td>
-<td><strong>Option 1</strong> (desktop viewer)</td>
-<td>✅ fully bundled (Java + app)</td>
+<td>Any computer (Windows, Mac, Linux)</td>
+<td><strong>Option 1 — OPEN-MAPS</strong> (web browser) ✅ easiest</td>
+<td><code>Maps-Browser/</code></td>
 </tr>
 <tr>
-<td>An Android phone/tablet</td>
-<td><strong>Option 2</strong> (bundled APK)</td>
-<td>✅ bundled APK</td>
+<td>An Android phone or tablet</td>
+<td><strong>Option 3</strong> — OsmAnd app (bundled), with search and
+directions</td>
+<td><code>OsmAnd/</code> + <code>Phone-Apps/</code></td>
 </tr>
 <tr>
-<td>An iPhone/iPad</td>
-<td><strong>Option 3</strong> (App Store)</td>
-<td>⚠️ install the app while online</td>
+<td>An iPhone or iPad</td>
+<td><strong>Option 4</strong> — OsmAnd from the App Store (install while
+online)</td>
+<td><code>OsmAnd/</code></td>
 </tr>
 </tbody>
 </table>
 <hr />
+<h2
+id="option-1--open-maps-street-maps-in-your-web-browser-any-computer">Option
+1 — OPEN-MAPS: street maps in your web browser (any computer)</h2>
+<ol type="1">
+<li>In the top folder of the drive, open <strong>OPEN-MAPS</strong>:
+<ul>
+<li><strong>Windows:</strong> <code>OPEN-MAPS.bat</code></li>
+<li><strong>Mac:</strong> <code>OPEN-MAPS.command</code> (if blocked:
+<strong>System Settings → Privacy &amp; Security → Open
+Anyway</strong>)</li>
+<li><strong>Linux:</strong> run <code>bash OPEN-MAPS.sh</code> in a
+terminal</li>
+</ul></li>
+<li>Your browser opens at <strong><a
+href="http://localhost:8097/viewer/">http://localhost:8097/viewer/</a></strong>
+with a map of the US.</li>
+<li>Zoom with the mouse wheel or the <strong>+ / −</strong> buttons.
+Pick a state in <strong>Go to a state</strong>.</li>
+<li>To stop, close the OPEN-MAPS window.</li>
+</ol>
+<p>The web address keeps your place (zoom/latitude/longitude): bookmark
+it to come back. These maps show streets, highways, towns, parks and
+water. They cannot plan a route — use the phone app (Option 3) for
+directions.</p>
+<p><strong>What is inside:</strong> state maps from the Protomaps
+basemap, made by <a
+href="https://github.com/Crosstalk-Solutions/project-nomad-maps">Project
+NOMAD</a>, plus a low-detail world map; the MapLibre map viewer; and
+Caddy, a small web server for each system. Map data © OpenStreetMap
+contributors (ODbL).</p>
+<hr />
+<h2
+id="option-2--osmand-desktop-viewer-only-on-the-kind-of-computer-that-built-the-drive">Option
+2 — OsmAnd desktop viewer (only on the kind of computer that built the
+drive)</h2>
+<p>The installer adds the OsmAndMapCreator viewer and a Java runtime
+<strong>for the system it ran on</strong> (Windows, Mac or Linux). On
+any other system, use Option 1.</p>
+<ol type="1">
+<li>Open <code>OsmAnd/MapViewer-Desktop/</code>.</li>
+<li><strong>Windows:</strong> double-click
+<strong><code>VIEW-MAPS-ON-PC.bat</code></strong>. <strong>macOS /
+Linux:</strong> run <strong><code>./VIEW-MAPS-ON-PC.sh</code></strong>
+in a terminal in that folder.</li>
+<li>The first run unzips the maps into <code>OsmAnd/obf/</code> (several
+minutes, about 30 GB for the whole US), then opens the viewer.</li>
+</ol>
+<hr />
+<h2 id="option-3--on-an-android-phone-or-tablet">Option 3 — On an
+Android phone or tablet</h2>
+<p>The app is bundled, so no app store or internet is needed.</p>
+<ol type="1">
+<li>Copy the OsmAnd APK from <code>Phone-Apps/</code> (e.g.
+<code>OsmAnd-XXXXXX.apk</code>) to the device. (See
+<code>Phone-Apps/USE-ON-PHONE</code> for the full phone setup, including
+Kiwix.)</li>
+<li>Tap the APK to install. You may need to allow <strong>"Install
+unknown apps"</strong> for your file manager (Settings → Apps → special
+access).</li>
+<li>Copy the <strong><code>.obf.zip</code></strong> map files (from
+<code>OsmAnd/</code>) into the OsmAnd maps folder: usually
+<code>Android/data/net.osmand.plus/files/</code> — or in OsmAnd use
+<strong>Menu → Download maps → Import</strong> and pick the files.</li>
+<li>Open OsmAnd. Maps, search and <strong>turn-by-turn
+directions</strong> all work offline.</li>
+</ol>
+<hr />
+<h2 id="option-4--on-an-iphone-or-ipad-warning">Option 4 — On an iPhone
+or iPad ⚠️</h2>
+<p>Apple does not allow installing apps from a file. <strong>While you
+still have internet,</strong> install <strong>OsmAnd Maps</strong> from
+the App Store. Later, import the <code>.obf</code> map files with the
+Files app, or download your regions inside OsmAnd while you are
+online.</p>
+<hr />
 <h2 id="notes">Notes</h2>
 <ul>
-<li>The maps are standard <strong>OsmAnd <code>.obf</code></strong>
-vector maps — detailed roads, towns, terrain, and search; routing works
-in the phone app.</li>
-<li>The desktop viewer (OsmAndMapCreator) is utilitarian but fully
-functional for finding places, roads, and coordinates offline.</li>
-<li>Keep a <strong>paper map</strong> as an ultimate backup —
+<li><strong>Keep a paper road atlas</strong> in the lockbox too —
 electronics fail.</li>
+<li>To get only some states (smaller drive), run the installer with
+<code>--map-regions texas,"new mexico"</code> (Windows:
+<code>-MapRegions texas,'new mexico'</code>).</li>
 </ul>
 </div></body></html>

@@ -21,7 +21,7 @@ everything. It is made for a drive you keep somewhere safe, such as a lockbox.
 
 ## What you get
 
-Sizes come from a full dry run on 2026-11-01 (`--dry-run --wikipedia maxi`). Kiwix
+Sizes come from a full dry run on 2026-11-01 (`--dry-run --wikipedia maxi`: 282 files, 257.70 GB). Kiwix
 publishes new builds often, so sizes move a little over time. Run `--dry-run` for today's numbers.
 
 | Part | What it is | Size |
@@ -34,10 +34,10 @@ publishes new builds often, so sizes move a little over time. Run `--dry-run` fo
 | **Education** | Wikibooks, Wikiversity, LibreTexts (math, physics, chemistry, biology, engineering, more), TED-Ed and TED talks | 44.7 GB |
 | **Computing** | Python, JavaScript, Linux, Docker, Git docs; Arduino, Raspberry Pi, electronics Q&A | 5.1 GB |
 | **Books (PDF)** | 11 public-domain US Army manuals + Hesperian's *Where There Is No Doctor* and *Where There Is No Dentist* | 0.2 GB |
-| **Maps** | All 83 OsmAnd US map files + desktop map viewer + Android app | 17.9 GB |
+| **Maps** | Two kinds: **browser maps** for any computer (50 states + world, Protomaps extracts by Project NOMAD, MapLibre viewer, Caddy server) and **OsmAnd** maps (83 files) for the Android app with directions + a desktop viewer. Pick states with `--map-regions` | 34.6 GB (browser 16.5 + OsmAnd 17.9) |
 | **Offline AI** | Qwen 3.5 4B (small) + Gemma 4 12B (medium), both Apache-2.0; llama.cpp for Windows, macOS and Linux (CPU + GPU); browser chat that also reads PDFs | 9.9 GB |
 | **Readers** | Kiwix readers for Windows, macOS (Intel + Apple) and Linux (x64 + ARM), Kiwix desktop app, Kiwix Android app | 0.8 GB |
-| **Total** | with `--wikipedia maxi` / default `nopic` | **243 GB / about 168 GB** |
+| **Total** | with `--wikipedia maxi` / default `nopic` | **257.7 GB / about 183 GB** |
 
 Choose a drive with room to spare: **256 GB** for the default, **500 GB** for
 Wikipedia with images. An **external SSD** is much faster than a flash drive.
@@ -82,6 +82,7 @@ Install the skill in `skills/offline-emergency-library/`, then say `/offline-eme
 | `--wikipedia maxi\|nopic\|mini\|none` | `-Wikipedia ...` | Which Wikipedia (default `nopic`) |
 | `--skip-groups a,b` | `-SkipGroups a,b` | Skip groups: `medicine,survival,diy,food,education,computing,pdfs` |
 | `--skip-maps` | `-SkipMaps` | No maps |
+| `--map-regions a,b` | `-MapRegions a,b` | Only these states, e.g. `texas,"new mexico"` (the world map is always added) |
 | `--skip-models` | `-SkipModels` | Only the small AI model |
 | `--skip-ai` | `-SkipAI` | No AI at all |
 | `--dry-run` | `-DryRun` | Check every link and add up the size. Downloads nothing |
@@ -159,6 +160,15 @@ Every item below was reproduced on 2026-11-01 before it was fixed.
 - **Faster:** archives use aria2 (many mirrors, many pieces) when it is installed;
   program files come from the first working Kiwix mirror (the default server
   gave 62 KB/s); archives download 4 at a time.
+- **Current offline AI for every computer:** Qwen 3.5 4B + Gemma 4 12B (were Llama 3.x /
+  Qwen 2.5), llama.cpp for Windows, macOS and Linux from one build, and **AI-CHAT** — a
+  browser chat that also reads PDFs. GPT4All (last release 2025-02) was removed.
+- **Browser maps for every computer:** **OPEN-MAPS** serves Project NOMAD's state maps in
+  any web browser. Before, the desktop map viewer only came for the system that ran the
+  installer.
+- **exFAT-safe unpacking:** program archives are unpacked with links turned into real
+  files. On exFAT, macOS stores links as files only a Mac can read, which broke the Linux
+  AI program on a Mac-built drive.
 - `--dry-run`, one run per folder at a time, and `curl | bash` no longer eats its own input.
 - The HTML guides are rebuilt from the Markdown (`tools/render-docs.sh`); the old ones
   showed garbled emoji and dashes.
@@ -166,6 +176,8 @@ Every item below was reproduced on 2026-11-01 before it was fixed.
 ---
 
 ## Credits
+
+Content and code this fork downloads or builds on:
 
 - **[Project NOMAD](https://github.com/Crosstalk-Solutions/project-nomad)** by
   [Crosstalk Solutions](https://www.projectnomad.us) — the inspiration for this fork. Its
@@ -176,6 +188,12 @@ Every item below was reproduced on 2026-11-01 before it was fixed.
   drive you can store offline. Thank you to the NOMAD team and community.
 - **[elhajahmadj/offline-emergency-library](https://github.com/elhajahmadj/offline-emergency-library)** —
   the original one-command downloader, guides and folder layout.
+- **[Project NOMAD maps](https://github.com/Crosstalk-Solutions/project-nomad-maps)** (MIT) — the
+  state map files, style, fonts and symbols used by OPEN-MAPS; built from the
+  [Protomaps](https://protomaps.com) basemap. Map data © [OpenStreetMap](https://openstreetmap.org/copyright)
+  contributors (ODbL).
+- **[MapLibre GL JS](https://maplibre.org)**, **[PMTiles](https://github.com/protomaps/PMTiles)** and
+  **[Caddy](https://caddyserver.com)** — the map viewer and its local web server.
 - **[Kiwix](https://kiwix.org)** and its mirror hosts — the ZIM archives and readers.
 - **[OsmAnd](https://osmand.net)**, **[llama.cpp](https://github.com/ggml-org/llama.cpp)**,
   **[Qwen](https://huggingface.co/Qwen)**, **[Gemma](https://huggingface.co/google)**, **[Hesperian](https://hesperian.org)**,

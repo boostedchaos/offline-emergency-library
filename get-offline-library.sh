@@ -10,6 +10,7 @@
 #   --wikipedia maxi|nopic|mini|none   which Wikipedia (default: nopic = all articles, no images)
 #   --skip-groups a,b                  skip content groups: medicine,survival,diy,food,education,computing,pdfs
 #   --skip-wikipedia  --skip-maps  --skip-models (small AI model only)  --skip-ai
+#   --map-regions a,b                  only these US states in both map types, e.g. "texas,new mexico"
 #   --catalog FILE                     use another ZIM list (default: catalog/zims.tsv)
 #   --jobs N                           archives downloaded at the same time (default 4; 2 with aria2)
 # Faster: install aria2 (brew install aria2 / apt install aria2). Then each archive is
@@ -18,13 +19,14 @@
 REPO_RAW="https://raw.githubusercontent.com/boostedchaos/offline-emergency-library/main"
 KIWIX="https://download.kiwix.org"
 UA="Mozilla/5.0"
-DEST=""; JOBS=""; WIKI="nopic"; SKIP_MAPS=0; SKIP_MODELS=0; SKIP_AI=0; DRY=0; SKIP_GROUPS=""; CATALOG=""
+DEST=""; JOBS=""; MAP_REGIONS=""; WIKI="nopic"; SKIP_MAPS=0; SKIP_MODELS=0; SKIP_AI=0; DRY=0; SKIP_GROUPS=""; CATALOG=""
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--destination) DEST="$2"; shift 2;;
     --wikipedia)      WIKI="$2"; shift 2;;
     --skip-wikipedia) WIKI="none"; shift;;
     --skip-maps)      SKIP_MAPS=1; shift;;
+    --map-regions)    MAP_REGIONS="$2"; shift 2;;
     --skip-models)    SKIP_MODELS=1; shift;;
     --skip-ai)        SKIP_AI=1; shift;;
     --skip-groups)    SKIP_GROUPS="$2"; shift 2;;
@@ -40,6 +42,13 @@ command -v curl >/dev/null 2>&1 || { echo "ERROR: 'curl' is required."; exit 1; 
 HAVE_UNZIP=1; command -v unzip >/dev/null 2>&1 || HAVE_UNZIP=0
 HAVE_TAR=1;   command -v tar   >/dev/null 2>&1 || HAVE_TAR=0
 if command -v sha256sum >/dev/null 2>&1; then SHA="sha256sum"; else SHA="shasum -a 256"; fi
+# --map-regions: OsmAnd spells states with "-" (Us_rhode-island_...), NOMAD with "_" (rhode_island_...)
+MR_OSM=""; MR_NOMAD=""
+if [ -n "$MAP_REGIONS" ]; then
+  mr="$(printf '%s' "$MAP_REGIONS" | tr 'A-Z' 'a-z' | sed -E 's/ *, */,/g; s/^ +| +$//g')"
+  MR_OSM="$(printf '%s' "$mr" | tr ' _' '--' | tr ',' '|')"
+  MR_NOMAD="$(printf '%s' "$mr" | tr ' -' '__' | tr ',' '|')"
+fi
 HAVE_ARIA=0; command -v aria2c >/dev/null 2>&1 && HAVE_ARIA=1
 [ -z "$JOBS" ] && { JOBS=4; [ "$HAVE_ARIA" = 1 ] && JOBS=2; }   # aria2 opens up to 16 connections per file
 
@@ -352,7 +361,8 @@ if [ "$SKIP_MAPS" = 0 ]; then
   log "=== [8/9] Offline US maps (OsmAnd) ==="
   page "https://download.osmand.net/get_indexes" > "$WORK/osmand.xml"
   grep 'type="map"' "$WORK/osmand.xml" | grep -oE 'name="[Uu][Ss]_[^"]+\.obf\.zip"' | sed -E 's/name="([^"]+)"/\1/' | sort -u > "$WORK/osmand.txt"
-  log "osmand: $(wc -l < "$WORK/osmand.txt" | tr -d ' ') US map files"
+  if [ -n "$MR_OSM" ]; then grep -E "^Us_($MR_OSM)_" "$WORK/osmand.txt" > "$WORK/osmand.f"; mv "$WORK/osmand.f" "$WORK/osmand.txt"; fi
+  log "osmand: $(wc -l < "$WORK/osmand.txt" | tr -d ' ') US map files${MAP_REGIONS:+ (regions: $MAP_REGIONS)}"
   [ -s "$WORK/osmand.txt" ] || bad "OsmAnd maps" "no US maps found in the OsmAnd index"
   while IFS= read -r fn; do fetch "https://download.osmand.net/download.php?standard=yes&file=$fn" "$ROOT/OsmAnd/$fn"; done < "$WORK/osmand.txt"
 
@@ -387,6 +397,55 @@ EOS
       find "$MVD/jre" -name java -exec chmod +x {} \; 2>/dev/null
     fi
   else log "desktop map viewer: skipped (install 'unzip' then re-run)"; fi
+
+  # ---- browser maps: Protomaps state extracts made by Project NOMAD (MIT; map data
+  # (c) OpenStreetMap contributors, ODbL), NOMAD's style/fonts/symbols, MapLibre viewer,
+  # and Caddy (Apache-2.0) to serve them - OPEN-MAPS opens them in any web browser.
+  log "=== [8c] Browser maps (Project NOMAD / Protomaps) + viewer ==="
+  MB="$ROOT/Maps-Browser"
+  NM="https://github.com/Crosstalk-Solutions/project-nomad-maps/raw/refs/heads/master"
+  page "https://api.github.com/repos/Crosstalk-Solutions/project-nomad-maps/contents/pmtiles" |
+    grep -oE '"name"[ ]*:[ ]*"[a-z_-]+_[0-9]{4}-[0-9]{2}\.pmtiles"' | sed -E 's/.*"([^"]+)"$/\1/' | LC_ALL=C sort > "$WORK/nomad-maps.txt"
+  if [ -n "$MR_NOMAD" ]; then grep -E "^(global[a-z-]*|$MR_NOMAD)_[0-9]{4}-[0-9]{2}\.pmtiles$" "$WORK/nomad-maps.txt" > "$WORK/nm.f"; mv "$WORK/nm.f" "$WORK/nomad-maps.txt"; fi
+  # newest file per region (names end _YYYY-MM.pmtiles); world map first so states draw over it
+  sed -E 's/_[0-9]{4}-[0-9]{2}\.pmtiles$//' "$WORK/nomad-maps.txt" | sort -u | while IFS= read -r r; do
+    grep -E "^${r}_[0-9]{4}-[0-9]{2}\.pmtiles$" "$WORK/nomad-maps.txt" | tail -n1
+  done | awk '/^global/{print; next} {rest=rest $0 "\n"} END{printf "%s", rest}' > "$WORK/nomad-latest.txt"
+  log "browser maps: $(wc -l < "$WORK/nomad-latest.txt" | tr -d ' ') map files"
+  [ -s "$WORK/nomad-latest.txt" ] || bad "browser maps" "no map list from the project-nomad-maps repo"
+  : > "$WORK/regions.txt"
+  while IFS= read -r fn; do
+    fetch "$NM/pmtiles/$fn" "$MB/pmtiles/$fn" || continue
+    real || continue
+    # no published fingerprints: check the PMTiles header (the file starts with "PMTiles")
+    if [ "$(head -c 7 "$MB/pmtiles/$fn")" = "PMTiles" ]; then echo "$fn" >> "$WORK/regions.txt"
+    else bad "$fn" "not a PMTiles file - deleted it, run again"; rm -f "$MB/pmtiles/$fn"; fi
+  done < "$WORK/nomad-latest.txt"
+  if real && [ -s "$WORK/regions.txt" ]; then
+    { printf '['; sed 's/.*/"&"/' "$WORK/regions.txt" | paste -sd, -; printf ']\n'; } > "$MB/regions.json"
+  fi
+  if fetch "$NM/base-assets.tar.gz" "$MB/base-assets.tar.gz" && real; then
+    rm -rf "$MB/assets-new"
+    if untar_real "$MB/base-assets.tar.gz" "$MB/assets-new" && [ -f "$MB/assets-new/tozip/nomad-base-styles.json" ]; then
+      rm -rf "$MB/assets"; mv "$MB/assets-new/tozip" "$MB/assets"; rm -rf "$MB/assets-new"
+    else bad "base-assets.tar.gz" "could not unpack the map style and fonts"; fi
+  fi
+  for u in maplibre-gl@4.7.1/dist/maplibre-gl.js maplibre-gl@4.7.1/dist/maplibre-gl.css pmtiles@4.4.0/dist/pmtiles.js; do
+    fetch "https://unpkg.com/$u" "$MB/viewer/lib/$(basename "$u")"
+  done
+  # Caddy web server for every platform (one release)
+  page "https://api.github.com/repos/caddyserver/caddy/releases/latest" > "$WORK/caddy.json"
+  for ck in windows_amd64.zip windows_arm64.zip mac_arm64.tar.gz mac_amd64.tar.gz linux_amd64.tar.gz linux_arm64.tar.gz; do
+    cu="$(grep -oE '"browser_download_url"[ ]*:[ ]*"[^"]+_'"$ck"'"' "$WORK/caddy.json" | sed -E 's/.*"(https[^"]+)"$/\1/' | head -n1)"
+    if [ -z "$cu" ]; then bad "caddy $ck" "not in the latest Caddy release"; continue; fi
+    cd_="${ck%.zip}"; cd_="${cd_%.tar.gz}"; cd_="$(printf '%s' "$cd_" | tr '_' '-')"
+    if fetch "$cu" "$MB/server/$(basename "$cu")" && real; then
+      case "$ck" in
+        *.zip)    [ "$HAVE_UNZIP" = 1 ] && unzip -o -q "$MB/server/$(basename "$cu")" -d "$MB/server/$cd_" ;;   # keep LICENSE (Apache-2.0)
+        *.tar.gz) untar_real "$MB/server/$(basename "$cu")" "$MB/server/$cd_" ;;
+      esac
+    fi
+  done
 else log "=== [8/9] Maps SKIPPED ==="; fi
 
 # ================================================================ phone apps
@@ -433,6 +492,10 @@ for f in OPEN-LIBRARY.command OPEN-LIBRARY.sh OPEN-LIBRARY.bat CHECK-DRIVE.comma
   place "drive/$f" "$ROOT/$f"
 done
 if [ "$SKIP_AI" = 0 ]; then for f in AI-CHAT.command AI-CHAT.sh AI-CHAT.bat; do place "drive/$f" "$ROOT/$f"; done; fi
+if [ "$SKIP_MAPS" = 0 ]; then
+  for f in OPEN-MAPS.command OPEN-MAPS.sh OPEN-MAPS.bat; do place "drive/$f" "$ROOT/$f"; done
+  place "drive/maps/index.html" "$ROOT/Maps-Browser/viewer/index.html"
+fi
 chmod +x "$ROOT"/*.command "$ROOT"/*.sh 2>/dev/null
 
 # ================================================================ README index

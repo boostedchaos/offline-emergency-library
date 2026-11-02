@@ -9,6 +9,7 @@ to open each part.
 | To do this | Open this file (in the top folder) |
 |---|---|
 | **Read the library** — Wikipedia, medical, survival, repair, education | **OPEN-LIBRARY** — `.bat` on Windows, `.command` on Mac, `.sh` on Linux. Your web browser opens at `http://localhost:8095`. Search everything there. Close the black window to stop. |
+| **See a street map** — any US state | **OPEN-MAPS** — same three versions. Opens at `http://localhost:8097/viewer/`. |
 | **Ask the offline AI** — questions, or about a PDF you attach | **AI-CHAT** — same three versions. Pick small (any laptop) or medium (16 GB memory). Opens at `http://localhost:8098`. |
 | **Check the drive** — prove no file has rotted | **CHECK-DRIVE** — same three versions. Takes 10–40 minutes. |
 
@@ -29,7 +30,8 @@ to open each part.
 | `Manuals/` | Army field manuals (PDF), iFixit, Appropedia, DIY, survival, food & garden, radio | OPEN-LIBRARY; PDFs in a browser — see `Manuals/READ-ME-FIRST.html` |
 | `Education/` | Wikibooks, Wikiversity, LibreTexts textbooks, TED talks | OPEN-LIBRARY |
 | `Computing/` | Programming docs, electronics and Raspberry Pi Q&A | OPEN-LIBRARY |
-| `OsmAnd/` | Offline US maps | Phone app, or `MapViewer-Desktop/` — see `OsmAnd/HOW-TO-VIEW-MAPS.html` |
+| `Maps-Browser/` | Street maps for any web browser | OPEN-MAPS — see `OsmAnd/HOW-TO-VIEW-MAPS.html` |
+| `OsmAnd/` | Offline US maps for the OsmAnd phone app (with directions) | Phone app — see `OsmAnd/HOW-TO-VIEW-MAPS.html` |
 | `AI-Offline/` | Offline AI: 2 models + the AI program for every system | AI-CHAT — see `AI-Offline/HOW-TO-RUN-OFFLINE-AI.html` |
 | `Kiwix-Reader/` | The readers OPEN-LIBRARY uses, plus the Kiwix desktop app | See `Kiwix-Reader/HOW-TO-USE-KIWIX.html` |
 | `Phone-Apps/` | Android apps (Kiwix, OsmAnd) to copy onto a phone | See `Phone-Apps/USE-ON-PHONE.html` |
@@ -45,7 +47,8 @@ to open each part.
 - **Water, food, shelter:** OPEN-LIBRARY → survival archives; plus the Army survival PDFs.
 - **Grow or cook food:** OPEN-LIBRARY → gardening, cooking, homesteading.
 - **Radio:** `Manuals/Radio-Communications/RADIO-GUIDE.html`, and the ham-radio Q&A.
-- **Find your way:** `OsmAnd/HOW-TO-VIEW-MAPS.html`.
+- **Find your way:** OPEN-MAPS on a computer; the OsmAnd phone app for directions
+  (`OsmAnd/HOW-TO-VIEW-MAPS.html`).
 - **Chat with an AI offline:** `AI-Offline/HOW-TO-RUN-OFFLINE-AI.html`.
 
 ---

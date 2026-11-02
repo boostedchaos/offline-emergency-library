@@ -11,6 +11,7 @@
     -Wikipedia maxi|nopic|mini|none   which Wikipedia (default nopic = all articles, no images)
     -SkipGroups medicine,survival,diy,food,education,computing,pdfs
     -SkipWikipedia -SkipMaps -SkipModels (small AI model only) -SkipAI
+    -MapRegions a,b  only these US states in both map types, e.g. texas,'new mexico'
     -Catalog FILE    another ZIM list (default catalog/zims.tsv)
     -Jobs N          archives downloaded at the same time (default 4; 2 with aria2)
   Faster: aria2c.exe (shipped inside Kiwix desktop, which this script downloads) fetches
@@ -23,6 +24,7 @@ param(
   [string[]]$SkipGroups = @(),
   [switch]$SkipWikipedia,
   [switch]$SkipMaps,
+  [string[]]$MapRegions = @(),
   [switch]$SkipModels,
   [switch]$SkipAI,
   [string]$Catalog,
@@ -37,6 +39,10 @@ $Kiwix   = 'https://download.kiwix.org'
 $UA      = 'Mozilla/5.0'
 if ($SkipWikipedia) { $Wikipedia = 'none' }
 $SkipGroups = @($SkipGroups | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+# -MapRegions: OsmAnd spells states with "-" (Us_rhode-island_...), NOMAD with "_" (rhode_island_...)
+$MrOsm = $null; $MrNomad = $null
+$mr = @($MapRegions | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ })
+if ($mr.Count) { $MrOsm = ($mr | ForEach-Object { $_ -replace '[ _]','-' }) -join '|'; $MrNomad = ($mr | ForEach-Object { $_ -replace '[ -]','_' }) -join '|' }
 
 # ---------------------------------------------------------------- destination
 if (-not $Destination -and -not $DryRun) {
@@ -421,7 +427,8 @@ if (-not $SkipMaps) {
   $idx = Page 'https://download.osmand.net/get_indexes'
   $us = @()
   try { $us = @(([xml]$idx).osmand_regions.region | Where-Object { $_.type -eq 'map' -and $_.name -like 'us_*' } | ForEach-Object { $_.name } | Sort-Object -Unique) } catch {}
-  Log "osmand: $($us.Count) US map files"
+  if ($MrOsm) { $us = @($us | Where-Object { $_ -match "^Us_($MrOsm)_" }) }
+  Log "osmand: $($us.Count) US map files$(if ($MrOsm) { " (regions: $($mr -join ', '))" })"
   if ($us.Count -eq 0) { Bad 'OsmAnd maps' 'no US maps found in the OsmAnd index' }
   foreach ($fn in $us) { [void](Fetch "https://download.osmand.net/download.php?standard=yes&file=$fn" (P "OsmAnd/$fn")) }
 
@@ -486,6 +493,60 @@ pause
 "@
     [System.IO.File]::WriteAllText((Join-Path $mvd 'VIEW-MAPS-ON-PC.bat'), ($mvbat -replace "`r?`n","`r`n"), [System.Text.Encoding]::ASCII)
   }
+  # ---- browser maps: Protomaps state extracts made by Project NOMAD (MIT; map data
+  # (c) OpenStreetMap contributors, ODbL), NOMAD's style/fonts/symbols, MapLibre viewer,
+  # and Caddy (Apache-2.0) to serve them - OPEN-MAPS opens them in any web browser.
+  Log '=== [8c] Browser maps (Project NOMAD / Protomaps) + viewer ==='
+  $nm = 'https://github.com/Crosstalk-Solutions/project-nomad-maps/raw/refs/heads/master'
+  $names = @()
+  try { $names = @((Invoke-RestMethod 'https://api.github.com/repos/Crosstalk-Solutions/project-nomad-maps/contents/pmtiles' -Headers @{'User-Agent'='oel'}) | ForEach-Object { $_.name } | Where-Object { $_ -match '^[a-z_-]+_\d{4}-\d{2}\.pmtiles$' } | Sort-Object) } catch {}
+  if ($MrNomad) { $names = @($names | Where-Object { $_ -match "^(global[a-z-]*|$MrNomad)_\d{4}-\d{2}\.pmtiles$" }) }
+  # newest file per region; world map first so states draw over it
+  $latest = @($names | Group-Object { $_ -replace '_\d{4}-\d{2}\.pmtiles$','' } | ForEach-Object { $_.Group | Sort-Object | Select-Object -Last 1 })
+  $latest = @($latest | Where-Object { $_ -like 'global*' }) + @($latest | Where-Object { $_ -notlike 'global*' } | Sort-Object)
+  Log "browser maps: $($latest.Count) map files"
+  if (-not $latest.Count) { Bad 'browser maps' 'no map list from the project-nomad-maps repo' }
+  $regions = @()
+  foreach ($fn in $latest) {
+    $out = P "Maps-Browser/pmtiles/$fn"
+    if ((Fetch "$nm/pmtiles/$fn" $out) -and -not $DryRun) {
+      # no published fingerprints: check the PMTiles header (the file starts with "PMTiles")
+      $fs = [System.IO.File]::OpenRead($out); $buf = New-Object byte[] 7; [void]$fs.Read($buf, 0, 7); $fs.Close()
+      if ([System.Text.Encoding]::ASCII.GetString($buf) -eq 'PMTiles') { $regions += $fn }
+      else { Bad $fn 'not a PMTiles file - deleted it, run again'; Remove-Item -LiteralPath $out -Force }
+    }
+  }
+  if (-not $DryRun -and $regions.Count) {
+    [System.IO.File]::WriteAllText((P 'Maps-Browser/regions.json'), ('[' + (($regions | ForEach-Object { '"' + $_ + '"' }) -join ',') + "]`n"), (New-Object System.Text.UTF8Encoding($false)))
+  }
+  $ba = P 'Maps-Browser/base-assets.tar.gz'
+  if ((Fetch "$nm/base-assets.tar.gz" $ba) -and -not $DryRun) {
+    $new = P 'Maps-Browser/assets-new'
+    if (Test-Path $new) { Remove-Item $new -Recurse -Force }
+    try {
+      Expand-Tgz $ba $new
+      if (Test-Path (Join-Path $new 'tozip/nomad-base-styles.json')) {
+        $old = P 'Maps-Browser/assets'; if (Test-Path $old) { Remove-Item $old -Recurse -Force }
+        Move-Item (Join-Path $new 'tozip') $old; Remove-Item $new -Recurse -Force
+      } else { Bad 'base-assets.tar.gz' 'could not unpack the map style and fonts' }
+    } catch { Bad 'base-assets.tar.gz' $_.Exception.Message }
+  }
+  foreach ($u in 'maplibre-gl@4.7.1/dist/maplibre-gl.js','maplibre-gl@4.7.1/dist/maplibre-gl.css','pmtiles@4.4.0/dist/pmtiles.js') {
+    [void](Fetch "https://unpkg.com/$u" (P ("Maps-Browser/viewer/lib/" + (Split-Path $u -Leaf))))
+  }
+  # Caddy web server for every platform (one release)
+  $crel = $null; try { $crel = Invoke-RestMethod 'https://api.github.com/repos/caddyserver/caddy/releases/latest' -Headers @{'User-Agent'='oel'} } catch {}
+  foreach ($ck in 'windows_amd64.zip','windows_arm64.zip','mac_arm64.tar.gz','mac_amd64.tar.gz','linux_amd64.tar.gz','linux_arm64.tar.gz') {
+    $a = $null; if ($crel) { $a = $crel.assets | Where-Object { $_.name -like "*_$ck" } | Select-Object -First 1 }
+    if (-not $a) { Bad "caddy $ck" 'not in the latest Caddy release'; continue }
+    $dir = ($ck -replace '\.(zip|tar\.gz)$','') -replace '_','-'
+    $out = P "Maps-Browser/server/$($a.name)"
+    if ((Fetch $a.browser_download_url $out) -and -not $DryRun) {
+      $dest = P "Maps-Browser/server/$dir"
+      try { if ($ck -like '*.zip') { Expand-Archive $out -DestinationPath $dest -Force } else { Expand-Tgz $out $dest } }
+      catch { Bad $a.name "could not unpack it: $($_.Exception.Message)" }
+    }
+  }
 } else { Log '=== [8/9] Maps SKIPPED ===' }
 
 # ================================================================ phone apps
@@ -529,6 +590,10 @@ PlaceDoc 'HOW-TO-VIEW-MAPS'      (P 'OsmAnd/HOW-TO-VIEW-MAPS')
 PlaceDoc 'USE-ON-PHONE'          (P 'Phone-Apps/USE-ON-PHONE')
 foreach ($f in 'OPEN-LIBRARY.command','OPEN-LIBRARY.sh','OPEN-LIBRARY.bat','CHECK-DRIVE.command','CHECK-DRIVE.sh','CHECK-DRIVE.bat','check-drive.ps1') { Place "drive/$f" (P $f) }
 if (-not $SkipAI) { foreach ($f in 'AI-CHAT.command','AI-CHAT.sh','AI-CHAT.bat') { Place "drive/$f" (P $f) } }
+if (-not $SkipMaps) {
+  foreach ($f in 'OPEN-MAPS.command','OPEN-MAPS.sh','OPEN-MAPS.bat') { Place "drive/$f" (P $f) }
+  Place 'drive/maps/index.html' (P 'Maps-Browser/viewer/index.html')
+}
 
 # ================================================================ README index
 Log '=== Building README.html (full index of everything) ==='
@@ -584,7 +649,8 @@ if ($km) {
       if ($LASTEXITCODE -ne 0) { $ok = $false }
     }
   } finally { Pop-Location }
-  if ($ok -and $rels.Count -and (Test-Path $new)) { Move-Item $new (P 'library.xml') -Force; Log "library.xml: $(([regex]::Matches((Get-Content (P 'library.xml') -Raw), '<book ')).Count) archives" }
+  if (-not $rels.Count) { Remove-Item (P 'library.xml') -Force -ErrorAction SilentlyContinue; Log 'library.xml: no archives, skipped' }
+  elseif ($ok -and (Test-Path $new)) { Move-Item $new (P 'library.xml') -Force; Log "library.xml: $(([regex]::Matches((Get-Content (P 'library.xml') -Raw), '<book ')).Count) archives" }
   else { Remove-Item $new -Force -ErrorAction SilentlyContinue; Bad 'library.xml' 'kiwix-manage could not build it (OPEN-LIBRARY will scan the drive instead)' }
 } else { Log 'library.xml: skipped (needs Windows kiwix-manage.exe)' }
 
