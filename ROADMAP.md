@@ -5,7 +5,7 @@ Want one of these? Comment on (or open) the matching issue. PRs welcome.
 
 ## Near term
 - [ ] **`--lite` quick-start preset** — a ~2–3 GB "get running in minutes" build (3B AI +
-      medical + survival + regional maps, no 24 GB Wikipedia).
+      medical + survival + regional maps, no 53 GB Wikipedia).
 - [ ] **Checksums on releases** — publish SHA-256 for the installers so people can verify
       before running.
 - [ ] **Real-hardware testing** of the macOS and Linux installers (help wanted).

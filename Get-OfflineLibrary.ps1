@@ -71,7 +71,7 @@ try {
   $drive = (Get-Item $Root).PSDrive
   $freeGB = [math]::Round((Get-PSDrive $drive.Name).Free/1GB,1)
   Log "Destination: $Root   (free space: $freeGB GB)"
-  if ($freeGB -lt 65) { Log "WARNING: ~65 GB recommended for the full library. You have $freeGB GB free. Consider -SkipWikipedia / -SkipMaps / -SkipModels." }
+  if ($freeGB -lt 92) { Log "WARNING: ~92 GB recommended for the full library. You have $freeGB GB free. Consider -SkipWikipedia / -SkipMaps / -SkipModels." }
 } catch {}
 
 # ---------------------------------------------------------------- folder tree
@@ -193,8 +193,13 @@ foreach($p in $pdfs){
 
 # ================================================================ 7. Wikipedia + Maps
 if(-not $SkipWikipedia){
-  Log '=== [7/8] Wikipedia (article text, compressed ~24 GB) ==='
-  Fetch 'https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2' (Join-Path $Root 'Wikipedia\enwiki-latest-pages-articles.xml.bz2')
+  # Kiwix ZIM (full article text, no images): opens in Kiwix and is searchable.
+  # The raw XML dump (enwiki-...pages-articles.xml.bz2) cannot be opened by Kiwix.
+  Log '=== [7/8] Wikipedia (full article text, Kiwix ZIM, ~53 GB) ==='
+  $wdir = 'https://download.kiwix.org/zim/wikipedia/'
+  $wname = Latest-Zim $wdir 'wikipedia_en_all_nopic_'
+  if($wname){ Log "zim: $wname"; Fetch ($wdir+$wname) (Join-Path $Root "Wikipedia\$wname") }
+  else { Log 'zim: NOT FOUND for prefix wikipedia_en_all_nopic_' }
 } else { Log '=== [7/8] Wikipedia SKIPPED ===' }
 
 if(-not $SkipMaps){

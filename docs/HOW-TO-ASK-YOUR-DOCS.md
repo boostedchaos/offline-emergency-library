@@ -77,7 +77,7 @@ A "collection" is just a folder of documents GPT4All will read. Add the kit's fo
    - You can also add your own folders of PDFs/notes anytime.
 
 **Supported file types:** PDF, plain text (`.txt`), Markdown (`.md`), Word (`.docx`),
-and several code/office formats. (See Section 6 for ZIM and the Wikipedia XML.)
+and several code/office formats. (See Section 6 for ZIM files, including Wikipedia.)
 
 ---
 
@@ -107,15 +107,14 @@ and several code/office formats. (See Section 6 for ZIM and the Wikipedia XML.)
 
 ---
 
-## 6. What about ZIM files and the Wikipedia XML?
+## 6. What about ZIM files (including Wikipedia)?
 
 - **ZIM files** (iFixit, Appropedia, WikiMed, zimgit — in `E:\Manuals` and
   `E:\Medical`) are **not** read by GPT4All. Open those in the **Kiwix** reader
   instead (see `E:\Kiwix-Reader\HOW-TO-USE-KIWIX`). Kiwix has its own fast full-text
   search across all articles.
-- The **Wikipedia dump** (`E:\Wikipedia\...xml.bz2`) is a single 24 GB compressed file
-  — too large to feed to GPT4All directly. Read Wikipedia via Kiwix instead (or the raw
-  file is for archival/processing).
+- **Wikipedia** (`E:\Wikipedia\wikipedia_en_all_nopic_*.zim`) is also a ZIM file (~53 GB).
+  Read and search it in Kiwix, like the other archives.
 - **For AI Q&A, point GPT4All at the PDF/text folders** (`ArmyFieldManuals`,
   `Medical\Manuals-PDF`, `Radio-Communications`, and any notes you add).
 

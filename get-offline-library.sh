@@ -175,8 +175,10 @@ get_pdf "shipsmedicineche0000medi"                           "Ships Medicine Che
 
 # ================================================================ 7. Wikipedia + Maps
 if [ "$SKIP_WIKI" = 0 ]; then
-  log "=== [7/8] Wikipedia (article text, ~24 GB) ==="
-  fetch "https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2" "$ROOT/Wikipedia/enwiki-latest-pages-articles.xml.bz2"
+  # Kiwix ZIM (full article text, no images): opens in Kiwix and is searchable.
+  # The raw XML dump (enwiki-...pages-articles.xml.bz2) cannot be opened by Kiwix.
+  log "=== [7/8] Wikipedia (full article text, Kiwix ZIM, ~53 GB) ==="
+  add_zim "https://download.kiwix.org/zim/wikipedia/" "wikipedia_en_all_nopic_" "$ROOT/Wikipedia"
 else log "=== [7/8] Wikipedia SKIPPED ==="; fi
 
 if [ "$SKIP_MAPS" = 0 ]; then

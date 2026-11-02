@@ -30,7 +30,7 @@ You can carry most of this library on a phone — handy for grab-and-go emergenc
   **Menu → Configure map / Import** (or place them in `Android/data/net.osmand.plus/files/`).
 - **PDFs / HTML:** copy the folders; open with any PDF viewer or browser.
 
-> **Storage tip:** the full set is large (Wikipedia alone is ~24 GB). Most people put a
+> **Storage tip:** the full set is large (Wikipedia alone is ~53 GB). Most people put a
 > **subset** on the phone — e.g. medical (`WikiMed`), survival, repair, and maps for their
 > region — and keep the full library on the drive. Pick what fits your phone's free space
 > (a 128 GB+ phone or an SD card helps).

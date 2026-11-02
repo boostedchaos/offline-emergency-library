@@ -23,7 +23,7 @@ works with **no internet**.
 |---|---|---|---|
 | **Offline AI chat** | 3 local AI models (Llama 3.2 3B, Llama 3.1 8B, Qwen2.5 7B) + CPU & GPU engines (llama.cpp) | ~11 GB | CPU only (GPU optional) |
 | **Offline doc-Q&A** | GPT4All — ask an AI questions about your PDFs, with citations | ~0.7 GB | CPU, one-time install |
-| **Wikipedia** | Full English Wikipedia article text (compressed) | ~24 GB | Kiwix (or archival) |
+| **Wikipedia** | Full English Wikipedia article text (Kiwix ZIM, no images) | ~53 GB | Kiwix |
 | **Offline maps** | Maps for the region you pick (**default US**; any country/region/continent — see below) + **bundled desktop viewer** (OsmAndMapCreator + portable Java) + **bundled Android app (APK)** | US ≈17 GB; varies by region (+~0.4 GB tools) | **PC (no phone) or phone** |
 | **Repair archive** | iFixit — cars, appliances, electronics, phones | ~3.4 GB | Kiwix |
 | **DIY archive** | Appropedia — plumbing, electrical, construction, energy, water, food | ~0.6 GB | Kiwix |
@@ -55,7 +55,7 @@ install, and future updates), so plan for more than 60 GB.
 | **Internal HDD/SSD** | Perfect if you're keeping it on a PC. |
 
 > **Tip:** If you only want the reference material (no AI), you can skip the big pieces
-> with `-SkipModels` and still get Wikipedia, maps, and all manuals in ~30 GB. If you also
+> with `-SkipModels` and still get Wikipedia, maps, and all manuals in ~57 GB. If you also
 > skip Wikipedia and maps (`-SkipWikipedia -SkipMaps`), the AI + manuals fit in ~20 GB.
 
 ---
@@ -154,7 +154,7 @@ runs 100% offline afterward:
 | AI engine (llama.cpp) | github.com/ggml-org/llama.cpp |
 | GPT4All | github.com/nomic-ai/gpt4all |
 | Kiwix reader + ZIM archives | download.kiwix.org |
-| Wikipedia | dumps.wikimedia.org |
+| Wikipedia | download.kiwix.org (`wikipedia_en_all_nopic`) |
 | Maps + desktop viewer | download.osmand.net |
 | Portable Java | api.adoptium.net (Eclipse Temurin) |
 | Manuals (PDF) | archive.org |
@@ -239,7 +239,7 @@ Both pages link to each component's guide:
 |---|---|
 | `-Region <name>` / `--region <name>` | Choose map region (default `US`); country, continent, sub-region, or `world` |
 | `-ListRegions` / `--list-regions [filter]` | List available map regions, then exit (no download) |
-| `-SkipWikipedia` / `--skip-wikipedia` | Don't download the 24 GB Wikipedia dump (~24 GB saved) |
+| `-SkipWikipedia` / `--skip-wikipedia` | Don't download Wikipedia (~53 GB saved) |
 | `-SkipMaps` / `--skip-maps` | Don't download the maps (~17 GB saved for US) |
 | `-SkipModels` / `--skip-models` | Skip the large 8B/7B AI models, keep the small 3B (~9 GB saved) |
 
