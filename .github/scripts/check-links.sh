@@ -11,7 +11,6 @@ urls=(
   "https://download.kiwix.org/zim/other/"
   "https://download.kiwix.org/zim/wikipedia/"
   "https://download.kiwix.org/release/kiwix-desktop/"
-  "https://dumps.wikimedia.org/enwiki/latest/"
   "https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip"
   "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jre/hotspot/normal/eclipse"
   "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF"

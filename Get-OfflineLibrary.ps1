@@ -19,7 +19,7 @@ param(
                             #   -Region US_texas   -Region world   (see -ListRegions)
   [switch]$ListRegions,     # print available map regions (optionally filtered by -Filter) and exit
   [string]$Filter,          # substring filter used with -ListRegions
-  [switch]$SkipWikipedia,   # Wikipedia is the biggest (~24 GB); allow skipping
+  [switch]$SkipWikipedia,   # Wikipedia is the biggest default download (~53 GB); allow skipping
   [switch]$SkipMaps,        # OsmAnd maps (~17 GB for US); allow skipping
   [switch]$SkipModels,      # the large AI chat models (~11 GB)
   [switch]$Education,        # OPT-IN: add Khan Academy (Kiwix ZIM, ~168 GB with videos)
