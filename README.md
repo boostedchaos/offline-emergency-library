@@ -283,6 +283,9 @@ Issues and PRs welcome — see [CONTRIBUTING](.github/CONTRIBUTING.md), the
 [ROADMAP](ROADMAP.md), and issues labeled **good first issue**. Testers for the macOS/Linux
 installers especially wanted.
 
+Release history and contributor credits are in the [CHANGELOG](CHANGELOG.md). Thanks to
+everyone who has tested the installers on real hardware and reported what broke.
+
 ## License
 Code and documentation in this repo: **MIT** (see `LICENSE`). Downloaded content retains
 its original licenses (open-weight model licenses, CC licenses for Kiwix content, public
