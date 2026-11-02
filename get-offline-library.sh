@@ -286,7 +286,8 @@ if [ "$SKIP_MAPS" = 0 ]; then
   curl -sL "https://download.osmand.net/get_indexes" -o "$ROOT/OsmAnd/_index.xml"
   allnames="$(grep -oE 'name="[^"]+\.obf\.zip"' "$ROOT/OsmAnd/_index.xml" | sed -E 's/name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
   : > "$ROOT/OsmAnd/_filelist.txt"
-  printf '%s' "$REGION" | tr ',;' '  ' | tr ' ' '\n' | while IFS= read -r tok; do
+  # '%s\n': without a final newline, read skips the last name (default "US" got 0 maps)
+  printf '%s\n' "$REGION" | tr ',;' '  ' | tr ' ' '\n' | while IFS= read -r tok; do
     [ -z "$tok" ] && continue
     tok="$(alias_region "$tok")"
     tl="$(printf '%s' "$tok" | tr 'A-Z' 'a-z')"
