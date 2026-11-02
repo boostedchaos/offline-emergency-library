@@ -1,17 +1,26 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Use the Library on a Phone / Tablet</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
-<h1>Use the Library on a Phone / Tablet</h1>
-<p>You can carry most of this library on a phone — handy for grab-and-go emergencies. The</p>
-<p><code>Phone-Apps\</code> folder bundles the Android apps you need so you can install them <strong>offline</strong></p>
-<p>(no Play Store, no internet). Then you copy the content files over.</p>
-<table><thead><tr>
+
+<h1 id="use-the-library-on-a-phone--tablet">Use the Library on a Phone /
+Tablet</h1>
+<p>You can carry most of this library on a phone — handy for grab-and-go
+emergencies. The <code>Phone-Apps\</code> folder bundles the Android
+apps you need so you can install them <strong>offline</strong> (no Play
+Store, no internet). Then you copy the content files over.</p>
+<table>
+<thead>
+<tr>
 <th>On the phone you can…</th>
 <th>App (bundled APK)</th>
 <th>Content to copy</th>
-</tr></thead><tbody>
+</tr>
+</thead>
+<tbody>
 <tr>
-<td>Read all offline archives (Wikipedia, medical, repair, survival)</td>
+<td>Read all offline archives (Wikipedia, medical, repair,
+survival)</td>
 <td><strong>Kiwix</strong></td>
-<td>the <code>.zim</code> files from <code>Medical\</code>, <code>Manuals\...</code></td>
+<td>the <code>.zim</code> files from <code>Medical\</code>,
+<code>Manuals\...</code></td>
 </tr>
 <tr>
 <td>Use offline maps (navigation, search)</td>
@@ -28,69 +37,138 @@
 <td>any browser (built in)</td>
 <td>the <code>.html</code> files</td>
 </tr>
-</tbody></table>
-<hr>
-<h2>Android — step by step</h2>
-<h3>1. Install the apps (offline)</h3>
-<ol>
-<li>Copy the APK files from <code>Phone-Apps\</code> to your phone (USB cable, SD card, etc.):</li>
-</ol>
+</tbody>
+</table>
+<hr />
+<h2 id="android--step-by-step">Android — step by step</h2>
+<h3 id="1-install-the-apps-offline">1. Install the apps (offline)</h3>
+<ol type="1">
+<li>Copy the APK files from <code>Phone-Apps\</code> to your phone (USB
+cable, SD card, etc.):
 <ul>
-<li><code>*-universal-standalone.apk</code> → <strong>Kiwix</strong></li>
+<li><code>*-universal-standalone.apk</code> →
+<strong>Kiwix</strong></li>
 <li><code>OsmAnd-*.apk</code> → <strong>OsmAnd</strong></li>
-</ul>
-<ol>
-<li>On the phone, tap each APK to install. The first time, Android asks you to allow</li>
+</ul></li>
+<li>On the phone, tap each APK to install. The first time, Android asks
+you to allow <strong>"Install unknown apps"</strong> for your file
+manager/browser — allow it, then install.</li>
 </ol>
-<p>   <strong>"Install unknown apps"</strong> for your file manager/browser — allow it, then install.</p>
-<h3>2. Copy the content</h3>
+<h3 id="2-copy-the-content">2. Copy the content</h3>
 <ul>
-<li><strong>Kiwix:</strong> copy the <code>.zim</code> files to the phone (anywhere, e.g. a <code>Kiwix</code> folder). Open</li>
+<li><strong>Kiwix:</strong> copy the <code>.zim</code> files to the
+phone (anywhere, e.g. a <code>Kiwix</code> folder). Open Kiwix →
+<strong>＋ / Open file</strong> → pick each <code>.zim</code>. They're
+added to your library and are fully searchable offline.</li>
+<li><strong>OsmAnd:</strong> copy the <code>.obf.zip</code> map files to
+the phone, then in OsmAnd use <strong>Menu → Configure map /
+Import</strong> (or place them in
+<code>Android/data/net.osmand.plus/files/</code>).</li>
+<li><strong>PDFs / HTML:</strong> copy the folders; open with any PDF
+viewer or browser.</li>
 </ul>
-<p>  Kiwix → <strong>＋ / Open file</strong> → pick each <code>.zim</code>. They're added to your library and are</p>
-<p>  fully searchable offline.</p>
+<blockquote>
+<p><strong>Storage tip:</strong> the full set is large (Wikipedia alone
+is ~24 GB). Most people put a <strong>subset</strong> on the phone —
+e.g. medical (<code>WikiMed</code>), survival, repair, and maps for
+their region — and keep the full library on the drive. Pick what fits
+your phone's free space (a 128 GB+ phone or an SD card helps).</p>
+</blockquote>
+<hr />
+<h2 id="iphone--ipad">iPhone / iPad</h2>
+<p>Apple doesn't allow installing apps from a file, so get the apps from
+the <strong>App Store while you still have internet</strong> (do this
+now, as part of preparing your kit):</p>
+<table>
+<thead>
+<tr>
+<th>App (App Store, free)</th>
+<th>What it opens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kiwix</strong></td>
+<td>the <code>.zim</code> archives (Wikipedia, medical, repair,
+survival)</td>
+</tr>
+<tr>
+<td><strong>OsmAnd Maps</strong></td>
+<td>the <code>.obf</code> offline maps</td>
+</tr>
+<tr>
+<td><strong>PocketPal AI</strong> (optional)</td>
+<td>a small <code>.gguf</code> AI model — see the AI section below</td>
+</tr>
+</tbody>
+</table>
+<p>PDFs and these HTML guides open in the built-in
+<strong>Files</strong> app. Nothing else to install.</p>
+<h3 id="1-plug-in-the-drive">1. Plug in the drive</h3>
 <ul>
-<li><strong>OsmAnd:</strong> copy the <code>.obf.zip</code> map files to the phone, then in OsmAnd use</li>
+<li><strong>USB-C iPad, or iPhone 15 and newer:</strong> plug the drive
+straight in.</li>
+<li><strong>Lightning iPhone:</strong> use Apple's <strong>Lightning to
+USB 3 Camera Adapter</strong> with a charger plugged into the adapter.
+Without that extra power, a USB SSD or hard drive may not start.</li>
+<li>The drive shows up in <strong>Files → Browse →
+Locations</strong>.</li>
 </ul>
-<p>  <strong>Menu → Configure map / Import</strong> (or place them in <code>Android/data/net.osmand.plus/files/</code>).</p>
-<ul>
-<li><strong>PDFs / HTML:</strong> copy the folders; open with any PDF viewer or browser.</li>
-</ul>
-<blockquote><strong>Storage tip:</strong> the full set is large (Wikipedia alone is ~24 GB). Most people put a <strong>subset</strong> on the phone — e.g. medical (<code>WikiMed</code>), survival, repair, and maps for their region — and keep the full library on the drive. Pick what fits your phone's free space (a 128 GB+ phone or an SD card helps).</blockquote>
-<hr>
-<h2>iPhone / iPad</h2>
-<p>Apple doesn't allow installing apps from a file, so get the apps from the **App Store while</p>
-<p>you still have internet** (do this now, as part of preparing your kit):</p>
-<ul>
-<li><strong>Kiwix</strong> (App Store) — then import <code>.zim</code> files via the Files app / iTunes file sharing.</li>
-<li><strong>OsmAnd Maps</strong> (App Store) — then import maps, or download your regions in-app while</li>
-</ul>
-<p>  online.</p>
-<hr>
-<h2>Can I run the AI on my phone too?</h2>
-<p>The offline <strong>chat AI</strong> and <strong>document-Q&amp;A</strong> in this kit are built for a <strong>computer</strong></p>
-<p>(Windows). Phones *can* run small AI models, but it needs a separate mobile app:</p>
-<ol>
-<li>Install a mobile GGUF model runner (for example, a "local LLM" app from your app store</li>
+<h3 id="2-read-the-archives-straight-from-the-drive-no-copying">2. Read
+the archives straight from the drive (no copying)</h3>
+<p>Kiwix opens a <code>.zim</code> where it is, so even full Wikipedia
+works without filling the phone.</p>
+<ol type="1">
+<li>Open Kiwix → <strong>Open</strong> → pick the drive → tap a
+<code>.zim</code> file.</li>
+<li>Repeat for each archive you want.</li>
+<li>Keep the drive plugged in while you read. Unplug it and Kiwix can't
+read those archives until you plug it back in.</li>
 </ol>
-<p>   such as <strong>PocketPal AI</strong>, <strong>ChatterUI</strong>, or <strong>Private AI</strong> — install while online).</p>
-<ol>
-<li>Copy one of the small model files from <code>AI-Offline\models\</code> (the <strong>3B</strong> model is best</li>
-</ol>
-<p>   for phones) to the phone.</p>
-<ol>
+<h3 id="3-maps">3. Maps</h3>
+<p>OsmAnd keeps its maps <strong>inside the phone</strong>, so import
+only the region you need: in <strong>Files</strong>, tap the
+<code>.obf.zip</code> to unzip it, then share the <code>.obf</code> file
+to <strong>OsmAnd</strong>.</p>
+<h3 id="what-does-not-work-on-iphone--ipad">What does not work on iPhone
+/ iPad</h3>
+<p>The launchers in this kit (<code>.bat</code>, <code>.sh</code>,
+<code>.command</code> — desktop reader, AI chat, map viewer) are
+computer programs. iPhone and iPad can't run programs from a drive. Use
+those on a computer.</p>
+<hr />
+<h2 id="can-i-run-the-ai-on-my-phone-too">Can I run the AI on my phone
+too?</h2>
+<p>The offline <strong>chat AI</strong> and
+<strong>document-Q&amp;A</strong> in this kit are built for a
+<strong>computer</strong> (Windows). Phones <em>can</em> run small AI
+models, but it needs a separate mobile app:</p>
+<ol type="1">
+<li>Install a mobile GGUF model runner (for example, a "local LLM" app
+from your app store such as <strong>PocketPal AI</strong>,
+<strong>ChatterUI</strong>, or <strong>Private AI</strong> — install
+while online).</li>
+<li>Copy one of the small model files from
+<code>AI-Offline\models\</code> (the <strong>3B</strong> model is best
+for phones) to the phone.</li>
 <li>Load that model file in the app and chat offline.</li>
 </ol>
-<p>This is optional and depends on your phone's RAM (6–8 GB+ recommended). The bundled</p>
-<p>Windows AI is the primary experience; phone AI is a bonus.</p>
-<hr>
-<h2>Summary</h2>
+<p>This is optional and depends on your phone's RAM (6–8 GB+
+recommended). On iPhone/iPad, <strong>PocketPal AI</strong> copies the
+model into the phone, so you need free space for it (the 3B model is
+about 2 GB). The bundled Windows AI is the primary experience; phone AI
+is a bonus.</p>
+<hr />
+<h2 id="summary">Summary</h2>
 <ul>
-<li><strong>Android:</strong> everything but the AI installs <strong>offline</strong> from <code>Phone-Apps\</code> (Kiwix +</li>
-</ul>
-<p>  OsmAnd). Copy the <code>.zim</code>, <code>.obf.zip</code>, PDFs, and HTML you want.</p>
-<ul>
-<li><strong>iPhone/iPad:</strong> install Kiwix + OsmAnd from the App Store while online, then import.</li>
-<li><strong>AI on phone:</strong> optional, via a separate mobile app + the small model file.</li>
+<li><strong>Android:</strong> everything but the AI installs
+<strong>offline</strong> from <code>Phone-Apps\</code> (Kiwix + OsmAnd).
+Copy the <code>.zim</code>, <code>.obf.zip</code>, PDFs, and HTML you
+want.</li>
+<li><strong>iPhone/iPad:</strong> install Kiwix + OsmAnd from the App
+Store while online. Kiwix opens the <code>.zim</code> files straight
+from the drive; maps are imported into OsmAnd.</li>
+<li><strong>AI on phone:</strong> optional, via a separate mobile app +
+the small model file.</li>
 </ul>
 </div></body></html>
