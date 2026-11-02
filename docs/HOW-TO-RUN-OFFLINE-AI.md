@@ -31,7 +31,8 @@ answers from it. See `HOW-TO-ASK-YOUR-DOCS`.
 ## Two models = a second opinion
 
 The two models come from different makers (Alibaba's Qwen and Google's Gemma). For an
-important question, ask both and compare. The medium model "thinks" before it answers;
+important question, ask both and compare. The small model answers at once (its
+"thinking" is turned off, so it is fast). The medium model "thinks" before it answers;
 click **Reasoning** to see its thinking.
 
 ## Good to know

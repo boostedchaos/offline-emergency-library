@@ -15,9 +15,13 @@ echo   3 = Small on the graphics card (GPU)
 echo   4 = Medium on the graphics card (GPU)
 choice /c 1234 /n /m "Type 1, 2, 3 or 4: "
 set "C=%errorlevel%"
+rem Small model: thinking off + Qwen's own settings for that mode (model card).
 set "MODEL=%SMALL%"
+set "TUNE=--reasoning off --temp 0.7 --top-p 0.8 --top-k 20 --min-p 0 --presence-penalty 1.5"
 if "%C%"=="2" set "MODEL=%MEDIUM%"
+if "%C%"=="2" set "TUNE="
 if "%C%"=="4" set "MODEL=%MEDIUM%"
+if "%C%"=="4" set "TUNE="
 if "%C%"=="3" set "P=win-vulkan-x64"
 if "%C%"=="4" set "P=win-vulkan-x64"
 if "%P%"=="win-vulkan-x64" set "GPU=-ngl 99"
@@ -28,7 +32,7 @@ if not defined SRV goto noengine
 echo Loading the model (can take up to a minute from the drive)...
 echo Your browser opens at http://localhost:%PORT% when it is ready. Close this window to stop.
 start "" /b powershell -NoProfile -WindowStyle Hidden -Command "for($i=0;$i -lt 180;$i++){try{Invoke-WebRequest -UseBasicParsing http://127.0.0.1:%PORT%/health -TimeoutSec 2 | Out-Null; Start-Process 'http://localhost:%PORT%'; break}catch{Start-Sleep 1}}"
-"%SRV%" -m "%MODEL%" -c 8192 %GPU% --host 127.0.0.1 --port %PORT%
+"%SRV%" -m "%MODEL%" -c 8192 %GPU% %TUNE% --host 127.0.0.1 --port %PORT%
 pause
 exit /b 0
 :nomodel

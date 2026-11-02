@@ -17,11 +17,14 @@ echo "  1 = Small  (Qwen 3.5 4B)  - fast, needs about 8 GB of memory"
 echo "  2 = Medium (Gemma 4 12B)  - better answers, needs about 16 GB of memory"
 [ "$P" = ubuntu-x64 ] && echo "  3 = Small on the graphics card (GPU)" && echo "  4 = Medium on the graphics card (GPU)"
 read -r -p "Type a number and press Enter [1]: " c
+# Small model: thinking off + Qwen's own settings for that mode (model card). With
+# default settings it "thought" in circles and gave no answer (tested 2026-11-01).
+TUNE="--reasoning off --temp 0.7 --top-p 0.8 --top-k 20 --min-p 0 --presence-penalty 1.5"
 GPU=""
 case "$c" in
-  2) MODEL="$MEDIUM" ;;
+  2) MODEL="$MEDIUM"; TUNE="" ;;
   3) MODEL="$SMALL";  P=ubuntu-vulkan-x64; GPU="-ngl 99" ;;
-  4) MODEL="$MEDIUM"; P=ubuntu-vulkan-x64; GPU="-ngl 99" ;;
+  4) MODEL="$MEDIUM"; TUNE=""; P=ubuntu-vulkan-x64; GPU="-ngl 99" ;;
   *) MODEL="$SMALL" ;;
 esac
 if [ ! -f "$MODEL" ]; then echo "That model is not on this drive: $MODEL"; read -r -p "Press Enter to close. " _; exit 1; fi
@@ -37,4 +40,4 @@ echo "Your browser opens at http://localhost:$PORT when it is ready. Close this 
       open "http://localhost:$PORT" 2>/dev/null || xdg-open "http://localhost:$PORT" >/dev/null 2>&1; break
     fi; sleep 1
   done ) &
-exec "$SRV" -m "$MODEL" -c 8192 $GPU --host 127.0.0.1 --port "$PORT"
+exec "$SRV" -m "$MODEL" -c 8192 $GPU $TUNE --host 127.0.0.1 --port "$PORT"
