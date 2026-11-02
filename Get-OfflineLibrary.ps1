@@ -21,7 +21,9 @@ param(
   [string]$Filter,          # substring filter used with -ListRegions
   [switch]$SkipWikipedia,   # Wikipedia is the biggest (~24 GB); allow skipping
   [switch]$SkipMaps,        # OsmAnd maps (~17 GB for US); allow skipping
-  [switch]$SkipModels       # the large AI chat models (~11 GB)
+  [switch]$SkipModels,      # the large AI chat models (~11 GB)
+  [switch]$Education,        # OPT-IN: add Khan Academy (Kiwix ZIM, ~168 GB with videos)
+  [string]$EduLang = 'en'    # Khan Academy language: en, es, or fr
 )
 
 $ErrorActionPreference = 'Continue'
@@ -80,7 +82,7 @@ $dirs = @(
  'Manuals','Manuals\ArmyFieldManuals','Manuals\Repair-iFixit','Manuals\DIY-Appropedia',
  'Manuals\Survival-Water-Food','Manuals\Radio-Communications',
  'Medical','Medical\WikiMed','Medical\zimgit-medicine','Medical\Manuals-PDF',
- 'Wikipedia','OsmAnd','Kiwix-Reader','Kiwix-Reader\app','Phone-Apps'
+ 'Wikipedia','OsmAnd','Kiwix-Reader','Kiwix-Reader\app','Phone-Apps','Education'
 )
 foreach($d in $dirs){ New-Item -ItemType Directory -Force (Join-Path $Root $d) | Out-Null }
 
@@ -163,6 +165,15 @@ foreach($z in $zims){
   if($name){ Log "zim: $name"; Fetch ($z.dir+$name) (Join-Path $Root "$($z.d)\$name") }
   else { Log "zim: NOT FOUND for prefix $($z.pre)" }
 }
+
+# ================================================================ 5b. Education (opt-in)
+if($Education){
+  Log "=== [5b] Education: Khan Academy (Kiwix ZIM, ~168 GB with videos, lang=$EduLang) ==="
+  New-Item -ItemType Directory -Force (Join-Path $Root 'Education\KhanAcademy') | Out-Null
+  $kaName = Latest-Zim 'https://download.kiwix.org/zim/other/' "khanacademy_$($EduLang)_all_"
+  if($kaName){ Log "zim: $kaName"; Fetch ("https://download.kiwix.org/zim/other/$kaName") (Join-Path $Root "Education\KhanAcademy\$kaName") }
+  else { Log "Khan Academy: no ZIM found for language '$EduLang' (try -EduLang en|es|fr)" }
+} else { Log "=== [5b] Education (Khan Academy) not selected - add -Education to include (~168 GB) ===" }
 
 # ================================================================ 6. PDFs (Internet Archive)
 Log '=== [6/8] Public-domain manuals (PDF) ==='
@@ -380,6 +391,7 @@ PlaceDoc 'Medical-READ-ME-FIRST.md' (Join-Path $Root 'Medical\READ-ME-FIRST')   
 PlaceDoc 'RADIO-GUIDE.md'           (Join-Path $Root 'Manuals\Radio-Communications\RADIO-GUIDE')     'Emergency Radio Communications Guide'
 PlaceDoc 'HOW-TO-VIEW-MAPS.md'      (Join-Path $Root 'OsmAnd\HOW-TO-VIEW-MAPS')                      'Offline Maps - How to View'
 PlaceDoc 'USE-ON-PHONE.md'          (Join-Path $Root 'Phone-Apps\USE-ON-PHONE')                      'Use the Library on a Phone'
+PlaceDoc 'Education-READ-ME-FIRST.md' (Join-Path $Root 'Education\READ-ME-FIRST')                     'Education - Khan Academy Offline'
 
 # ================================================================ README index
 Log '=== Building README.html (full index of everything) ==='
