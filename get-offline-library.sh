@@ -160,16 +160,40 @@ gh_asset_latest(){ # repo regex -> asset url from the 'latest' release
 latest_zim(){ curl -sL -A "$UA" "$1" | grep -oE "$2[^\"<]*\.zim" | sort -u | tail -n1; }
 
 # ================================================================ 1. AI engine
-log "=== [1/8] Offline AI engine (llama.cpp) ==="
+# llama.cpp for Windows, macOS and Linux, all from ONE build, so a drive made on any
+# computer runs the AI on any other. Folder names match the .bat/.sh launchers below.
+log "=== [1/8] Offline AI engine (llama.cpp) for Windows, macOS and Linux ==="
+LLAMA_ASSETS="win-cpu-x64.zip:x64 win-cpu-arm64.zip:arm64 win-vulkan-x64.zip:vulkan-x64 macos-arm64.tar.gz:macos-arm64 macos-x64.tar.gz:macos-x64 ubuntu-x64.tar.gz:linux-x64 ubuntu-arm64.tar.gz:linux-arm64 ubuntu-vulkan-x64.tar.gz:linux-vulkan-x64"
+# untar_real ARCHIVE DEST - exFAT has no symlinks (Linux cannot make them there; macOS
+# writes "XSym" stand-ins only macOS can read). Unpack on the computer's own disk first,
+# then copy with links followed (cp -RL) so the drive holds real files.
+untar_real(){
+  t="$(mktemp -d 2>/dev/null || echo "/tmp/oel-untar-$$")"; mkdir -p "$t" "$2"
+  tar -xzf "$1" -C "$t" && cp -RL "$t/." "$2/"; rc=$?
+  rm -rf "$t"; return $rc
+}
 if [ "$HAVE_TAR" = 1 ]; then
-  if [ "$PLAT" = mac ]; then
-    u="$(gh_asset ggml-org/llama.cpp "bin-macos-${CPU}\\.tar\\.gz$")"
-    [ -n "$u" ] && { log "engine: $(basename "$u")"; fetch "$u" "$ROOT/AI-Offline/engine/engine.tar.gz"; mkdir -p "$ROOT/AI-Offline/engine/metal"; tar -xf "$ROOT/AI-Offline/engine/engine.tar.gz" -C "$ROOT/AI-Offline/engine/metal"; }
+  rels="$(curl -sL -H "User-Agent: oel" "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20")"
+  urls="$(printf '%s' "$rels" | grep -oE '"browser_download_url"[ ]*:[ ]*"[^"]+"' | sed -E 's/.*"(https[^"]+)"/\1/')"
+  LT=""
+  for t in $(printf '%s' "$rels" | grep -oE '"tag_name"[ ]*:[ ]*"[^"]+"' | sed -E 's/.*"([^"]+)"$/\1/'); do
+    ok=1; for x in $LLAMA_ASSETS; do printf '%s\n' "$urls" | grep -q "/download/$t/llama-$t-bin-${x%%:*}\$" || { ok=0; break; }; done
+    [ "$ok" = 1 ] && { LT="$t"; break; }
+  done
+  if [ -z "$LT" ]; then log "engine: no recent llama.cpp build has all 8 platform files"
   else
-    u="$(gh_asset ggml-org/llama.cpp "bin-ubuntu-${CPU}\\.tar\\.gz$")"
-    [ -n "$u" ] && { log "engine CPU: $(basename "$u")"; fetch "$u" "$ROOT/AI-Offline/engine/cpu.tar.gz"; mkdir -p "$ROOT/AI-Offline/engine/cpu"; tar -xf "$ROOT/AI-Offline/engine/cpu.tar.gz" -C "$ROOT/AI-Offline/engine/cpu"; }
-    g="$(gh_asset ggml-org/llama.cpp "bin-ubuntu-vulkan-${CPU}\\.tar\\.gz$")"
-    [ -n "$g" ] && { log "engine GPU(Vulkan): $(basename "$g")"; fetch "$g" "$ROOT/AI-Offline/engine/gpu.tar.gz"; mkdir -p "$ROOT/AI-Offline/engine/gpu"; tar -xf "$ROOT/AI-Offline/engine/gpu.tar.gz" -C "$ROOT/AI-Offline/engine/gpu"; }
+    log "engine: llama.cpp $LT"
+    E="$ROOT/AI-Offline/engine"
+    for x in $LLAMA_ASSETS; do
+      f="${x%%:*}"; d="$E/${x##*:}"
+      log "engine: $f"; fetch "https://github.com/ggml-org/llama.cpp/releases/download/$LT/llama-$LT-bin-$f" "$E/$f"
+      rm -rf "$d"; mkdir -p "$d"   # fresh unpack: no files left from an older build
+      case "$f" in
+        *.zip)    if [ "$HAVE_UNZIP" = 1 ]; then unzip -o -q "$E/$f" -d "$d" || log "  WARN: could not unpack $f"; else log "  $f: install 'unzip' to unpack the Windows engine"; fi ;;
+        *.tar.gz) untar_real "$E/$f" "$d" || log "  WARN: could not unpack $f" ;;
+      esac
+    done
+    echo "$LT" > "$E/BUILD.txt"
   fi
 else
   log "engine: skipped (no 'tar')"
@@ -350,47 +374,49 @@ if [ "$SKIP_MAPS" = 0 ]; then
   [ -n "$vc" ] && { log "phone app: OsmAnd~ $vc"; fetch "https://f-droid.org/repo/net.osmand.plus_$vc.apk" "$PA/OsmAnd-$vc.apk"; }
 fi
 
-# ================================================================ launchers (.sh)
-log "=== Writing launchers ==="
+# ================================================================ launchers (.sh + .bat)
+# Both kinds on every drive, so the AI starts on any computer. Get-OfflineLibrary.ps1 writes
+# the same files. Each .sh picks the engine folder for the computer it runs on.
+log "=== Writing launchers (.sh + .bat) ==="
 AO="$ROOT/AI-Offline"
-make_launcher(){ # file  model  extra-args
-cat > "$AO/$1" <<EOS
+make_sh(){ # file  tool  model  gpu(0/1)  args  note
+cat > "$AO/$1" <<'EOS'
 #!/usr/bin/env bash
-DIR="\$(cd "\$(dirname "\$0")" && pwd)"
-CLI="\$(find "\$DIR/engine" -name llama-cli -type f 2>/dev/null | head -n1)"
-SRV="\$(find "\$DIR/engine" -name llama-server -type f 2>/dev/null | head -n1)"
-[ -z "\$CLI" ] && { echo "AI engine not found in \$DIR/engine"; exit 1; }
-LIBDIR="\$(dirname "\$CLI")"
-export LD_LIBRARY_PATH="\$LIBDIR:\${LD_LIBRARY_PATH:-}"
-export DYLD_LIBRARY_PATH="\$LIBDIR:\${DYLD_LIBRARY_PATH:-}"
-exec "\$CLI" -m "\$DIR/models/$2" -c 4096 $3 -cnv
+# Offline AI (macOS / Linux). Uses the engine folder for this computer.
+DIR="$(cd "$(dirname "$0")" && pwd)"
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) P=macos-arm64 ;;
+  Darwin-*) P=macos-x64 ;;
+  Linux-aarch64|Linux-arm64) P=linux-arm64 ;;
+  *) P=linux-x64 ;;
+esac
+[ "__GPU__" = 1 ] && [ "$P" = linux-x64 ] && P=linux-vulkan-x64
+BIN="$(find "$DIR/engine/$P" -name __TOOL__ -type f 2>/dev/null | head -n1)"
+[ -z "$BIN" ] && { echo "AI engine for this computer not found: $DIR/engine/$P"; exit 1; }
+chmod +x "$BIN" 2>/dev/null
+LIBDIR="$(dirname "$BIN")"
+export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}" DYLD_LIBRARY_PATH="$LIBDIR:${DYLD_LIBRARY_PATH:-}"
+echo "__NOTE__"
+exec "$BIN" -m "$DIR/models/__MODEL__" __ARGS__
 EOS
+sed -i.bak -e "s|__TOOL__|$2|" -e "s|__MODEL__|$3|" -e "s|__GPU__|$4|" -e "s|__ARGS__|$5|" -e "s|__NOTE__|$6|" "$AO/$1" && rm -f "$AO/$1.bak"
 chmod +x "$AO/$1" 2>/dev/null
 }
-make_launcher "chat-3B-light.sh" "Llama-3.2-3B-Instruct-Q4_K_M.gguf" ""
-make_launcher "chat-8B-smart.sh" "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" ""
-if [ "$PLAT" = linux ]; then
-  # GPU launcher uses the Vulkan engine subdir
-  cat > "$AO/chat-GPU-Qwen7B.sh" <<'EOS'
-#!/usr/bin/env bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
-CLI="$(find "$DIR/engine/gpu" -name llama-cli -type f 2>/dev/null | head -n1)"
-[ -z "$CLI" ] && CLI="$(find "$DIR/engine" -name llama-cli -type f 2>/dev/null | head -n1)"
-LIBDIR="$(dirname "$CLI")"; export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}"
-exec "$CLI" -m "$DIR/models/Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
-EOS
-  chmod +x "$AO/chat-GPU-Qwen7B.sh" 2>/dev/null
-fi
-cat > "$AO/web-ui.sh" <<'EOS'
-#!/usr/bin/env bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
-SRV="$(find "$DIR/engine" -name llama-server -type f 2>/dev/null | head -n1)"
-[ -z "$SRV" ] && { echo "server not found"; exit 1; }
-LIBDIR="$(dirname "$SRV")"; export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}"; export DYLD_LIBRARY_PATH="$LIBDIR:${DYLD_LIBRARY_PATH:-}"
-echo "Open http://127.0.0.1:8080 when it says 'server listening'"
-exec "$SRV" -m "$DIR/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 --host 127.0.0.1 --port 8080
-EOS
-chmod +x "$AO/web-ui.sh" 2>/dev/null
+make_sh "chat-3B-light.sh"   llama-cli    "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096 -cnv" "Offline AI - Llama 3.2 3B (light). Ctrl+C to quit."
+make_sh "chat-8B-smart.sh"   llama-cli    "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" 0 "-c 4096 -cnv" "Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit."
+make_sh "chat-GPU-Qwen7B.sh" llama-cli    "Qwen2.5-7B-Instruct-Q4_K_M.gguf"        1 "-c 4096 -ngl 99 -cnv" "Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux)."
+make_sh "web-ui.sh"          llama-server "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096 --host 127.0.0.1 --port 8080" "Open http://127.0.0.1:8080 when it says 'server is listening'."
+# .bat launchers: same text as Get-OfflineLibrary.ps1 writes, with Windows (CRLF) line ends.
+make_bat(){ # file  title  exe  model  args  [note]
+  { echo "@echo off"; echo "title $2"; echo 'cd /d "%~dp0"'
+    [ -n "$6" ] && printf '%s\n' "$6"
+    echo "\"%~dp0$3\" -m \"%~dp0models\\$4\" $5"; echo "pause"; } | sed 's/$/\r/' > "$AO/$1"
+}
+make_bat "CHAT-3B-light.bat"   "Offline AI - Llama 3.2 3B (light)" 'engine\x64\llama-cli.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096 -cnv"
+make_bat "CHAT-8B-smart.bat"   "Offline AI - Llama 3.1 8B (smart)" 'engine\x64\llama-cli.exe' "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" "-c 4096 -cnv"
+make_bat "CHAT-GPU-Qwen7B.bat" "Offline AI - Qwen2.5 7B (GPU)"     'engine\vulkan-x64\llama-cli.exe' "Qwen2.5-7B-Instruct-Q4_K_M.gguf" "-c 4096 -ngl 99 -cnv" 'echo If this errors with out-of-memory, your GPU is too small - change -ngl 99 to a lower
+echo number (e.g. -ngl 20) or use a CPU launcher instead.'
+make_bat "WEB-UI.bat"          "Offline AI - Web UI"               'engine\x64\llama-server.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096 --host 127.0.0.1 --port 8080" 'echo When it says "server listening", open a browser to http://127.0.0.1:8080'
 
 # ================================================================ documentation
 log "=== Documentation (Markdown + HTML) ==="

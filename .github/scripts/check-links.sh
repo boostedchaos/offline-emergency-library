@@ -49,6 +49,7 @@ gh_has_asset() { # repo  releases-path  regex  label
 }
 gh_has_asset "ggml-org/llama.cpp"   "releases?per_page=20" "bin-win-cpu-x64\\.zip"        "llama.cpp Windows CPU build"
 gh_has_asset "ggml-org/llama.cpp"   "releases?per_page=20" "bin-ubuntu-x64\\.tar\\.gz"    "llama.cpp Linux build"
+gh_has_asset "ggml-org/llama.cpp"   "releases?per_page=20" "bin-macos-arm64\\.tar\\.gz"   "llama.cpp macOS build"
 gh_has_asset "nomic-ai/gpt4all"     "releases/latest"      "installer-win64-v.*\\.exe"    "GPT4All Windows installer"
 gh_has_asset "kiwix/kiwix-android"  "releases/latest"      "universal-standalone\\.apk"   "Kiwix Android APK"
 gh_has_asset "learningequality/kolibri" "releases/latest"  "windows-setup\\.exe"          "Kolibri app installer"

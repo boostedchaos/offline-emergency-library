@@ -19,10 +19,13 @@ E:\AI-Offline\
 ├─ CHAT-8B-smart.bat     <- Double-click to chat (bigger, smarter CPU model)
 ├─ CHAT-GPU-Qwen7B.bat   <- Double-click to chat (GPU-accelerated, ~6GB GPU)
 ├─ WEB-UI.bat            <- Chat in your web browser instead of a black window
+├─ chat-*.sh, web-ui.sh  <- The same launchers for macOS / Linux
 ├─ engine\               <- The program that runs the AI (llama.cpp)
 │   ├─ x64\              <- CPU engine for normal Intel/AMD computers
 │   ├─ arm64\           <- CPU engine for ARM computers (Snapdragon / Surface Pro X)
-│   └─ vulkan-x64\      <- GPU engine (Vulkan) for graphics-card acceleration
+│   ├─ vulkan-x64\      <- GPU engine (Vulkan) for graphics-card acceleration
+│   ├─ macos-arm64\ macos-x64\                  <- engines for Macs (Apple Silicon / Intel)
+│   └─ linux-x64\ linux-arm64\ linux-vulkan-x64\ <- engines for Linux (CPU / ARM / GPU)
 ├─ models\               <- The AI "brains" (the actual model files)
 │   ├─ Llama-3.2-3B-Instruct-Q4_K_M.gguf        (~1.9 GB)  CPU, light
 │   ├─ Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf   (~4.6 GB)  CPU, smarter
@@ -32,6 +35,8 @@ E:\AI-Offline\
 
 - **engine** = the software (called *llama.cpp*). It is tiny and needs no installation.
   There is a **CPU** build (x64/arm64) and a **GPU** build (vulkan-x64).
+  Every drive has the engine for **Windows, macOS and Linux**, so the AI runs on any of
+  them, no matter which computer made the drive.
 - **models** = the AI itself. These `.gguf` files hold everything the AI "knows."
   **Three** are included (see the table in section 3).
 - The `.bat` files are one-click shortcuts that start everything for you.
@@ -63,14 +68,15 @@ This works offline too — it's a local page served by your own computer.
 
 ## 2b. On macOS / Linux
 
-There are no `.bat` files on Mac/Linux — use the matching **`.sh`** launchers instead.
+On a Mac or Linux computer, use the **`.sh`** launchers (every drive has them). Each one
+picks the engine for the computer it runs on.
 Open a terminal in the `AI-Offline` folder and run:
 
 ```
 ./chat-3B-light.sh        # fast, light model
 ./chat-8B-smart.sh        # smarter model
 ./web-ui.sh               # browser chat at http://127.0.0.1:8080
-./chat-GPU-Qwen7B.sh      # Linux only: GPU-accelerated (Vulkan)
+./chat-GPU-Qwen7B.sh      # GPU: Vulkan on Linux, Metal on a Mac
 ```
 
 (If a script isn't executable: `chmod +x *.sh` first.) On macOS the AI automatically uses
@@ -224,17 +230,20 @@ to be installed. This is why it works in an emergency with no internet.
 
 ## 8. Technical summary (for reference)
 
-- **Engine:** llama.cpp, Windows build `b12024`.
+- **Engine:** llama.cpp, one build for every system (its number is in `engine/BUILD.txt`).
   - CPU builds: `engine\x64` (Intel/AMD) and `engine\arm64` (ARM). No GPU needed.
   - GPU build: `engine\vulkan-x64` (Vulkan) — accelerates on NVIDIA/AMD/Intel GPUs,
     no CUDA install required.
+  - macOS builds: `engine/macos-arm64` (Apple Silicon) and `engine/macos-x64` (Intel). They
+    use the Mac's GPU (Metal) automatically.
+  - Linux builds: `engine/linux-x64`, `engine/linux-arm64`, and `engine/linux-vulkan-x64` (GPU).
 - **Format:** GGUF, Q4_K_M quantization (4-bit) — small size, good quality.
 - **Models (3):**
   - Meta Llama 3.2 3B Instruct — general assistant, very light (CPU).
   - Meta Llama 3.1 8B Instruct — stronger general knowledge & reasoning (CPU).
   - Qwen 2.5 7B Instruct — strong all-rounder, sized to fit a ~6 GB GPU (GPU).
 - **Source URLs (only needed if you ever want to re-download):**
-  - Engine: https://github.com/ggml-org/llama.cpp/releases/tag/b12024
+  - Engine: https://github.com/ggml-org/llama.cpp/releases (the build named in `engine/BUILD.txt`)
   - 3B:  https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF
   - 8B:  https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF
   - 7B:  https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF
