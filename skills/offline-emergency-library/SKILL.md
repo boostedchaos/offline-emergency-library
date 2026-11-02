@@ -7,7 +7,8 @@ description: >
   country/region/continent selectable), survival/repair/
   medical archives (Kiwix ZIM: iFixit, Appropedia, WikiMed, survival/water/food/knots),
   public-domain US Army field manuals + medical PDFs, the Kiwix reader, launchers, and
-  full documentation (Markdown + HTML). Invoke for requests like "download the offline
+  full documentation (Markdown + HTML), plus optional Khan Academy courses (opt-in).
+  Invoke for requests like "download the offline
   emergency library", "/offline-emergency-library", "set up my offline survival kit",
   "get the offline AI + Wikipedia + maps + manuals". The ONLY thing to ask the user is
   where to save the files.
@@ -54,6 +55,9 @@ When this skill is invoked, your job is simple:
   openly-licensed Kiwix archives, and public-domain US-government manuals. No piracy.
 - If the user is low on disk space, you *may* mention the optional flags
   `-SkipWikipedia`, `-SkipMaps`, `-SkipModels` — but do not prompt for them unless asked.
+- **Khan Academy is opt-in** (it's ~168 GB with videos). Only add it if the user asks for
+  education/courses: pass `-Education` (Windows) / `--education` (macOS/Linux), optionally
+  `-EduLang es|fr` / `--edu-lang es|fr`. Do not include it by default.
 - **Maps default to the US.** If the user wants another area, pass `-Region <name>`
   (Windows) / `--region <name>` (macOS/Linux) — e.g. `France`, `"Germany,Austria"`,
   `Europe`, `US_texas`, or `world`. To discover exact names, run with `-ListRegions` /

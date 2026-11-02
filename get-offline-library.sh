@@ -10,12 +10,15 @@
 REPO_RAW="https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main"
 DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0
 REGION="US"; LISTREGIONS=0; FILTER=""
+EDU=0; EDULANG="en"
 CONTINENTS="africa asia australia-oceania centralamerica europe northamerica southamerica"
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--destination) DEST="$2"; shift 2;;
     --region)         REGION="$2"; shift 2;;
     --list-regions)   LISTREGIONS=1; if [ -n "$2" ] && [ "${2#-}" = "$2" ]; then FILTER="$2"; shift 2; else shift; fi;;
+    --education)      EDU=1; shift;;
+    --edu-lang)       EDULANG="$2"; shift 2;;
     --skip-wikipedia) SKIP_WIKI=1; shift;;
     --skip-maps)      SKIP_MAPS=1; shift;;
     --skip-models)    SKIP_MODELS=1; shift;;
@@ -72,7 +75,7 @@ for d in AI-Offline AI-Offline/engine AI-Offline/models AI-Offline/DocReader-GPT
          Manuals Manuals/ArmyFieldManuals Manuals/Repair-iFixit Manuals/DIY-Appropedia \
          Manuals/Survival-Water-Food Manuals/Radio-Communications \
          Medical Medical/WikiMed Medical/zimgit-medicine Medical/Manuals-PDF \
-         Wikipedia OsmAnd Kiwix-Reader Phone-Apps; do
+         Wikipedia OsmAnd Kiwix-Reader Phone-Apps Education; do
   mkdir -p "$ROOT/$d"
 done
 
@@ -146,6 +149,17 @@ add_zim "https://download.kiwix.org/zim/other/"     "zimgit-food-preparation_en_
 add_zim "https://download.kiwix.org/zim/other/"     "zimgit-knots_en_"          "$ROOT/Manuals/Survival-Water-Food"
 add_zim "https://download.kiwix.org/zim/wikipedia/" "wikipedia_en_medicine_maxi_" "$ROOT/Medical/WikiMed"
 add_zim "https://download.kiwix.org/zim/other/"     "zimgit-medicine_en_"       "$ROOT/Medical/zimgit-medicine"
+
+# ================================================================ 5b. Education (opt-in)
+if [ "$EDU" = 1 ]; then
+  log "=== [5b] Education: Khan Academy (Kiwix ZIM, ~168 GB with videos, lang=$EDULANG) ==="
+  mkdir -p "$ROOT/Education/KhanAcademy"
+  kaname="$(latest_zim 'https://download.kiwix.org/zim/other/' "khanacademy_${EDULANG}_all_")"
+  if [ -n "$kaname" ]; then log "zim: $kaname"; fetch "https://download.kiwix.org/zim/other/$kaname" "$ROOT/Education/KhanAcademy/$kaname"
+  else log "Khan Academy: no ZIM for language '$EDULANG' (try --edu-lang en|es|fr)"; fi
+else
+  log "=== [5b] Education (Khan Academy) not selected - add --education to include (~168 GB) ==="
+fi
 
 # ================================================================ 6. PDFs
 log "=== [6/8] Public-domain manuals (PDF) ==="
@@ -307,6 +321,7 @@ place_doc "Medical-READ-ME-FIRST" "$ROOT/Medical/READ-ME-FIRST"
 place_doc "RADIO-GUIDE"           "$ROOT/Manuals/Radio-Communications/RADIO-GUIDE"
 place_doc "HOW-TO-VIEW-MAPS"      "$ROOT/OsmAnd/HOW-TO-VIEW-MAPS"
 place_doc "USE-ON-PHONE"          "$ROOT/Phone-Apps/USE-ON-PHONE"
+place_doc "Education-READ-ME-FIRST" "$ROOT/Education/READ-ME-FIRST"
 
 # ================================================================ README index
 log "=== Building README.html (full index of everything) ==="

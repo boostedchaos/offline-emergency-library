@@ -29,6 +29,7 @@ works with **no internet**.
 | **DIY archive** | Appropedia — plumbing, electrical, construction, energy, water, food | ~0.6 GB | Kiwix |
 | **Medical** | Offline medical Wikipedia (WikiMed) + curated medical guide | ~1.8 GB | Kiwix |
 | **Survival** | Post-disaster, water, food prep, knots (zimgit) | ~0.8 GB | Kiwix |
+| **Education** *(opt-in)* | Khan Academy — full courses + videos (math, science, history…) | **~168 GB** (off by default) | Kiwix |
 | **Army manuals** | Public-domain US Army field/technical manuals (survival, first aid, hand tools, carpentry, auto mechanics, rigging, field cooking) | ~0.2 GB | Any browser (PDF) |
 | **Medical books** | *Where There Is No Doctor / No Dentist*, *Ship's Medicine Chest* | ~45 MB | Any browser (PDF) |
 | **Radio guide** | How ham/CB/shortwave/GMRS radio works + emergency comms | tiny | Any browser |
@@ -57,6 +58,9 @@ install, and future updates), so plan for more than 60 GB.
 > **Tip:** If you only want the reference material (no AI), you can skip the big pieces
 > with `-SkipModels` and still get Wikipedia, maps, and all manuals in ~30 GB. If you also
 > skip Wikipedia and maps (`-SkipWikipedia -SkipMaps`), the AI + manuals fit in ~20 GB.
+>
+> **Adding Khan Academy?** It's **opt-in** and **~168 GB with videos** — budget for a
+> **256 GB+** (ideally 512 GB) drive if you include `-Education`.
 
 ---
 
@@ -230,6 +234,7 @@ Both pages link to each component's guide:
 - `Phone-Apps\USE-ON-PHONE.html` — port the library to a phone
 - `Manuals\READ-ME-FIRST.html` and `Medical\READ-ME-FIRST.html`
 - `Manuals\Radio-Communications\RADIO-GUIDE.html` — emergency radio comms
+- `Education\READ-ME-FIRST.html` — Khan Academy offline (opt-in)
 
 ---
 
@@ -239,6 +244,8 @@ Both pages link to each component's guide:
 |---|---|
 | `-Region <name>` / `--region <name>` | Choose map region (default `US`); country, continent, sub-region, or `world` |
 | `-ListRegions` / `--list-regions [filter]` | List available map regions, then exit (no download) |
+| `-Education` / `--education` | **Add Khan Academy** (Kiwix ZIM, ~168 GB with videos) — off by default |
+| `-EduLang <en\|es\|fr>` / `--edu-lang <…>` | Khan Academy language (default `en`) |
 | `-SkipWikipedia` / `--skip-wikipedia` | Don't download the 24 GB Wikipedia dump (~24 GB saved) |
 | `-SkipMaps` / `--skip-maps` | Don't download the maps (~17 GB saved for US) |
 | `-SkipModels` / `--skip-models` | Skip the large 8B/7B AI models, keep the small 3B (~9 GB saved) |
