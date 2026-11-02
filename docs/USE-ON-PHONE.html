@@ -78,12 +78,69 @@ your phone's free space (a 128 GB+ phone or an SD card helps).</p>
 <p>Apple doesn't allow installing apps from a file, so get the apps from
 the <strong>App Store while you still have internet</strong> (do this
 now, as part of preparing your kit):</p>
+<table>
+<thead>
+<tr>
+<th>App (App Store, free)</th>
+<th>What it opens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kiwix</strong></td>
+<td>the <code>.zim</code> archives (Wikipedia, medical, repair,
+survival)</td>
+</tr>
+<tr>
+<td><strong>OsmAnd Maps</strong></td>
+<td>the <code>.obf</code> offline maps</td>
+</tr>
+<tr>
+<td><strong>PocketPal AI</strong> (optional)</td>
+<td>a small <code>.gguf</code> AI model — see the AI section below</td>
+</tr>
+</tbody>
+</table>
+<p>PDFs and these HTML guides open in the built-in
+<strong>Files</strong> app. Nothing else to install.</p>
+<h3 id="1-plug-in-the-drive">1. Plug in the drive</h3>
 <ul>
-<li><strong>Kiwix</strong> (App Store) — then import <code>.zim</code>
-files via the Files app / iTunes file sharing.</li>
-<li><strong>OsmAnd Maps</strong> (App Store) — then import maps, or
-download your regions in-app while online.</li>
+<li><strong>USB-C iPad, or iPhone 15 and newer:</strong> plug the drive
+straight in.</li>
+<li><strong>Lightning iPhone:</strong> use Apple's <strong>Lightning to
+USB 3 Camera Adapter</strong> with a charger plugged into the adapter.
+Without that extra power, a USB SSD or hard drive may not start.</li>
+<li>The drive shows up in <strong>Files → Browse →
+Locations</strong>.</li>
 </ul>
+<h3 id="2-read-the-archives-straight-from-the-drive-no-copying">2. Read
+the archives straight from the drive (no copying)</h3>
+<p>Kiwix opens a <code>.zim</code> where it is, so even full Wikipedia
+works without filling the phone.</p>
+<ol type="1">
+<li>Open Kiwix → tap the <strong>open file</strong> button → pick the
+drive → tap a <code>.zim</code> file.</li>
+<li>Repeat for each archive you want.</li>
+<li>Keep the drive plugged in while you read. Unplug it and Kiwix can't
+read those archives until you plug it back in.</li>
+</ol>
+<h3 id="3-maps">3. Maps</h3>
+<p>OsmAnd keeps its maps <strong>inside the phone</strong>, so import
+only the region you need:</p>
+<ol type="1">
+<li>In <strong>Files</strong>, tap the <code>.obf.zip</code> to unzip
+it.</li>
+<li>Copy the <code>.obf</code> file to <strong>On My iPhone/iPad →
+OsmAnd</strong> (the top OsmAnd folder, not a subfolder).</li>
+<li>Close and reopen OsmAnd. The map shows under <strong>Menu → Maps
+&amp; Resources</strong>.</li>
+</ol>
+<h3 id="what-does-not-work-on-iphone--ipad">What does not work on iPhone
+/ iPad</h3>
+<p>The launchers in this kit (<code>.bat</code>, <code>.sh</code>,
+<code>.command</code> — desktop reader, AI chat, map viewer) are
+computer programs. iPhone and iPad can't run programs from a drive. Use
+those on a computer.</p>
 <hr />
 <h2 id="can-i-run-the-ai-on-my-phone-too">Can I run the AI on my phone
 too?</h2>
@@ -96,14 +153,16 @@ models, but it needs a separate mobile app:</p>
 from your app store such as <strong>PocketPal AI</strong>,
 <strong>ChatterUI</strong>, or <strong>Private AI</strong> — install
 while online).</li>
-<li>Copy one of the small model files from
-<code>AI-Offline\models\</code> (the <strong>3B</strong> model is best
-for phones) to the phone.</li>
+<li>Copy the small model <code>Qwen3.5-4B-Q4_K_M.gguf</code> from
+<code>AI-Offline\models\</code> to the phone (the 12B model is too big
+for most phones).</li>
 <li>Load that model file in the app and chat offline.</li>
 </ol>
 <p>This is optional and depends on your phone's RAM (6–8 GB+
-recommended). The bundled Windows AI is the primary experience; phone AI
-is a bonus.</p>
+recommended). On iPhone/iPad, <strong>PocketPal AI</strong> copies the
+model into the phone, so you need free space for it (the small model is
+about 2.7 GB). The bundled Windows AI is the primary experience; phone
+AI is a bonus.</p>
 <hr />
 <h2 id="summary">Summary</h2>
 <ul>
@@ -112,7 +171,8 @@ is a bonus.</p>
 Copy the <code>.zim</code>, <code>.obf.zip</code>, PDFs, and HTML you
 want.</li>
 <li><strong>iPhone/iPad:</strong> install Kiwix + OsmAnd from the App
-Store while online, then import.</li>
+Store while online. Kiwix opens the <code>.zim</code> files straight
+from the drive; maps are imported into OsmAnd.</li>
 <li><strong>AI on phone:</strong> optional, via a separate mobile app +
 the small model file.</li>
 </ul>
