@@ -50,7 +50,8 @@ if [ -z "$DEST" ]; then
   echo "  Offline Emergency Library installer"
   echo "  -----------------------------------"
   printf "Where would you like to save these files? "
-  read -r DEST
+  # Read from the terminal, not stdin: with "curl ... | bash" stdin is the script itself.
+  read -r DEST < /dev/tty
 fi
 [ -z "$DEST" ] && { echo "No destination given. Exiting."; exit 1; }
 ROOT="$DEST/OfflineLibrary"
