@@ -89,7 +89,11 @@ function Fetch($url,$out){
     if($LASTEXITCODE -eq 0){ return }
     Log '  (aria2 failed, falling back to curl)'
   }
-  curl.exe -L -C - --retry 10 --retry-delay 5 --retry-all-errors -s -o $out $url
+  curl.exe -fL -C - --retry 10 --retry-delay 5 --retry-all-errors -sS -o $out $url
+  if($LASTEXITCODE -ne 0 -or -not (Test-Path $out -PathType Leaf) -or (Get-Item $out).Length -eq 0){
+    Log "ERROR: download failed: $url -> $out. Re-run the installer to resume."
+    exit 1
+  }
 }
 function UA(){ 'Mozilla/5.0' }
 if($UseAria){ Log 'Downloader: aria2 (fast, multi-connection)' } else { Log "Downloader: curl (tip: install 'aria2' for much faster downloads)" }
@@ -276,11 +280,10 @@ foreach($p in $pdfs){
     if($f){
       $out = Join-Path $Root "$($p.d)\$($p.n)"
       Log "pdf: $($p.n)"
-      # -f so HTTP errors (401 borrow / 500) aren't saved as a .pdf
-      curl.exe -fL -C - --retry 6 --retry-delay 5 --retry-all-errors -s -o $out "https://archive.org/download/$($p.id)/$([uri]::EscapeDataString($f.name))"
+      Fetch "https://archive.org/download/$($p.id)/$([uri]::EscapeDataString($f.name))" $out
       if(Test-Path $out){
         $fs = New-Object IO.FileStream($out,'Open'); $b = New-Object byte[] 4; [void]$fs.Read($b,0,4); $fs.Close()
-        if(-not ([System.Text.Encoding]::ASCII.GetString($b) -eq '%PDF')){ Log "  WARN: $($p.n) not a valid PDF (removed)"; Remove-Item $out -Force }
+        if(-not ([System.Text.Encoding]::ASCII.GetString($b) -eq '%PDF')){ Log "  ERROR: $($p.n) not a valid PDF (removed)"; Remove-Item $out -Force; exit 1 }
       } else { Log "  WARN: $($p.n) failed to download" }
     } else { Log "pdf: NO PDF for $($p.id)" }
   }catch{ Log "pdf ERROR $($p.n): $($_.Exception.Message)" }
@@ -492,7 +495,10 @@ function PlaceDoc($srcName,$destPath,$title){
     $dest = "$destPath$ext"
     $lp = Join-Path $localDocs ($base + $ext)
     if(Test-Path $lp){ Copy-Item $lp $dest -Force }
-    else { curl.exe -sL "$RepoRaw/docs/$base$ext" -A (UA) -o $dest }
+    else {
+      curl.exe -fLsS "$RepoRaw/docs/$base$ext" -A (UA) -o $dest
+      if($LASTEXITCODE -ne 0){ Log "ERROR: documentation download failed: $base$ext"; exit 1 }
+    }
   }
 }
 PlaceDoc 'START-HERE.md'            (Join-Path $Root 'START-HERE')                                  'Offline Emergency Kit - Start Here'

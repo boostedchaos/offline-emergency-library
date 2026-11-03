@@ -125,7 +125,11 @@ fetch(){ # url out
       -d "$(dirname "$2")" -o "$(basename "$2")" "$1" && return 0
     echo "  (aria2 failed, falling back to curl)"
   fi
-  curl -L -C - --retry 10 --retry-delay 5 --retry-all-errors -s -o "$2" "$1"
+  curl -fL -C - --retry 10 --retry-delay 5 --retry-all-errors -sS -o "$2" "$1" || {
+    log "ERROR: download failed: $1 -> $2. Re-run the installer to resume."
+    exit 1
+  }
+  [ -s "$2" ] || { log "ERROR: download is missing or empty: $2"; exit 1; }
 }
 if [ "$USE_ARIA" = 1 ]; then log "Downloader: aria2 (fast, multi-connection)"; else log "Downloader: curl (tip: install 'aria2' for much faster downloads)"; fi
 UA="Mozilla/5.0"
@@ -275,11 +279,10 @@ get_pdf(){ # id  localname  destdir
   enc="$(printf '%s' "$f" | sed 's/ /%20/g')"
   out="$3/$2"
   log "pdf: $2"
-  # -f so HTTP errors (401 borrow / 500) don't get saved as a .pdf
-  curl -fL -C - --retry 6 --retry-delay 5 --retry-all-errors -s -o "$out" "https://archive.org/download/$1/$enc" || true
+  fetch "https://archive.org/download/$1/$enc" "$out"
   # validate it's really a PDF; drop error pages / empties
   if [ -f "$out" ]; then
-    if [ "$(head -c 4 "$out" 2>/dev/null)" != "%PDF" ]; then log "  WARN: $2 was not a valid PDF (removed)"; rm -f "$out"; fi
+    if [ "$(head -c 4 "$out" 2>/dev/null)" != "%PDF" ]; then log "  ERROR: $2 was not a valid PDF (removed)"; rm -f "$out"; exit 1; fi
   else log "  WARN: $2 failed to download"; fi
 }
 AFM="$ROOT/Manuals/ArmyFieldManuals"; MPDF="$ROOT/Medical/Manuals-PDF"
@@ -425,7 +428,11 @@ SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 place_doc(){ # base  destpath
   for ext in md html; do
     if [ -f "$SCRIPTDIR/docs/$1.$ext" ]; then cp "$SCRIPTDIR/docs/$1.$ext" "$2.$ext"
-    else curl -s -A "$UA" "$REPO_RAW/docs/$1.$ext" -o "$2.$ext"; fi
+    else
+      curl -fLsS -A "$UA" "$REPO_RAW/docs/$1.$ext" -o "$2.$ext" || {
+        log "ERROR: documentation download failed: $1.$ext"; exit 1;
+      }
+    fi
   done
 }
 place_doc "START-HERE"            "$ROOT/START-HERE"
