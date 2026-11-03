@@ -12,6 +12,11 @@ Contributor-driven reliability and portability work, from people running the kit
 hardware.
 
 ### Added
+- **`-Lite` / `--lite` quick-start preset.** Gets you running fast with the 3B model, AI
+  engines, medical/survival archives, PDF manuals, readers, phone apps and regional maps,
+  skipping full Wikipedia, the 8B/7B models, GPT4All, iFixit and Appropedia. Not a fixed
+  small bundle (maps still default to US ~17 GB — pick a sub-region or `--skip-maps`);
+  re-run without the flag to expand in place. Resolves #4. _[@EnragedAntelope](https://github.com/EnragedAntelope) — PR #16._
 - **Offline AI runs on any OS from one drive.** Both installers now fetch the llama.cpp
   engine for Windows, macOS and Linux (all from one matching build) and unpack real files
   instead of symlinks, so a drive built on one computer runs the AI on another — and it no
