@@ -71,5 +71,7 @@ set up **now, while you still have internet**, so the kit is fully usable offlin
 ## ⚠️ Reminders
 
 - Offline AIs and old manuals **can be wrong**. Verify anything safety-critical.
-- Keep the drive **backed up** (a second copy on another drive/USB is wise).
+- Keep the drive **backed up** (a second copy on another drive/USB is wise), and run
+  **CHECK-DRIVE** (`CHECK-DRIVE.bat` on Windows, `CHECK-DRIVE.command` on macOS) every few
+  months to find damaged files.
 - **Practice** using each tool now so it's familiar in an actual emergency.

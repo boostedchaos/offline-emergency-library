@@ -524,6 +524,21 @@ PlaceDoc 'Education-READ-ME-FIRST.md' (Join-Path $Root 'Education\READ-ME-FIRST'
 PlaceDoc 'HOW-TO-KOLIBRI.md'          (Join-Path $Root 'Education\HOW-TO-KOLIBRI')                     'Kolibri - Offline Learning App'
 
 # ================================================================ README index
+# CHECK-DRIVE scripts (#28), placed before the index so README.html lists them.
+foreach($f in 'CHECK-DRIVE.sh','check-drive.ps1','CHECK-DRIVE.bat'){
+  $dest = Join-Path $Root $f
+  $lp = Join-Path (Join-Path $scriptDir 'drive') $f
+  if(Test-Path $lp){ Copy-Item $lp $dest -Force }
+  else {
+    curl.exe -fLsS "$RepoRaw/drive/$f" -A (UA) -o $dest
+    if($LASTEXITCODE -ne 0){ Log "ERROR: download failed: drive/$f"; exit 1 }
+  }
+}
+# A raw download is the LF git copy; cmd.exe wants CRLF. The .sh must stay LF.
+$bat = Join-Path $Root 'CHECK-DRIVE.bat'
+[System.IO.File]::WriteAllText($bat, (([System.IO.File]::ReadAllText($bat) -replace "`r", '') -replace "`n", "`r`n"), [System.Text.Encoding]::ASCII)
+Copy-Item (Join-Path $Root 'CHECK-DRIVE.sh') (Join-Path $Root 'CHECK-DRIVE.command') -Force   # macOS double-click
+
 Log '=== Building README.html (full index of everything) ==='
 function Esc2($s){ $s -replace '&','&amp;' -replace '<','&lt;' -replace '>','&gt;' }
 function Rel2($full){ ($full.Substring($Root.Length)).TrimStart('\','/') -replace '\\','/' }
@@ -558,6 +573,32 @@ try{
   [System.IO.File]::WriteAllText((Join-Path $Root 'README.html'), $sb.ToString(), [System.Text.UTF8Encoding]::new($false))
   Log "README.html index written."
 }catch{ Log "README index ERROR: $($_.Exception.Message)" }
+
+# ================================================================ drive check (#28)
+# One SHA-256 line per file, so CHECK-DRIVE can find damage later. Runs last, after README.html.
+# Format (same on every OS): "<lowercase sha256>  ./path/with/forward/slashes", byte-sorted, LF, UTF-8.
+Log '=== Drive check list: CHECKSUMS-SHA256.txt ==='
+Log 'Hashing every file (one pass over the whole drive - this can take a while)...'
+$skipNames = '^(CHECKSUMS-SHA256\.txt.*|_download\.log|_filelist\.txt|_index\.xml|.*\.part|.*\.aria2|\._.*|\.DS_Store)$'
+$skipDirs  = '^(\.Spotlight-V100|\.fseventsd|\.Trashes|System Volume Information)/'
+$rootFull = (Get-Item -LiteralPath $Root).FullName.TrimEnd('\','/')
+$sumLines = New-Object System.Collections.Generic.List[string]
+$hashFail = New-Object System.Collections.Generic.List[string]
+foreach($fi in (Get-ChildItem -LiteralPath $rootFull -Recurse -File -Force -ErrorAction SilentlyContinue)){
+  $rel = $fi.FullName.Substring($rootFull.Length).TrimStart('\','/') -replace '\\','/'
+  if($fi.Name -match $skipNames -or $rel -match $skipDirs){ continue }
+  try { $h = (Get-FileHash -LiteralPath $fi.FullName -Algorithm SHA256 -ErrorAction Stop).Hash.ToLower(); $sumLines.Add("$h  ./$rel") }
+  catch { $hashFail.Add($rel) }
+}
+if($hashFail.Count){ Log "ERROR: could not read these files for the checksum list: $($hashFail -join ', ')"; exit 1 }
+# Byte (ordinal) order of the path, the same order as LC_ALL=C sort on macOS/Linux.
+$arr = $sumLines.ToArray(); $keys = [string[]]@($arr | ForEach-Object { $_.Substring(66) })
+[System.Array]::Sort($keys, $arr, [System.StringComparer]::Ordinal)
+$text = if($arr.Count){ ($arr -join "`n") + "`n" } else { '' }
+$listNew = Join-Path $Root 'CHECKSUMS-SHA256.txt.new'
+[System.IO.File]::WriteAllText($listNew, $text, (New-Object System.Text.UTF8Encoding($false)))
+Move-Item -LiteralPath $listNew (Join-Path $Root 'CHECKSUMS-SHA256.txt') -Force
+Log "CHECKSUMS-SHA256.txt: $($arr.Count) files. Run CHECK-DRIVE every few months."
 
 Log '=== DONE. Open README.html (full index) or START-HERE.html ==='
 Write-Host ''

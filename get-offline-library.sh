@@ -461,6 +461,16 @@ place_doc "USE-ON-PHONE"          "$ROOT/Phone-Apps/USE-ON-PHONE"
 place_doc "Education-READ-ME-FIRST" "$ROOT/Education/READ-ME-FIRST"
 place_doc "HOW-TO-KOLIBRI"          "$ROOT/Education/HOW-TO-KOLIBRI"
 
+# CHECK-DRIVE scripts (#28), placed before the index so README.html lists them.
+for f in CHECK-DRIVE.sh check-drive.ps1 CHECK-DRIVE.bat; do
+  if [ -f "$SCRIPTDIR/drive/$f" ]; then cp "$SCRIPTDIR/drive/$f" "$ROOT/$f"
+  else curl -fLsS -A "$UA" "$REPO_RAW/drive/$f" -o "$ROOT/$f" || { log "ERROR: download failed: drive/$f"; exit 1; }; fi
+done
+# A raw download is the LF git copy; cmd.exe wants CRLF (same as the launcher .bat files).
+tr -d '\r' < "$ROOT/CHECK-DRIVE.bat" | sed 's/$/\r/' > "$ROOT/CHECK-DRIVE.bat.tmp" && mv -f "$ROOT/CHECK-DRIVE.bat.tmp" "$ROOT/CHECK-DRIVE.bat"
+cp "$ROOT/CHECK-DRIVE.sh" "$ROOT/CHECK-DRIVE.command"   # macOS double-click
+chmod +x "$ROOT/CHECK-DRIVE.sh" "$ROOT/CHECK-DRIVE.command" 2>/dev/null
+
 # ================================================================ README index
 log "=== Building README.html (full index of everything) ==="
 IDX="$ROOT/README.html"
@@ -514,6 +524,25 @@ hsz(){ du -h "$1" 2>/dev/null | cut -f1; }
   printf '%s' "</div></body></html>"
 } > "$IDX"
 log "README.html index written."
+
+# ================================================================ drive check (#28)
+# One SHA-256 line per file, so CHECK-DRIVE can find damage later. Runs last,
+# after README.html, so everything the installer wrote is covered.
+log "=== Drive check list: CHECKSUMS-SHA256.txt ==="
+# Format (same on every OS): "<lowercase sha256>  ./path/with/forward/slashes", byte-sorted.
+# Skipped: the list itself, the log, the OsmAnd work files, unfinished downloads, OS clutter.
+if command -v sha256sum >/dev/null 2>&1; then SHA="sha256sum"; else SHA="shasum -a 256"; fi
+log "Hashing every file (one pass over the whole drive - this can take a while)..."
+( cd "$ROOT" && find . -type f \
+    ! -name 'CHECKSUMS-SHA256.txt*' ! -name '_download.log' ! -name '_filelist.txt' ! -name '_index.xml' \
+    ! -name '*.part' ! -name '*.aria2' ! -name '._*' ! -name '.DS_Store' \
+    ! -path './.Spotlight-V100/*' ! -path './.fseventsd/*' ! -path './.Trashes/*' ! -path './System Volume Information/*' |
+  LC_ALL=C sort | while IFS= read -r f; do $SHA "$f" || echo "$f" >&2; done ) > "$ROOT/CHECKSUMS-SHA256.txt.new" 2> "$ROOT/CHECKSUMS-SHA256.txt.err"
+if [ -s "$ROOT/CHECKSUMS-SHA256.txt.err" ]; then
+  log "ERROR: could not read these files for the checksum list: $(tr '\n' ' ' < "$ROOT/CHECKSUMS-SHA256.txt.err")"; exit 1
+fi
+rm -f "$ROOT/CHECKSUMS-SHA256.txt.err"; mv -f "$ROOT/CHECKSUMS-SHA256.txt.new" "$ROOT/CHECKSUMS-SHA256.txt"
+log "CHECKSUMS-SHA256.txt: $(grep -c . "$ROOT/CHECKSUMS-SHA256.txt") files. Run CHECK-DRIVE every few months."
 
 log "=== DONE. Open README.html (full index) or START-HERE.html ==="
 echo ""
