@@ -129,7 +129,7 @@ E:\AI-Offline\
 <li>Paste this (adjust the drive/path if the folder is somewhere else):</li>
 </ol>
 <pre><code>
-   "E:\AI-Offline\engine\x64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
+   "E:\AI-Offline\engine\x64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096
 </code></pre>
 <ol>
 <li>Press Enter, wait for it to load, then type your message.</li>
@@ -137,16 +137,17 @@ E:\AI-Offline\
 <p><strong>On an ARM computer</strong> (e.g. Surface Pro X, Snapdragon laptop), use the <code>arm64</code></p>
 <p>folder instead of <code>x64</code>:</p>
 <pre><code>
-   "E:\AI-Offline\engine\arm64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
+   "E:\AI-Offline\engine\arm64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096
 </code></pre>
 <p><strong>On a computer with a graphics card (GPU acceleration)</strong>, use the <code>vulkan-x64</code></p>
 <p>engine and add <code>-ngl 99</code> to push the model onto the GPU:</p>
 <pre><code>
-   "E:\AI-Offline\engine\vulkan-x64\llama-cli.exe" -m "E:\AI-Offline\models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
+   "E:\AI-Offline\engine\vulkan-x64\llama-cli.exe" -m "E:\AI-Offline\models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99
 </code></pre>
 <p>   If you get an out-of-memory / device error, your GPU can't fit all the layers:</p>
 <p>   lower the number (e.g. <code>-ngl 20</code>) to offload only part of the model, or use a CPU</p>
 <p>   engine instead. The Vulkan engine works on NVIDIA, AMD and Intel graphics cards.</p>
+<p>Current llama-cli builds enter chat mode automatically for these instruction-tuned models.</p>
 <h3>What the options mean</h3>
 <ul>
 <li><code>-m "...gguf"</code>  = which model (brain) file to load.</li>
@@ -155,7 +156,6 @@ E:\AI-Offline\
 <p>                    Lower this to <code>2048</code> if you run low on memory; raise it if you</p>
 <p>                    have lots of RAM and want longer memory.</p>
 <ul>
-<li><code>-cnv</code>          = conversation / chat mode (back-and-forth chat).</li>
 <li><code>-ngl 99</code>       = (GPU only) how many model layers to put on the graphics card.</li>
 </ul>
 <p>                    99 means "all of them." Lower it if the GPU runs out of memory.</p>

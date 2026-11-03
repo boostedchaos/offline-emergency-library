@@ -403,9 +403,9 @@ EOS
 sed -i.bak -e "s|__TOOL__|$2|" -e "s|__MODEL__|$3|" -e "s|__GPU__|$4|" -e "s|__ARGS__|$5|" -e "s|__NOTE__|$6|" "$AO/$1" && rm -f "$AO/$1.bak"
 chmod +x "$AO/$1" 2>/dev/null
 }
-make_sh "chat-3B-light.sh"   llama-cli    "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096 -cnv" "Offline AI - Llama 3.2 3B (light). Ctrl+C to quit."
-make_sh "chat-8B-smart.sh"   llama-cli    "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" 0 "-c 4096 -cnv" "Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit."
-make_sh "chat-GPU-Qwen7B.sh" llama-cli    "Qwen2.5-7B-Instruct-Q4_K_M.gguf"        1 "-c 4096 -ngl 99 -cnv" "Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux)."
+make_sh "chat-3B-light.sh"   llama-cli    "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096" "Offline AI - Llama 3.2 3B (light). Ctrl+C to quit."
+make_sh "chat-8B-smart.sh"   llama-cli    "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" 0 "-c 4096" "Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit."
+make_sh "chat-GPU-Qwen7B.sh" llama-cli    "Qwen2.5-7B-Instruct-Q4_K_M.gguf"        1 "-c 4096 -ngl 99" "Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux)."
 make_sh "web-ui.sh"          llama-server "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096 --host 127.0.0.1 --port 8080" "Open http://127.0.0.1:8080 when it says 'server is listening'."
 # .bat launchers: same text as Get-OfflineLibrary.ps1 writes, with Windows (CRLF) line ends.
 make_bat(){ # file  title  exe  model  args  [note]
@@ -413,9 +413,9 @@ make_bat(){ # file  title  exe  model  args  [note]
     [ -n "$6" ] && printf '%s\n' "$6"
     echo "\"%~dp0$3\" -m \"%~dp0models\\$4\" $5"; echo "pause"; } | sed 's/$/\r/' > "$AO/$1"
 }
-make_bat "CHAT-3B-light.bat"   "Offline AI - Llama 3.2 3B (light)" 'engine\x64\llama-cli.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096 -cnv"
-make_bat "CHAT-8B-smart.bat"   "Offline AI - Llama 3.1 8B (smart)" 'engine\x64\llama-cli.exe' "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" "-c 4096 -cnv"
-make_bat "CHAT-GPU-Qwen7B.bat" "Offline AI - Qwen2.5 7B (GPU)"     'engine\vulkan-x64\llama-cli.exe' "Qwen2.5-7B-Instruct-Q4_K_M.gguf" "-c 4096 -ngl 99 -cnv" 'echo If this errors with out-of-memory, your GPU is too small - change -ngl 99 to a lower
+make_bat "CHAT-3B-light.bat"   "Offline AI - Llama 3.2 3B (light)" 'engine\x64\llama-cli.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096"
+make_bat "CHAT-8B-smart.bat"   "Offline AI - Llama 3.1 8B (smart)" 'engine\x64\llama-cli.exe' "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" "-c 4096"
+make_bat "CHAT-GPU-Qwen7B.bat" "Offline AI - Qwen2.5 7B (GPU)"     'engine\vulkan-x64\llama-cli.exe' "Qwen2.5-7B-Instruct-Q4_K_M.gguf" "-c 4096 -ngl 99" 'echo If this errors with out-of-memory, your GPU is too small - change -ngl 99 to a lower
 echo number (e.g. -ngl 20) or use a CPU launcher instead.'
 make_bat "WEB-UI.bat"          "Offline AI - Web UI"               'engine\x64\llama-server.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096 --host 127.0.0.1 --port 8080" 'echo When it says "server listening", open a browser to http://127.0.0.1:8080'
 

@@ -117,7 +117,7 @@ fails or you copied the folder somewhere else.
 2. Paste this (adjust the drive/path if the folder is somewhere else):
 
    ```
-   "E:\AI-Offline\engine\x64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
+   "E:\AI-Offline\engine\x64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096
    ```
 
 3. Press Enter, wait for it to load, then type your message.
@@ -126,26 +126,27 @@ fails or you copied the folder somewhere else.
 folder instead of `x64`:
 
    ```
-   "E:\AI-Offline\engine\arm64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
+   "E:\AI-Offline\engine\arm64\llama-cli.exe" -m "E:\AI-Offline\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096
    ```
 
 **On a computer with a graphics card (GPU acceleration)**, use the `vulkan-x64`
 engine and add `-ngl 99` to push the model onto the GPU:
 
    ```
-   "E:\AI-Offline\engine\vulkan-x64\llama-cli.exe" -m "E:\AI-Offline\models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
+   "E:\AI-Offline\engine\vulkan-x64\llama-cli.exe" -m "E:\AI-Offline\models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99
    ```
 
    If you get an out-of-memory / device error, your GPU can't fit all the layers:
    lower the number (e.g. `-ngl 20`) to offload only part of the model, or use a CPU
    engine instead. The Vulkan engine works on NVIDIA, AMD and Intel graphics cards.
 
+Current llama-cli builds enter chat mode automatically for these instruction-tuned models.
+
 ### What the options mean
 - `-m "...gguf"`  = which model (brain) file to load.
 - `-c 4096`       = how much conversation it can remember at once (context size).
                     Lower this to `2048` if you run low on memory; raise it if you
                     have lots of RAM and want longer memory.
-- `-cnv`          = conversation / chat mode (back-and-forth chat).
 - `-ngl 99`       = (GPU only) how many model layers to put on the graphics card.
                     99 means "all of them." Lower it if the GPU runs out of memory.
 - `-t 4`          = (optional) use 4 CPU threads. If left out, it auto-picks.

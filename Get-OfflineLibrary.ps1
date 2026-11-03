@@ -421,14 +421,14 @@ WriteBat (Join-Path $ao 'CHAT-3B-light.bat') @"
 @echo off
 title Offline AI - Llama 3.2 3B (light)
 cd /d "%~dp0"
-"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
+"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096
 pause
 "@
 WriteBat (Join-Path $ao 'CHAT-8B-smart.bat') @"
 @echo off
 title Offline AI - Llama 3.1 8B (smart)
 cd /d "%~dp0"
-"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" -c 4096 -cnv
+"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" -c 4096
 pause
 "@
 WriteBat (Join-Path $ao 'CHAT-GPU-Qwen7B.bat') @"
@@ -437,7 +437,7 @@ title Offline AI - Qwen2.5 7B (GPU)
 cd /d "%~dp0"
 echo If this errors with out-of-memory, your GPU is too small - change -ngl 99 to a lower
 echo number (e.g. -ngl 20) or use a CPU launcher instead.
-"%~dp0engine\vulkan-x64\llama-cli.exe" -m "%~dp0models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99 -cnv
+"%~dp0engine\vulkan-x64\llama-cli.exe" -m "%~dp0models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99
 pause
 "@
 WriteBat (Join-Path $ao 'WEB-UI.bat') @"
@@ -475,9 +475,9 @@ function WriteSh($name,$tool,$model,$gpu,$argv,$note){
   if(-not $t.EndsWith("`n")){ $t += "`n" }
   [System.IO.File]::WriteAllText((Join-Path $ao $name), $t, [System.Text.UTF8Encoding]::new($false))
 }
-WriteSh 'chat-3B-light.sh'   'llama-cli'    'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096 -cnv' 'Offline AI - Llama 3.2 3B (light). Ctrl+C to quit.'
-WriteSh 'chat-8B-smart.sh'   'llama-cli'    'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf' '0' '-c 4096 -cnv' 'Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit.'
-WriteSh 'chat-GPU-Qwen7B.sh' 'llama-cli'    'Qwen2.5-7B-Instruct-Q4_K_M.gguf'        '1' '-c 4096 -ngl 99 -cnv' 'Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux).'
+WriteSh 'chat-3B-light.sh'   'llama-cli'    'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096' 'Offline AI - Llama 3.2 3B (light). Ctrl+C to quit.'
+WriteSh 'chat-8B-smart.sh'   'llama-cli'    'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf' '0' '-c 4096' 'Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit.'
+WriteSh 'chat-GPU-Qwen7B.sh' 'llama-cli'    'Qwen2.5-7B-Instruct-Q4_K_M.gguf'        '1' '-c 4096 -ngl 99' 'Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux).'
 WriteSh 'web-ui.sh'          'llama-server' 'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096 --host 127.0.0.1 --port 8080' "Open http://127.0.0.1:8080 when it says 'server is listening'."
 
 # ================================================================ documentation
