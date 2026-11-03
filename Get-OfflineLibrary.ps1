@@ -179,12 +179,16 @@ try{
     Log "engine: llama.cpp $lt"
     $e = Join-Path $Root 'AI-Offline\engine'
     foreach($x in $LlamaAssets.Keys){
-      $out = Join-Path $e $x; $dest = Join-Path $e $LlamaAssets[$x]
+      # The build tag is in the file name: a re-run on a newer build must not resume into
+      # the old build's archive (curl -C - / aria2 -c would append to it - see #35).
+      $out = Join-Path $e "$lt-$x"; $dest = Join-Path $e $LlamaAssets[$x]
       Log "engine: $x"; Fetch "https://github.com/ggml-org/llama.cpp/releases/download/$lt/llama-$lt-bin-$x" $out
       if(Test-Path $dest){ Remove-Item $dest -Recurse -Force }   # fresh unpack: no files left from an older build
       try{ if($x -like '*.zip'){ Expand-Archive $out -DestinationPath $dest -Force } else { Expand-Tgz $out $dest } }
-      catch{ Log "  WARN: could not unpack ${x}: $($_.Exception.Message)" }
+      catch{ Log "ERROR: could not unpack ${x} ($out): $($_.Exception.Message). Delete it and re-run."; exit 1 }
     }
+    # Archives from other builds (and the old names without a tag) are no longer needed.
+    Get-ChildItem -LiteralPath $e -File | Where-Object { ($_.Name -like '*.zip' -or $_.Name -like '*.tar.gz') -and -not $_.Name.StartsWith("$lt-") } | Remove-Item -Force
     Set-Content -Path (Join-Path $e 'BUILD.txt') -Value $lt -Encoding ascii
   }
 }catch{ Log "engine ERROR: $($_.Exception.Message)" }
