@@ -70,8 +70,8 @@
 </ol>
 <p>   Use the app's menus to open/browse a map, zoom, and search.</p>
 <p><strong>Dependencies: fully handled.</strong> This folder includes a <strong>portable Java runtime</strong> (<code>jre\</code>)</p>
-<p>and the <strong>OsmAndMapCreator</strong> app (<code>app\</code>). Nothing else is required — it runs on any</p>
-<p>64-bit Windows PC, offline.</p>
+<p>and the <strong>OsmAndMapCreator</strong> app (<code>app\</code>). Nothing else is required to launch it — offline, on a 64-bit PC.</p>
+<blockquote><strong>Known limitation on Windows (being worked on — <a href="https://github.com/elhajahmadj/offline-emergency-library/issues/15">#15</a>):</strong> on some Windows setups the OsmAndMapCreator window opens but the <strong>map area stays blank</strong>. The bundled build ships a Linux native renderer and no Windows one, which is the likely cause. If this happens to you, use the maps on an <strong>Android phone/tablet</strong> (Option 2 below) — that path is fully tested — or the opt-in <strong>browser maps</strong> if your kit was built with them. We're working on a desktop viewer that renders reliably on Windows.</blockquote>
 <blockquote><strong>Space note:</strong> the maps download as compressed <code>.obf.zip</code> (~17 GB). Desktop viewing needs them <strong>unzipped</strong> to <code>.obf</code> (~30 GB), so the first run roughly doubles the map space. Make sure the drive has ~30 GB free before using desktop maps. (If space is tight, you can delete <code>OsmAnd\obf\</code> afterward; re-running the <code>.bat</code> recreates it.)</blockquote>
 <hr>
 <h2>Option 2 — On an Android phone/tablet</h2>
@@ -116,7 +116,7 @@
 <tr>
 <td>A computer, no phone</td>
 <td><strong>Option 1</strong> (desktop viewer)</td>
-<td>✅ fully bundled (Java + app)</td>
+<td>✅ bundled (Java + app); ⚠️ blank map on some Windows setups — see note (<a href="https://github.com/elhajahmadj/offline-emergency-library/issues/15">#15</a>)</td>
 </tr>
 <tr>
 <td>An Android phone/tablet</td>

@@ -65,8 +65,15 @@ Everything you need is bundled — **no separate install, no Java to set up.**
    Use the app's menus to open/browse a map, zoom, and search.
 
 **Dependencies: fully handled.** This folder includes a **portable Java runtime** (`jre\`)
-and the **OsmAndMapCreator** app (`app\`). Nothing else is required — it runs on any
-64-bit Windows PC, offline.
+and the **OsmAndMapCreator** app (`app\`). Nothing else is required to launch it — offline,
+on a 64-bit PC.
+
+> **Known limitation on Windows (being worked on — [#15](https://github.com/elhajahmadj/offline-emergency-library/issues/15)):**
+> on some Windows setups the OsmAndMapCreator window opens but the **map area stays blank**.
+> The bundled build ships a Linux native renderer and no Windows one, which is the likely
+> cause. If this happens to you, use the maps on an **Android phone/tablet** (Option 2
+> below) — that path is fully tested — or the opt-in **browser maps** if your kit was built
+> with them. We're working on a desktop viewer that renders reliably on Windows.
 
 > **Space note:** the maps download as compressed `.obf.zip` (~17 GB). Desktop viewing
 > needs them **unzipped** to `.obf` (~30 GB), so the first run roughly doubles the map
@@ -110,7 +117,7 @@ This is an Apple platform limitation — there's no offline sideloading like And
 
 | You have… | Use | Dependency status |
 |---|---|---|
-| A computer, no phone | **Option 1** (desktop viewer) | ✅ fully bundled (Java + app) |
+| A computer, no phone | **Option 1** (desktop viewer) | ✅ bundled (Java + app); ⚠️ blank map on some Windows setups — see note ([#15](https://github.com/elhajahmadj/offline-emergency-library/issues/15)) |
 | An Android phone/tablet | **Option 2** (bundled APK) | ✅ bundled APK |
 | An iPhone/iPad | **Option 3** (App Store) | ⚠️ install the app while online |
 
