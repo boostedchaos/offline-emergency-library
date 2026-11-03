@@ -19,6 +19,7 @@ param(
                             #   -Region US_texas   -Region world   (see -ListRegions)
   [switch]$ListRegions,     # print available map regions (optionally filtered by -Filter) and exit
   [string]$Filter,          # substring filter used with -ListRegions
+  [switch]$Lite,            # quick start: 3B AI, medical/survival references and regional maps
   [switch]$SkipWikipedia,   # Wikipedia is the biggest (~49 GB ZIM); allow skipping
   [switch]$SkipMaps,        # OsmAnd maps (~17 GB for US); allow skipping
   [switch]$SkipModels,      # the large AI chat models (~11 GB)
@@ -30,6 +31,7 @@ param(
 
 $ErrorActionPreference = 'Continue'
 $ProgressPreference    = 'SilentlyContinue'
+if($Lite){ $SkipWikipedia = $true; $SkipModels = $true }
 $RepoRaw = 'https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main'
 $Continents = @('africa','asia','australia-oceania','centralamerica','europe','northamerica','southamerica')
 # Common names / ISO codes -> OsmAnd region token (unknown input passes through unchanged)
@@ -97,13 +99,14 @@ function Fetch($url,$out){
 }
 function UA(){ 'Mozilla/5.0' }
 if($UseAria){ Log 'Downloader: aria2 (fast, multi-connection)' } else { Log "Downloader: curl (tip: install 'aria2' for much faster downloads)" }
+if($Lite){ Log "Lite preset: 3B AI, medical/survival references and maps for '$Region' (unless skipped). Size depends on region; use -Region for a small area or -SkipMaps. Re-run without -Lite to add the full library." }
 
 # free-space check (needs roughly 60 GB for everything)
 try {
   $drive = (Get-Item $Root).PSDrive
   $freeGB = [math]::Round((Get-PSDrive $drive.Name).Free/1GB,1)
   Log "Destination: $Root   (free space: $freeGB GB)"
-  if ($freeGB -lt 65) { Log "WARNING: ~65 GB recommended for the full library. You have $freeGB GB free. Consider -SkipWikipedia / -SkipMaps / -SkipModels." }
+  if (-not $Lite -and $freeGB -lt 65) { Log "WARNING: ~65 GB recommended for the full library. You have $freeGB GB free. Consider -SkipWikipedia / -SkipMaps / -SkipModels." }
 } catch {}
 
 # ---------------------------------------------------------------- folder tree
@@ -195,11 +198,13 @@ foreach($m in $models){
 
 # ================================================================ 3. GPT4All
 Log '=== [3/8] GPT4All (offline document Q&A) ==='
+if(-not $Lite){
 try{
   $rel = Gh-ReleaseWith 'nomic-ai/gpt4all' 'installer-win64-v'
   $a = $rel.assets | Where-Object { $_.name -match 'installer-win64-v.*\.exe$' -and $_.name -notmatch 'arm' } | Select-Object -First 1
   if($a){ Log "gpt4all: $($a.name)"; Fetch $a.browser_download_url (Join-Path $Root "AI-Offline\DocReader-GPT4All\$($a.name)") }
 }catch{ Log "gpt4all ERROR: $($_.Exception.Message)" }
+} else { Log 'gpt4all: skipped (lite preset)' }
 
 # ================================================================ 4. Kiwix reader
 Log '=== [4/8] Kiwix reader (portable) ==='
@@ -227,6 +232,7 @@ $zims = @(
  @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-medicine_en_';       d='Medical\zimgit-medicine'}
 )
 foreach($z in $zims){
+  if($Lite -and $z.d -in @('Manuals\Repair-iFixit','Manuals\DIY-Appropedia')){ continue }
   $name = Latest-Zim $z.dir $z.pre
   if($name){ Log "zim: $name"; Fetch ($z.dir+$name) (Join-Path $Root "$($z.d)\$name") }
   else { Log "zim: NOT FOUND for prefix $($z.pre)" }
@@ -427,6 +433,7 @@ cd /d "%~dp0"
 "%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096
 pause
 "@
+if(-not $Lite){
 WriteBat (Join-Path $ao 'CHAT-8B-smart.bat') @"
 @echo off
 title Offline AI - Llama 3.1 8B (smart)
@@ -443,6 +450,7 @@ echo number (e.g. -ngl 20) or use a CPU launcher instead.
 "%~dp0engine\vulkan-x64\llama-cli.exe" -m "%~dp0models\Qwen2.5-7B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 99
 pause
 "@
+}
 WriteBat (Join-Path $ao 'WEB-UI.bat') @"
 @echo off
 title Offline AI - Web UI
@@ -479,8 +487,10 @@ function WriteSh($name,$tool,$model,$gpu,$argv,$note){
   [System.IO.File]::WriteAllText((Join-Path $ao $name), $t, [System.Text.UTF8Encoding]::new($false))
 }
 WriteSh 'chat-3B-light.sh'   'llama-cli'    'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096' 'Offline AI - Llama 3.2 3B (light). Ctrl+C to quit.'
+if(-not $Lite){
 WriteSh 'chat-8B-smart.sh'   'llama-cli'    'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf' '0' '-c 4096' 'Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit.'
 WriteSh 'chat-GPU-Qwen7B.sh' 'llama-cli'    'Qwen2.5-7B-Instruct-Q4_K_M.gguf'        '1' '-c 4096 -ngl 99' 'Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux).'
+}
 WriteSh 'web-ui.sh'          'llama-server' 'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096 --host 127.0.0.1 --port 8080' "Open http://127.0.0.1:8080 when it says 'server is listening'."
 
 # ================================================================ documentation

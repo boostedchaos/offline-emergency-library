@@ -5,10 +5,10 @@
 # Usage:
 #   ./get-offline-library.sh                 # asks where to save
 #   ./get-offline-library.sh -d /mnt/usb     # non-interactive
-#   flags: --skip-wikipedia  --skip-maps  --skip-models
+#   flags: --lite  --skip-wikipedia  --skip-maps  --skip-models
 
 REPO_RAW="https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main"
-DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0
+DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0; LITE=0
 REGION="US"; LISTREGIONS=0; FILTER=""
 EDU=0; EDULANG="en"; KOLIBRI=0
 CONTINENTS="africa asia australia-oceania centralamerica europe northamerica southamerica"
@@ -64,6 +64,7 @@ while [ $# -gt 0 ]; do
     --education)      EDU=1; shift;;
     --edu-lang)       EDULANG="$2"; shift 2;;
     --kolibri)        KOLIBRI=1; shift;;
+    --lite)           LITE=1; shift;;
     --skip-wikipedia) SKIP_WIKI=1; shift;;
     --skip-maps)      SKIP_MAPS=1; shift;;
     --skip-models)    SKIP_MODELS=1; shift;;
@@ -71,6 +72,7 @@ while [ $# -gt 0 ]; do
     *) shift;;
   esac
 done
+if [ "$LITE" = 1 ]; then SKIP_WIKI=1; SKIP_MODELS=1; fi
 
 command -v curl >/dev/null 2>&1 || { echo "ERROR: 'curl' is required."; exit 1; }
 HAVE_UNZIP=1; command -v unzip >/dev/null 2>&1 || HAVE_UNZIP=0
@@ -135,6 +137,7 @@ fetch(){ # url out
   [ -s "$2" ] || { log "ERROR: download is missing or empty: $2"; exit 1; }
 }
 if [ "$USE_ARIA" = 1 ]; then log "Downloader: aria2 (fast, multi-connection)"; else log "Downloader: curl (tip: install 'aria2' for much faster downloads)"; fi
+if [ "$LITE" = 1 ]; then log "Lite preset: 3B AI, medical/survival references and maps for '$REGION' (unless skipped). Size depends on region; use --region for a small area or --skip-maps. Re-run without --lite to add the full library."; fi
 UA="Mozilla/5.0"
 
 # ---- platform detection ----
@@ -219,6 +222,7 @@ fi
 
 # ================================================================ 3. GPT4All
 log "=== [3/8] GPT4All (offline document Q&A) ==="
+if [ "$LITE" = 0 ]; then
 if [ "$PLAT" = mac ]; then
   u="$(gh_asset_latest nomic-ai/gpt4all 'installer-macos-v.*\.dmg$')"
   [ -n "$u" ] && { log "gpt4all: $(basename "$u")"; fetch "$u" "$ROOT/AI-Offline/DocReader-GPT4All/$(basename "$u")"; }
@@ -226,6 +230,7 @@ else
   u="$(gh_asset_latest nomic-ai/gpt4all 'installer-linux-v.*\.run$')"
   [ -n "$u" ] && { log "gpt4all: $(basename "$u")"; fetch "$u" "$ROOT/AI-Offline/DocReader-GPT4All/$(basename "$u")"; chmod +x "$ROOT/AI-Offline/DocReader-GPT4All/$(basename "$u")" 2>/dev/null; }
 fi
+else log "gpt4all: skipped (lite preset)"; fi
 
 # ================================================================ 4. Kiwix reader
 log "=== [4/8] Kiwix reader ==="
@@ -239,8 +244,10 @@ fi
 # ================================================================ 5. ZIM archives
 log "=== [5/8] Offline archives (Kiwix ZIM) ==="
 add_zim(){ n="$(latest_zim "$1" "$2")"; [ -n "$n" ] && { log "zim: $n"; fetch "$1$n" "$3/$n"; } || log "zim: not found ($2)"; }
-add_zim "https://download.kiwix.org/zim/ifixit/"    "ifixit_en_all_"            "$ROOT/Manuals/Repair-iFixit"
-add_zim "https://download.kiwix.org/zim/other/"     "appropedia_en_all_maxi_"   "$ROOT/Manuals/DIY-Appropedia"
+if [ "$LITE" = 0 ]; then
+  add_zim "https://download.kiwix.org/zim/ifixit/"    "ifixit_en_all_"            "$ROOT/Manuals/Repair-iFixit"
+  add_zim "https://download.kiwix.org/zim/other/"     "appropedia_en_all_maxi_"   "$ROOT/Manuals/DIY-Appropedia"
+fi
 add_zim "https://download.kiwix.org/zim/other/"     "zimgit-post-disaster_en_"  "$ROOT/Manuals/Survival-Water-Food"
 add_zim "https://download.kiwix.org/zim/other/"     "zimgit-water_en_"          "$ROOT/Manuals/Survival-Water-Food"
 add_zim "https://download.kiwix.org/zim/other/"     "zimgit-food-preparation_en_" "$ROOT/Manuals/Survival-Water-Food"
@@ -410,8 +417,10 @@ sed -i.bak -e "s|__TOOL__|$2|" -e "s|__MODEL__|$3|" -e "s|__GPU__|$4|" -e "s|__A
 chmod +x "$AO/$1" 2>/dev/null
 }
 make_sh "chat-3B-light.sh"   llama-cli    "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096" "Offline AI - Llama 3.2 3B (light). Ctrl+C to quit."
+if [ "$LITE" = 0 ]; then
 make_sh "chat-8B-smart.sh"   llama-cli    "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" 0 "-c 4096" "Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit."
 make_sh "chat-GPU-Qwen7B.sh" llama-cli    "Qwen2.5-7B-Instruct-Q4_K_M.gguf"        1 "-c 4096 -ngl 99" "Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux)."
+fi
 make_sh "web-ui.sh"          llama-server "Llama-3.2-3B-Instruct-Q4_K_M.gguf"      0 "-c 4096 --host 127.0.0.1 --port 8080" "Open http://127.0.0.1:8080 when it says 'server is listening'."
 # .bat launchers: same text as Get-OfflineLibrary.ps1 writes, with Windows (CRLF) line ends.
 make_bat(){ # file  title  exe  model  args  [note]
@@ -420,9 +429,11 @@ make_bat(){ # file  title  exe  model  args  [note]
     echo "\"%~dp0$3\" -m \"%~dp0models\\$4\" $5"; echo "pause"; } | sed 's/$/\r/' > "$AO/$1"
 }
 make_bat "CHAT-3B-light.bat"   "Offline AI - Llama 3.2 3B (light)" 'engine\x64\llama-cli.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096"
+if [ "$LITE" = 0 ]; then
 make_bat "CHAT-8B-smart.bat"   "Offline AI - Llama 3.1 8B (smart)" 'engine\x64\llama-cli.exe' "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" "-c 4096"
 make_bat "CHAT-GPU-Qwen7B.bat" "Offline AI - Qwen2.5 7B (GPU)"     'engine\vulkan-x64\llama-cli.exe' "Qwen2.5-7B-Instruct-Q4_K_M.gguf" "-c 4096 -ngl 99" 'echo If this errors with out-of-memory, your GPU is too small - change -ngl 99 to a lower
 echo number (e.g. -ngl 20) or use a CPU launcher instead.'
+fi
 make_bat "WEB-UI.bat"          "Offline AI - Web UI"               'engine\x64\llama-server.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096 --host 127.0.0.1 --port 8080" 'echo When it says "server listening", open a browser to http://127.0.0.1:8080'
 
 # ================================================================ documentation

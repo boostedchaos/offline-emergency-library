@@ -149,6 +149,30 @@ and it continues where it left off.
 | Maps on PC | ✅ bundled viewer+Java | ✅ bundled viewer+Java | ✅ bundled viewer+Java |
 | All content (Wikipedia, ZIM, PDF, maps, APKs) | ✅ | ✅ | ✅ |
 
+### Quick start with a smaller download
+
+Use `-Lite` (PowerShell) or `--lite` (Bash) to get the **3B AI model**, AI engines,
+medical and survival archives, PDF manuals, Kiwix reader, phone apps and regional
+maps. It skips full Wikipedia, the 8B/7B models, GPT4All, iFixit and Appropedia.
+Only the 3B chat and web-UI launchers are written on a fresh lite install.
+
+```powershell
+.\Get-OfflineLibrary.ps1 -Destination "E:\" -Lite -Region US_delaware
+```
+```bash
+./get-offline-library.sh -d /path/to/drive --lite --region US_delaware
+```
+
+**This is not a fixed 2-3 GB bundle.** The model, references and bundled tools
+already take several GB, and maps vary by region. Maps still default to **US**
+(about 17 GB of maps alone); choose a small sub-region as above, or add
+`-SkipMaps` / `--skip-maps` to omit maps, their viewer and the OsmAnd app.
+Education and Kolibri remain opt-in and can be combined with lite.
+
+To expand later, re-run into the **same destination without the lite flag**.
+Existing downloads are resumed/reused; lite does not remove previously downloaded
+files or launchers. With no lite flag, the default full-library behavior is unchanged.
+
 ---
 
 ## 🔐 Trust & verification
@@ -250,6 +274,7 @@ Both pages link to each component's guide:
 
 | Flag | Effect |
 |---|---|
+| `-Lite` / `--lite` | Quick start: 3B AI + medical/survival references + regional maps; omit Wikipedia, larger models, GPT4All, iFixit and Appropedia (see size note above) |
 | `-Region <name>` / `--region <name>` | Choose map region (default `US`); country, continent, sub-region, or `world` |
 | `-ListRegions` / `--list-regions [filter]` | List available map regions, then exit (no download) |
 | `-Education` / `--education` | **Add Khan Academy** archive (Kiwix ZIM, ~168 GB with videos) — off by default |
