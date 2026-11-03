@@ -289,6 +289,9 @@ A single drive is a single point of failure: it can be lost, dropped, or slowly 
    installer, which downloads anything that is missing (it does not re-check files that are
    already there).
 
+**Run CHECK-DRIVE before you re-run the installer.** Each run writes a new list from the files
+as they are at that moment, so a file that was already damaged would be listed as good.
+
 | OS | Double-click | Or in a terminal, inside the `OfflineLibrary` folder |
 |---|---|---|
 | Windows | `CHECK-DRIVE.bat` | `powershell -ExecutionPolicy Bypass -File check-drive.ps1` |
