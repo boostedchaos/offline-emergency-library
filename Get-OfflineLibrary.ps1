@@ -126,20 +126,56 @@ function Gh-ReleaseWith($repo,$needle){
 }
 
 # ================================================================ 1. AI engine
-Log '=== [1/8] Offline AI engine (llama.cpp, CPU + GPU) ==='
-try{
-  $rel = Gh-ReleaseWith 'ggml-org/llama.cpp' 'bin-win-cpu-x64'
-  if($rel){
-    foreach($pat in @('bin-win-cpu-x64\.zip$','bin-win-cpu-arm64\.zip$','bin-win-vulkan-x64\.zip$')){
-      $a = $rel.assets | Where-Object { $_.name -match $pat } | Select-Object -First 1
-      if($a){
-        $zip = Join-Path $Root ("AI-Offline\engine\"+$a.name)
-        Log "engine: $($a.name)"; Fetch $a.browser_download_url $zip
-        $sub = if($a.name -match 'arm64'){'arm64'} elseif($a.name -match 'vulkan'){'vulkan-x64'} else {'x64'}
-        try{ Expand-Archive $zip -DestinationPath (Join-Path $Root "AI-Offline\engine\$sub") -Force }catch{ Log "  extract failed: $($_.Exception.Message)" }
+# llama.cpp for Windows, macOS and Linux, all from ONE build, so a drive made on any
+# computer runs the AI on any other. Folder names match the .bat/.sh launchers below.
+Log '=== [1/8] Offline AI engine (llama.cpp) for Windows, macOS and Linux ==='
+$LlamaAssets = [ordered]@{ 'win-cpu-x64.zip'='x64'; 'win-cpu-arm64.zip'='arm64'; 'win-vulkan-x64.zip'='vulkan-x64'
+  'macos-arm64.tar.gz'='macos-arm64'; 'macos-x64.tar.gz'='macos-x64'
+  'ubuntu-x64.tar.gz'='linux-x64'; 'ubuntu-arm64.tar.gz'='linux-arm64'; 'ubuntu-vulkan-x64.tar.gz'='linux-vulkan-x64' }
+# Expand-Tgz: unpack a .tar.gz with its symlinks turned into real files. exFAT has no symlinks
+# and Windows tar often cannot create them, so unpack to a temp folder, replace each link
+# with a copy of its target, then copy the result onto the drive.
+function Expand-Tgz($file,$dest){
+  $tarExe = if (Get-Command tar.exe -ErrorAction SilentlyContinue) { 'tar.exe' } else { 'tar' }
+  $t = Join-Path ([System.IO.Path]::GetTempPath()) ('oel-untar-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Force $t, $dest | Out-Null
+  try {
+    & $tarExe -xzf $file -C $t 2>$null
+    $links = @(& $tarExe -tvzf $file | Where-Object { $_ -match '^l' -and $_ -match ' -> ' })
+    for ($pass = 0; $pass -lt 5; $pass++) {          # a link can point at another link: repeat
+      foreach ($l in $links) {
+        $m = [regex]::Match($l, '\s(\S+) -> (\S+)$'); if (-not $m.Success) { continue }
+        $lp = Join-Path $t $m.Groups[1].Value
+        $tp = Join-Path (Split-Path $lp -Parent) $m.Groups[2].Value
+        $item = Get-Item -LiteralPath $lp -Force -ErrorAction SilentlyContinue
+        if ($item -and $item.LinkType) { Remove-Item -LiteralPath $lp -Force; $item = $null }
+        if (-not $item -and (Test-Path -LiteralPath $tp -PathType Leaf)) { Copy-Item -LiteralPath $tp $lp }
       }
     }
-  } else { Log 'engine: no suitable llama.cpp release found' }
+    Copy-Item (Join-Path $t '*') $dest -Recurse -Force
+  } finally { Remove-Item $t -Recurse -Force -ErrorAction SilentlyContinue }
+}
+try{
+  $rels = Invoke-RestMethod 'https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20' -Headers @{'User-Agent'='ps'}
+  $lt = $null
+  foreach($r in @($rels)){
+    $names = @($r.assets | ForEach-Object { $_.name })
+    $ok = $true; foreach($x in $LlamaAssets.Keys){ if($names -notcontains "llama-$($r.tag_name)-bin-$x"){ $ok = $false; break } }
+    if($ok){ $lt = $r.tag_name; break }
+  }
+  if(-not $lt){ Log 'engine: no recent llama.cpp build has all 8 platform files' }
+  else {
+    Log "engine: llama.cpp $lt"
+    $e = Join-Path $Root 'AI-Offline\engine'
+    foreach($x in $LlamaAssets.Keys){
+      $out = Join-Path $e $x; $dest = Join-Path $e $LlamaAssets[$x]
+      Log "engine: $x"; Fetch "https://github.com/ggml-org/llama.cpp/releases/download/$lt/llama-$lt-bin-$x" $out
+      if(Test-Path $dest){ Remove-Item $dest -Recurse -Force }   # fresh unpack: no files left from an older build
+      try{ if($x -like '*.zip'){ Expand-Archive $out -DestinationPath $dest -Force } else { Expand-Tgz $out $dest } }
+      catch{ Log "  WARN: could not unpack ${x}: $($_.Exception.Message)" }
+    }
+    Set-Content -Path (Join-Path $e 'BUILD.txt') -Value $lt -Encoding ascii
+  }
 }catch{ Log "engine ERROR: $($_.Exception.Message)" }
 
 # ================================================================ 2. AI models
@@ -462,7 +498,7 @@ if(-not $SkipMaps){
 }
 
 # ================================================================ launchers
-Log '=== Writing launchers (.bat) ==='
+Log '=== Writing launchers (.bat + .sh) ==='
 function WriteBat($path,$text){ Set-Content -Path $path -Value $text -Encoding ascii }
 $ao = Join-Path $Root 'AI-Offline'
 WriteBat (Join-Path $ao 'CHAT-3B-light.bat') @"
@@ -496,6 +532,37 @@ echo When it says "server listening", open a browser to http://127.0.0.1:8080
 "%~dp0engine\x64\llama-server.exe" -m "%~dp0models\Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 --host 127.0.0.1 --port 8080
 pause
 "@
+
+# .sh launchers for macOS / Linux: same text as get-offline-library.sh writes (LF line ends,
+# UTF-8 without BOM). Each one picks the engine folder for the computer it runs on.
+$ShTemplate = @'
+#!/usr/bin/env bash
+# Offline AI (macOS / Linux). Uses the engine folder for this computer.
+DIR="$(cd "$(dirname "$0")" && pwd)"
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) P=macos-arm64 ;;
+  Darwin-*) P=macos-x64 ;;
+  Linux-aarch64|Linux-arm64) P=linux-arm64 ;;
+  *) P=linux-x64 ;;
+esac
+[ "__GPU__" = 1 ] && [ "$P" = linux-x64 ] && P=linux-vulkan-x64
+BIN="$(find "$DIR/engine/$P" -name __TOOL__ -type f 2>/dev/null | head -n1)"
+[ -z "$BIN" ] && { echo "AI engine for this computer not found: $DIR/engine/$P"; exit 1; }
+chmod +x "$BIN" 2>/dev/null
+LIBDIR="$(dirname "$BIN")"
+export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}" DYLD_LIBRARY_PATH="$LIBDIR:${DYLD_LIBRARY_PATH:-}"
+echo "__NOTE__"
+exec "$BIN" -m "$DIR/models/__MODEL__" __ARGS__
+'@
+function WriteSh($name,$tool,$model,$gpu,$argv,$note){
+  $t = $ShTemplate.Replace("`r`n","`n").Replace('__TOOL__',$tool).Replace('__MODEL__',$model).Replace('__GPU__',$gpu).Replace('__ARGS__',$argv).Replace('__NOTE__',$note)
+  if(-not $t.EndsWith("`n")){ $t += "`n" }
+  [System.IO.File]::WriteAllText((Join-Path $ao $name), $t, [System.Text.UTF8Encoding]::new($false))
+}
+WriteSh 'chat-3B-light.sh'   'llama-cli'    'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096 -cnv' 'Offline AI - Llama 3.2 3B (light). Ctrl+C to quit.'
+WriteSh 'chat-8B-smart.sh'   'llama-cli'    'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf' '0' '-c 4096 -cnv' 'Offline AI - Llama 3.1 8B (smart). Ctrl+C to quit.'
+WriteSh 'chat-GPU-Qwen7B.sh' 'llama-cli'    'Qwen2.5-7B-Instruct-Q4_K_M.gguf'        '1' '-c 4096 -ngl 99 -cnv' 'Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux).'
+WriteSh 'web-ui.sh'          'llama-server' 'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096 --host 127.0.0.1 --port 8080' "Open http://127.0.0.1:8080 when it says 'server is listening'."
 
 # ================================================================ documentation
 Log '=== Documentation (Markdown + HTML) ==='

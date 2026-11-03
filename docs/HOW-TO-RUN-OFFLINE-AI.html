@@ -16,10 +16,13 @@ E:\AI-Offline\
 ├─ CHAT-8B-smart.bat     &lt;- Double-click to chat (bigger, smarter CPU model)
 ├─ CHAT-GPU-Qwen7B.bat   &lt;- Double-click to chat (GPU-accelerated, ~6GB GPU)
 ├─ WEB-UI.bat            &lt;- Chat in your web browser instead of a black window
+├─ chat-*.sh, web-ui.sh  &lt;- The same launchers for macOS / Linux
 ├─ engine\               &lt;- The program that runs the AI (llama.cpp)
 │   ├─ x64\              &lt;- CPU engine for normal Intel/AMD computers
 │   ├─ arm64\           &lt;- CPU engine for ARM computers (Snapdragon / Surface Pro X)
-│   └─ vulkan-x64\      &lt;- GPU engine (Vulkan) for graphics-card acceleration
+│   ├─ vulkan-x64\      &lt;- GPU engine (Vulkan) for graphics-card acceleration
+│   ├─ macos-arm64\ macos-x64\                  &lt;- engines for Macs (Apple Silicon / Intel)
+│   └─ linux-x64\ linux-arm64\ linux-vulkan-x64\ &lt;- engines for Linux (CPU / ARM / GPU)
 ├─ models\               &lt;- The AI "brains" (the actual model files)
 │   ├─ Llama-3.2-3B-Instruct-Q4_K_M.gguf        (~1.9 GB)  CPU, light
 │   ├─ Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf   (~4.6 GB)  CPU, smarter
@@ -30,6 +33,8 @@ E:\AI-Offline\
 <li><strong>engine</strong> = the software (called *llama.cpp*). It is tiny and needs no installation.</li>
 </ul>
 <p>  There is a <strong>CPU</strong> build (x64/arm64) and a <strong>GPU</strong> build (vulkan-x64).</p>
+<p>  Every drive has the engine for <strong>Windows, macOS and Linux</strong>, so the AI runs on any of</p>
+<p>  them, no matter which computer made the drive.</p>
 <ul>
 <li><strong>models</strong> = the AI itself. These <code>.gguf</code> files hold everything the AI "knows."</li>
 </ul>
@@ -57,13 +62,14 @@ E:\AI-Offline\
 <p>This works offline too — it's a local page served by your own computer.</p>
 <hr>
 <h2>2b. On macOS / Linux</h2>
-<p>There are no <code>.bat</code> files on Mac/Linux — use the matching <strong><code>.sh</code></strong> launchers instead.</p>
+<p>On a Mac or Linux computer, use the <strong><code>.sh</code></strong> launchers (every drive has them). Each one</p>
+<p>picks the engine for the computer it runs on.</p>
 <p>Open a terminal in the <code>AI-Offline</code> folder and run:</p>
 <pre><code>
 ./chat-3B-light.sh        # fast, light model
 ./chat-8B-smart.sh        # smarter model
 ./web-ui.sh               # browser chat at http://127.0.0.1:8080
-./chat-GPU-Qwen7B.sh      # Linux only: GPU-accelerated (Vulkan)
+./chat-GPU-Qwen7B.sh      # GPU: Vulkan on Linux, Metal on a Mac
 </code></pre>
 <p>(If a script isn't executable: <code>chmod +x *.sh</code> first.) On macOS the AI automatically uses</p>
 <p>the Mac's GPU (Metal) — no separate GPU launcher needed.</p>
@@ -247,11 +253,18 @@ E:\AI-Offline\
 <hr>
 <h2>8. Technical summary (for reference)</h2>
 <ul>
-<li><strong>Engine:</strong> llama.cpp, Windows build <code>b12024</code>.</li>
+<li><strong>Engine:</strong> llama.cpp, one build for every system (its number is in <code>engine/BUILD.txt</code>).</li>
 <li>CPU builds: <code>engine\x64</code> (Intel/AMD) and <code>engine\arm64</code> (ARM). No GPU needed.</li>
 <li>GPU build: <code>engine\vulkan-x64</code> (Vulkan) — accelerates on NVIDIA/AMD/Intel GPUs,</li>
 </ul>
 <p>    no CUDA install required.</p>
+<ul>
+<li>macOS builds: <code>engine/macos-arm64</code> (Apple Silicon) and <code>engine/macos-x64</code> (Intel). They</li>
+</ul>
+<p>    use the Mac's GPU (Metal) automatically.</p>
+<ul>
+<li>Linux builds: <code>engine/linux-x64</code>, <code>engine/linux-arm64</code>, and <code>engine/linux-vulkan-x64</code> (GPU).</li>
+</ul>
 <ul>
 <li><strong>Format:</strong> GGUF, Q4_K_M quantization (4-bit) — small size, good quality.</li>
 <li><strong>Models (3):</strong></li>
@@ -259,7 +272,7 @@ E:\AI-Offline\
 <li>Meta Llama 3.1 8B Instruct — stronger general knowledge &amp; reasoning (CPU).</li>
 <li>Qwen 2.5 7B Instruct — strong all-rounder, sized to fit a ~6 GB GPU (GPU).</li>
 <li><strong>Source URLs (only needed if you ever want to re-download):</strong></li>
-<li>Engine: https://github.com/ggml-org/llama.cpp/releases/tag/b12024</li>
+<li>Engine: https://github.com/ggml-org/llama.cpp/releases (the build named in <code>engine/BUILD.txt</code>)</li>
 <li>3B:  https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF</li>
 <li>8B:  https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF</li>
 <li>7B:  https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF</li>
