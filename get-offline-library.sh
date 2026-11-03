@@ -97,7 +97,10 @@ fi
 if [ -z "$DEST" ]; then
   # When run as `curl ... | bash`, stdin is the script itself — read the answer from the
   # terminal instead, or tell the user to pass -d if there's no terminal.
-  if [ -r /dev/tty ]; then
+  # `[ -r /dev/tty ]` is true even with no controlling terminal (cron/CI/ssh non-tty),
+  # so actually try to open it; otherwise the read errors and the friendly message below
+  # is skipped.
+  if ( : < /dev/tty ) 2>/dev/null; then
     echo ""
     echo "  Offline Emergency Library installer"
     echo "  -----------------------------------"
