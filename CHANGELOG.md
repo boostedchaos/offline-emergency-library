@@ -6,6 +6,47 @@ This project is built and maintained in the open. Several fixes were found and
 reported (or independently patched) by contributors running the installer on real
 hardware — they are credited by name below. Thank you.
 
+## [Unreleased]
+
+Contributor-driven reliability and portability work, from people running the kit on real
+hardware.
+
+### Added
+- **Offline AI runs on any OS from one drive.** Both installers now fetch the llama.cpp
+  engine for Windows, macOS and Linux (all from one matching build) and unpack real files
+  instead of symlinks, so a drive built on one computer runs the AI on another — and it no
+  longer breaks on exFAT, where symlinks fail. _[@boostedchaos](https://github.com/boostedchaos)
+  (Kyle Welch) — PR #9._
+- **Fuller iPhone/iPad phone guide** — plugging in the drive, reading `.zim` archives
+  straight off it in Kiwix with no copy (device-tested on iPad), importing maps into OsmAnd,
+  and what doesn't run on iOS. _[@boostedchaos](https://github.com/boostedchaos) — PR #12._
+
+### Fixed
+- **Default `US` maps downloaded 0 files on macOS/Linux.** The Bash region loop fed `read`
+  a list with no trailing newline, so it dropped the last (and, for `US`, only) region name.
+  _[@boostedchaos](https://github.com/boostedchaos) — PR #11._
+- **Offline AI chat was broken on current llama.cpp.** Recent `llama-cli` builds reject the
+  obsolete `-cnv` flag (now scoped away from the CLI); conversation mode auto-activates for
+  the bundled instruct models anyway, so the flag was removed from every launcher and the
+  manual examples. _[@EnragedAntelope](https://github.com/EnragedAntelope) — PR #13._
+- **Failed downloads were silently saved as real files.** The `curl` fallback lacked `-f`,
+  so an HTTP 404/5xx body could be written as a `.gguf`/`.zim`/`.pdf` and the run continued
+  to its success banner. Both installers now use `-fL`/`-sS` with exit-code and non-empty
+  checks, route the medical PDFs through the checked helper, and `install.bat` propagates
+  failure instead of always printing "Done". A failed or non-`%PDF` download now stops the
+  run (re-runnable — payloads resume). _[@EnragedAntelope](https://github.com/EnragedAntelope)
+  — PR #14._
+- **Bash prompt skipped its friendly message with no terminal.** `[ -r /dev/tty ]` is true
+  even when no controlling terminal exists (cron/CI/non-tty `ssh`), so the read errored
+  instead of showing the "pass `-d`" hint. It now actually tests that the tty is openable.
+  _Reported by [@boostedchaos](https://github.com/boostedchaos) (issue #1)._
+
+### Known issues
+- On some Windows setups the bundled OsmAndMapCreator desktop viewer opens with a blank map
+  (the build ships a Linux native renderer only). Documented in HOW-TO-VIEW-MAPS with
+  tested alternatives; a cross-platform browser-maps viewer is in progress.
+  _Reported by [@EnragedAntelope](https://github.com/EnragedAntelope) — issue #15._
+
 ## [v1.4] — 2026-11-02 — faster downloads (aria2)
 
 ### Added
