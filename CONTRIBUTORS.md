@@ -2,9 +2,10 @@
 
 Thanks to everyone who has improved this project. ❤️
 
-The installers are tested and fixed by people running them on real hardware across
-Windows, macOS, and Linux. Credit for specific fixes is in the [CHANGELOG](CHANGELOG.md)
-and in the GitHub release notes.
+**Testing and bug reports count as contributions here** — running the installer on real
+hardware and reporting what breaks is just as valuable as code, and it's credited the same
+way. Credit for specific fixes is in the [CHANGELOG](CHANGELOG.md) and in the GitHub release
+notes.
 
 ## People
 
@@ -15,6 +16,9 @@ and in the GitHub release notes.
 - **[@xtalax](https://github.com/xtalax)** (Alex Jones) — Linux testing; diagnosed and
   fixed the `download.kiwix.org` → `lb.download.kiwix.org` redirect so Bash lookups
   follow `-L` and all Kiwix archives download.
+- **[@EnragedAntelope](https://github.com/EnragedAntelope)** — Windows testing and bug
+  reporting; found that the bundled OsmAndMapCreator desktop viewer ships only the Linux
+  native renderer, so the map display is blank on Windows ([#15](https://github.com/elhajahmadj/offline-emergency-library/issues/15)).
 
 Want to help? See [CONTRIBUTING](.github/CONTRIBUTING.md) and the open issues —
 testers for the macOS/Linux installers are especially welcome.
