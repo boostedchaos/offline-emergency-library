@@ -274,6 +274,41 @@ Both pages link to each component's guide:
 
 ---
 
+## 🧪 Keep it safe: two copies + CHECK-DRIVE
+
+A single drive is a single point of failure: it can be lost, dropped, or slowly corrupted
+(bit rot). Do these three things:
+
+1. **Keep two copies.** Copy the whole `OfflineLibrary` folder to a second drive, and store
+   that drive in a different place.
+2. **Check both drives every few months.** At the end of every install, the installer writes
+   **`CHECKSUMS-SHA256.txt`**: one SHA-256 fingerprint for every file on the drive. It also
+   puts **CHECK-DRIVE** next to it, which re-reads every file and prints only the problems.
+   It ends with `RESULT: ALL <n> FILES OK.` or a list of damaged or missing files.
+3. **Fix a damaged file** by copying it from the other drive. Or delete it and re-run the
+   installer, which downloads anything that is missing (it does not re-check files that are
+   already there).
+
+| OS | Double-click | Or in a terminal, inside the `OfflineLibrary` folder |
+|---|---|---|
+| Windows | `CHECK-DRIVE.bat` | `powershell -ExecutionPolicy Bypass -File check-drive.ps1` |
+| macOS | `CHECK-DRIVE.command` | `shasum -a 256 -c -q CHECKSUMS-SHA256.txt` |
+| Linux | — | `sha256sum -c --quiet CHECKSUMS-SHA256.txt` |
+
+The list uses relative paths (`./Medical/...`), so it works on a copy too: run CHECK-DRIVE on
+the second drive the same way. On a large drive a full check reads every byte, so it takes a
+while (roughly the time it takes to copy the drive).
+
+**exFAT** is the best format for a drive used on Windows, macOS and Linux, but it has no
+journal: pulling the drive out during a write can damage files. Always **eject** it first.
+macOS also writes small `._*` files on exFAT drives; CHECK-DRIVE ignores them.
+
+> `CHECKSUMS-SHA256.txt` on the drive covers the **library**. The repo's
+> [`SHA256SUMS.txt`](SHA256SUMS.txt) covers only the **installer scripts** (see
+> Trust & verification above).
+
+---
+
 ## Options (optional, for small drives)
 
 | Flag | Effect |
