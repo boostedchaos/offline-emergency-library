@@ -165,6 +165,24 @@ fetch(){ # url out
   }
   [ -s "$2" ] || { log "ERROR: download is missing or empty: $2"; exit 1; }
 }
+# Size of a remote file in bytes after redirects (empty if the server does not say).
+remote_size(){ curl -sIL -A "${UA:-Mozilla/5.0}" "$1" 2>/dev/null | tr -d '\r' | awk 'tolower($1)=="content-length:"{n=$2} END{if(n>0)print n}'; }
+# fetch_sized url out bytes: for a file whose name stays the same when the source
+# publishes a new edition (#57). A file of the right size is kept. Otherwise the new
+# edition goes to a part file whose name carries its size, so a re-run never resumes
+# one edition into another, and it replaces the old file only once it is complete.
+# With no size known, this is a plain fetch.
+fetch_sized(){ # url out bytes
+  [ -n "$3" ] || { fetch "$1" "$2"; return; }
+  if [ -f "$2" ] && [ ! -e "$2.aria2" ] && [ "$(wc -c < "$2" | tr -d ' ')" = "$3" ]; then return 0; fi
+  part="$2.$3.part"
+  for o in "$2".*.part; do [ -e "$o" ] && [ "$o" != "$part" ] && rm -f "$o" "$o.aria2"; done
+  [ -f "$2" ] && log "  re-download: $(basename "$2") (size on disk is not the source's $3 bytes)"
+  fetch "$1" "$part"
+  got="$(wc -c < "$part" | tr -d ' ')"
+  [ "$got" = "$3" ] || { rm -f "$part" "$part.aria2"; log "ERROR: $(basename "$2"): got $got bytes, expected $3. Re-run the installer."; exit 1; }
+  rm -f "$2.aria2"; mv -f "$part" "$2"
+}
 if [ "$USE_ARIA" = 1 ]; then log "Downloader: aria2 (fast, multi-connection)"; else log "Downloader: curl (tip: install 'aria2' for much faster downloads)"; fi
 if [ "$LITE" = 1 ]; then log "Lite preset: 3B AI, medical/survival references and maps for '$REGION' (unless skipped). Size depends on region; use --region for a small area or --skip-maps. Re-run without --lite to add the full library."; fi
 UA="Mozilla/5.0"
@@ -423,20 +441,37 @@ if [ "$SKIP_MAPS" = 0 ]; then
     log "osmand: no maps matched region '$REGION'. Run with --list-regions to see valid names. Skipping maps."
   else
   log "osmand: $n map files for '$REGION'"
-  while IFS= read -r fn; do [ -n "$fn" ] && fetch "https://download.osmand.net/download.php?standard=yes&file=$fn" "$ROOT/OsmAnd/$fn"; done < "$ROOT/OsmAnd/_filelist.txt"
+  # OsmAnd republishes maps under the same name: the index's containerSize (bytes) tells
+  # a current copy from an older edition (#57).
+  while IFS= read -r fn; do
+    [ -n "$fn" ] || continue
+    cs="$(grep -oE "<region [^>]*name=\"$fn\"[^>]*>" "$ROOT/OsmAnd/_index.xml" | head -n1 | grep -oE 'containerSize="[0-9]+"' | grep -oE '[0-9]+')"
+    fetch_sized "https://download.osmand.net/download.php?standard=yes&file=$fn" "$ROOT/OsmAnd/$fn" "$cs"
+  done < "$ROOT/OsmAnd/_filelist.txt"
   fi
 
   # desktop map viewer (OsmAndMapCreator + portable Java) — use maps on a PC, no phone
   log "=== [8b] Desktop map viewer (OsmAndMapCreator + portable Java) ==="
   MVD="$ROOT/OsmAnd/MapViewer-Desktop"; mkdir -p "$MVD/app"
   if [ "$HAVE_UNZIP" = 1 ]; then
-    fetch "https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip" "$MVD/OsmAndMapCreator.zip"
-    unzip -o -q "$MVD/OsmAndMapCreator.zip" -d "$MVD/app"
+    # "latest" URLs keep their file name across new editions: fetch by remote size (#57)
+    mcu="https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip"
+    fetch_sized "$mcu" "$MVD/OsmAndMapCreator.zip" "$(remote_size "$mcu")"
+    # unpack to a new folder; replace the working viewer only if the unpack worked
+    rm -rf "$MVD/app.new"
+    if unzip -o -q "$MVD/OsmAndMapCreator.zip" -d "$MVD/app.new" && [ -f "$MVD/app.new/OsmAndMapCreator.sh" ]; then
+      rm -rf "$MVD/app"; mv "$MVD/app.new" "$MVD/app"
+    else
+      rm -rf "$MVD/app.new"; log "  mapviewer ERROR: could not unpack OsmAndMapCreator.zip (old viewer kept). Delete it and re-run."
+    fi
     jreurl="https://api.adoptium.net/v3/binary/latest/21/ga/${PLAT}/${JARCH}/jre/hotspot/normal/eclipse"
     [ "$PLAT" = mac ] && jreurl="https://api.adoptium.net/v3/binary/latest/21/ga/mac/${JARCH}/jre/hotspot/normal/eclipse"
-    fetch "$jreurl" "$MVD/jre.tar.gz"
-    mkdir -p "$MVD/_jre"; tar -xf "$MVD/jre.tar.gz" -C "$MVD/_jre" 2>/dev/null
-    rm -rf "$MVD/jre"; mv "$MVD/_jre"/*/ "$MVD/jre" 2>/dev/null; rm -rf "$MVD/_jre"
+    fetch_sized "$jreurl" "$MVD/jre.tar.gz" "$(remote_size "$jreurl")"
+    rm -rf "$MVD/_jre"; mkdir -p "$MVD/_jre"; tar -xf "$MVD/jre.tar.gz" -C "$MVD/_jre" 2>/dev/null
+    if [ -n "$(find "$MVD/_jre" -name java -type f 2>/dev/null | head -n1)" ]; then
+      rm -rf "$MVD/jre"; mv "$MVD/_jre"/*/ "$MVD/jre" 2>/dev/null
+    else log "  mapviewer ERROR: could not unpack jre.tar.gz (old Java kept). Delete it and re-run."; fi
+    rm -rf "$MVD/_jre"
     cat > "$MVD/VIEW-MAPS-ON-PC.sh" <<'EOS'
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -504,7 +539,7 @@ if [ "$SKIP_MAPS" = 0 ] && [ "$BROWSER_MAPS" = 1 ]; then
   if [ -s "$MB/_ok.txt" ]; then printf '[%s]\n' "$(sed 's/.*/"&"/' "$MB/_ok.txt" | paste -sd, -)" > "$MB/regions.json"; fi
   rm -f "$MB/_ok.txt"
   # map style, fonts and symbols (one archive, no symlinks inside)
-  fetch "$NM/base-assets.tar.gz" "$MB/base-assets.tar.gz"
+  fetch_sized "$NM/base-assets.tar.gz" "$MB/base-assets.tar.gz" "$(remote_size "$NM/base-assets.tar.gz")"   # same name on every update (#57)
   rm -rf "$MB/assets-new"; mkdir -p "$MB/assets-new"
   if tar -xzf "$MB/base-assets.tar.gz" -C "$MB/assets-new" 2>/dev/null && [ -f "$MB/assets-new/tozip/nomad-base-styles.json" ]; then
     rm -rf "$MB/assets"; mv "$MB/assets-new/tozip" "$MB/assets"

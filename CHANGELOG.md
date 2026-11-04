@@ -150,6 +150,19 @@ hardware.
 - **Browser maps: total map size stated.** HOW-TO-VIEW-MAPS, the README options table and the skill now say that browser maps come on top of the OsmAnd maps, so a full US drive with `-BrowserMaps` needs about 34 GB for maps (16.5 + 17.8 GB, measured on a real install). Suggested in #15. _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #58._
 
 ### Fixed
+- **A re-run no longer keeps or corrupts downloads whose name stays the same.** OsmAnd maps,
+  OsmAndMapCreator (nightly), the portable Java runtime and the browser-maps style archive
+  keep their file name when the source publishes a new edition, so a re-run resumed the new
+  edition into the old file (`curl -C -` / `aria2 -c`): a smaller old copy became a spliced,
+  corrupt file, and a larger one was kept as "complete". Both installers now compare the
+  file on disk with the source's size (OsmAnd's `containerSize` from `get_indexes` for maps,
+  the server's `Content-Length` for the "latest" URLs). A file of the right size is kept;
+  otherwise the new edition downloads to `<name>.<bytes>.part`, so a resume never mixes
+  editions, and it replaces the old file only once it is complete and the right size. The
+  desktop viewer and its Java runtime now unpack to a new folder and replace the working
+  copy only if the unpack worked, so a bad archive no longer leaves a half-overwritten
+  viewer. If a server gives no size, the download behaves as before. Resolves #57, the same
+  class of bug as #35. _Reported by [@EnragedAntelope](https://github.com/EnragedAntelope) — issue #57._
 - **Blank desktop map on Windows now has a working path.** The bundled OsmAndMapCreator
   viewer ships a Linux-only native renderer, so on some Windows PCs the window opens with a
   blank map. Rather than patch that Java build, the kit now steers Windows users to the

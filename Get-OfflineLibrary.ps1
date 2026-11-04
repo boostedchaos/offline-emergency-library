@@ -120,6 +120,35 @@ function Fetch($url,$out){
   }
 }
 function UA(){ 'Mozilla/5.0' }
+# Size of a remote file in bytes after redirects ('' if the server does not say).
+function Remote-Size($url){
+  $n = ''
+  foreach($l in (curl.exe -sIL -A (UA) $url 2>$null)){ if("$l" -match '^\s*content-length:\s*(\d+)'){ $n = $Matches[1] } }
+  if($n -and [int64]$n -gt 0){ $n } else { '' }
+}
+# Fetch-Sized url out bytes: for a file whose name stays the same when the source
+# publishes a new edition (#57). A file of the right size is kept. Otherwise the new
+# edition goes to a part file whose name carries its size, so a re-run never resumes
+# one edition into another, and it replaces the old file only once it is complete.
+# With no size known, this is a plain Fetch.
+function Fetch-Sized($url,$out,$bytes){
+  if(-not $bytes){ Fetch $url $out; return }
+  if((Test-Path $out -PathType Leaf) -and -not (Test-Path "$out.aria2") -and (Get-Item $out).Length -eq [int64]$bytes){ return }
+  $part = "$out.$bytes.part"
+  Get-ChildItem -Path (Split-Path $out -Parent) -Filter ((Split-Path $out -Leaf) + '.*.part') -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -ne $part } |
+    ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue; Remove-Item -LiteralPath ($_.FullName + '.aria2') -Force -ErrorAction SilentlyContinue }
+  if(Test-Path $out -PathType Leaf){ Log "  re-download: $(Split-Path $out -Leaf) (size on disk is not the source's $bytes bytes)" }
+  Fetch $url $part
+  $got = (Get-Item $part).Length
+  if($got -ne [int64]$bytes){
+    Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue; Remove-Item -LiteralPath "$part.aria2" -Force -ErrorAction SilentlyContinue
+    Log "ERROR: $(Split-Path $out -Leaf): got $got bytes, expected $bytes. Re-run the installer."
+    exit 1
+  }
+  Remove-Item -LiteralPath "$out.aria2" -Force -ErrorAction SilentlyContinue
+  Move-Item -LiteralPath $part -Destination $out -Force
+}
 if($UseAria){ Log 'Downloader: aria2 (fast, multi-connection)' } else { Log "Downloader: curl (tip: install 'aria2' for much faster downloads)" }
 if($Lite){ Log "Lite preset: 3B AI, medical/survival references and maps for '$Region' (unless skipped). Size depends on region; use -Region for a small area or -SkipMaps. Re-run without -Lite to add the full library." }
 
@@ -401,9 +430,11 @@ if(-not $SkipMaps){
       $mb = ($sel | Measure-Object -Property size -Sum).Sum
       Log ("osmand: {0} map files for '{1}' (~{2:N1} GB download)" -f $sel.Count, $Region, ($mb/1024))
       if($mb -gt 40000){ Log ("WARNING: that's ~{0:N0} GB of maps - make sure you have room (and time)." -f ($mb/1024)) }
+      # OsmAnd republishes maps under the same name: the index's containerSize (bytes)
+      # tells a current copy from an older edition (#57).
       foreach($r in $sel){
         $out = Join-Path $Root "OsmAnd\$($r.name)"
-        Fetch "https://download.osmand.net/download.php?standard=yes&file=$($r.name)" $out
+        Fetch-Sized "https://download.osmand.net/download.php?standard=yes&file=$($r.name)" $out $r.containerSize
       }
     }
   }catch{ Log "osmand ERROR: $($_.Exception.Message)" }
@@ -417,25 +448,41 @@ if(-not $SkipMaps){
   try{
     $mc = Join-Path $mvd 'OsmAndMapCreator.zip'
     Log 'mapviewer: OsmAndMapCreator'
-    Fetch 'https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip' $mc
-    Expand-Archive $mc -DestinationPath (Join-Path $mvd 'app') -Force
-    # if the zip nested everything in a single subfolder, pull it up to \app
-    if(-not (Test-Path (Join-Path $mvd 'app\OsmAndMapCreator.bat'))){
-      $inner = Get-ChildItem (Join-Path $mvd 'app') -Directory | Select-Object -First 1
+    # "latest" URLs keep their file name across new editions: fetch by remote size (#57)
+    $mcu = 'https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip'
+    Fetch-Sized $mcu $mc (Remote-Size $mcu)
+    # unpack to a new folder; replace the working viewer only if the unpack worked.
+    # (PowerShell 5.1 Expand-Archive can "succeed" on a damaged zip with 0 files, so check the file.)
+    $appNew = Join-Path $mvd 'app.new'
+    if(Test-Path $appNew){ Remove-Item $appNew -Recurse -Force }
+    try{ Expand-Archive $mc -DestinationPath $appNew -Force }catch{ Log "  extract failed: $($_.Exception.Message)" }
+    # if the zip nested everything in a single subfolder, pull it up to \app.new
+    if((Test-Path $appNew) -and -not (Test-Path (Join-Path $appNew 'OsmAndMapCreator.bat'))){
+      $inner = Get-ChildItem $appNew -Directory | Select-Object -First 1
       if($inner -and (Test-Path (Join-Path $inner.FullName 'OsmAndMapCreator.bat'))){
-        Get-ChildItem $inner.FullName -Force | Move-Item -Destination (Join-Path $mvd 'app') -Force
+        Get-ChildItem $inner.FullName -Force | Move-Item -Destination $appNew -Force
       }
+    }
+    if(Test-Path (Join-Path $appNew 'OsmAndMapCreator.bat')){
+      $app = Join-Path $mvd 'app'; if(Test-Path $app){ Remove-Item $app -Recurse -Force }
+      Move-Item $appNew $app
+    } else {
+      Remove-Item $appNew -Recurse -Force -ErrorAction SilentlyContinue
+      Log '  mapviewer ERROR: could not unpack OsmAndMapCreator.zip (old viewer kept). Delete it and re-run.'
     }
     $jz = Join-Path $mvd 'jre.zip'
     Log 'mapviewer: portable Java runtime'
-    Fetch 'https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse' $jz
+    $jru = 'https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse'
+    Fetch-Sized $jru $jz (Remote-Size $jru)
     $tmp = Join-Path $mvd '_jre_tmp'
     if(Test-Path $tmp){ Remove-Item $tmp -Recurse -Force }
-    Expand-Archive $jz -DestinationPath $tmp -Force
-    $jreSrc = Get-ChildItem $tmp -Directory | Select-Object -First 1
-    $jreDst = Join-Path $mvd 'jre'
-    if(Test-Path $jreDst){ Remove-Item $jreDst -Recurse -Force }
-    if($jreSrc){ Move-Item $jreSrc.FullName $jreDst }
+    try{ Expand-Archive $jz -DestinationPath $tmp -Force }catch{ Log "  extract failed: $($_.Exception.Message)" }
+    $jreSrc = Get-ChildItem $tmp -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+    if($jreSrc -and (Test-Path (Join-Path $jreSrc.FullName 'bin\java.exe'))){
+      $jreDst = Join-Path $mvd 'jre'
+      if(Test-Path $jreDst){ Remove-Item $jreDst -Recurse -Force }
+      Move-Item $jreSrc.FullName $jreDst
+    } else { Log '  mapviewer ERROR: could not unpack jre.zip (old Java kept). Delete it and re-run.' }
     Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
   }catch{ Log "mapviewer ERROR: $($_.Exception.Message)" }
 
@@ -522,7 +569,7 @@ if((-not $SkipMaps) -and $BrowserMaps){
     }
     if($ok.Count){ [System.IO.File]::WriteAllText((Join-Path $mb 'regions.json'), ('[' + (($ok | ForEach-Object { '"' + $_ + '"' }) -join ',') + "]`n"), [System.Text.UTF8Encoding]::new($false)) }
     # map style, fonts and symbols (one archive, no symlinks inside)
-    $ba = Join-Path $mb 'base-assets.tar.gz'; Fetch "$nm/base-assets.tar.gz" $ba
+    $ba = Join-Path $mb 'base-assets.tar.gz'; Fetch-Sized "$nm/base-assets.tar.gz" $ba (Remote-Size "$nm/base-assets.tar.gz")   # same name on every update (#57)
     $new = Join-Path $mb 'assets-new'; if(Test-Path $new){ Remove-Item $new -Recurse -Force }; New-Item -ItemType Directory -Force $new | Out-Null
     $tarExe = if(Get-Command tar.exe -ErrorAction SilentlyContinue){ 'tar.exe' } else { 'tar' }
     & $tarExe -xzf $ba -C $new 2>$null
