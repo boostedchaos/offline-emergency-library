@@ -16,6 +16,12 @@ hardware.
   sold (giving copies away is fine) and names the non-commercial content: iFixit, the
   *Prolonged Casualty Care* guide, the WHO childbirth references, the two Hesperian books and
   the opt-in Khan Academy archive. Resolves #70. _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #89._
+- **Self-check verifies the AI models.** Both installers now compare every `.gguf` model on
+  the drive with the size and SHA-256 that Hugging Face publishes, so a cut-off or damaged
+  model download ends the run with FINISHED WITH PROBLEMS and names the file, instead of
+  failing later when someone tries to chat. The hash is taken from `CHECKSUMS-SHA256.txt`, so
+  the models are not read twice; an unfinished aria2 download also fails, and no answer from
+  Hugging Face is only a warning. Resolves #71. _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #88._
 - **WHO childbirth and maternal-health references.** Both installers now download two WHO
   PDFs from `iris.who.int` into `Medical/Manuals-PDF/` (~9 MB), each checked to start with
   `%PDF`: *Managing complications in pregnancy and childbirth* (2nd ed., 2017) and *WHO

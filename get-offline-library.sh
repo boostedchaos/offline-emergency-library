@@ -272,18 +272,24 @@ fi
 
 # ================================================================ 2. AI models
 log "=== [2/8] AI chat models (GGUF) ==="
-fetch "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf" "$ROOT/AI-Offline/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+HF="https://huggingface.co/bartowski"
+M3B="$HF/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+M8B="$HF/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+MQ7="$HF/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf"
+TR_MODEL="Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MTR="$HF/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/$TR_MODEL"
+GGUF_URLS="$M3B $M8B $MQ7 $MTR"   # for the self-check (only files on the drive are checked)
+fetch "$M3B" "$ROOT/AI-Offline/models/${M3B##*/}"
 log "model: Llama-3.2-3B done"
 if [ "$SKIP_MODELS" = 0 ]; then
-  fetch "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" "$ROOT/AI-Offline/models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"; log "model: Llama-3.1-8B done"
-  fetch "https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf" "$ROOT/AI-Offline/models/Qwen2.5-7B-Instruct-Q4_K_M.gguf"; log "model: Qwen2.5-7B done"
+  fetch "$M8B" "$ROOT/AI-Offline/models/${M8B##*/}"; log "model: Llama-3.1-8B done"
+  fetch "$MQ7" "$ROOT/AI-Offline/models/${MQ7##*/}"; log "model: Qwen2.5-7B done"
 else
   log "models: large models skipped"
 fi
 # Translator (opt-in): one small multilingual model run by the same engine, so no new runtime.
-TR_MODEL="Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 if [ "$TRANSLATE" = 1 ]; then
-  fetch "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/$TR_MODEL" "$ROOT/AI-Offline/models/$TR_MODEL"; log "model (translator): $TR_MODEL done"
+  fetch "$MTR" "$ROOT/AI-Offline/models/$TR_MODEL"; log "model (translator): $TR_MODEL done"
 else
   log "=== Translator not selected - add --translate to include (~2.5 GB) ==="
 fi
@@ -886,6 +892,30 @@ PEOF
 if [ "$pt" = 0 ]; then sc_warn "no PDF manuals found"
 elif [ -z "$pbad" ]; then sc_pass "$pt PDF files: all start with %PDF"
 else sc_fail "file(s) named .pdf that are not PDFs - delete each one and re-run the installer:$pbad"; fi
+# 5. Every AI model (.gguf) has the size and SHA-256 that Hugging Face publishes, so a cut-off
+#    download is caught (#71). The hash is the one just written to CHECKSUMS-SHA256.txt: no extra read.
+gt=0; gbad=""; gwarn=""
+for u in $GGUF_URLS; do
+  n="${u##*/}"; f="$ROOT/AI-Offline/models/$n"
+  [ -f "$f" ] || continue; gt=$((gt+1))
+  if [ -e "$f.aria2" ]; then gbad="$gbad
+        AI-Offline/models/$n (download not finished)"; continue; fi
+  hd="$(curl -sI --max-time 30 "$u" 2>/dev/null | tr -d '\r')"
+  want="$(printf '%s\n' "$hd" | grep -i '^x-linked-size:' | head -n1 | tr -dc '0-9')"
+  wsha="$(printf '%s\n' "$hd" | grep -i '^x-linked-etag:' | head -n1 | grep -oE '[0-9a-f]{64}')"
+  have="$(awk -v p="./AI-Offline/models/$n" 'substr($0,67)==p{print substr($0,1,64); exit}' "$ROOT/CHECKSUMS-SHA256.txt")"
+  sz="$(wc -c < "$f" | tr -d ' ')"
+  if [ -z "$want" ]; then gwarn="$gwarn $n"
+  elif [ "$sz" != "$want" ]; then gbad="$gbad
+        AI-Offline/models/$n ($sz of $want bytes)"
+  elif [ -n "$wsha" ] && [ "$have" != "$wsha" ]; then gbad="$gbad
+        AI-Offline/models/$n (SHA-256 does not match Hugging Face)"
+  fi
+done
+if [ "$gt" = 0 ]; then sc_warn "no AI models (.gguf) found"
+elif [ -n "$gbad" ]; then sc_fail "AI model(s) not complete or damaged - delete each one and re-run the installer:$gbad"
+elif [ -n "$gwarn" ]; then sc_warn "could not reach Hugging Face to check these AI models (not verified):$gwarn"
+else sc_pass "$gt AI models (.gguf): size and SHA-256 match Hugging Face"; fi
 
 if [ "$SC_FAIL" = 0 ]; then
   log "=== DONE. Open README.html (full index) or START-HERE.html ==="

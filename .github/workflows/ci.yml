@@ -28,6 +28,8 @@ jobs:
             if [ "$expected" != "$actual" ]; then echo "MISMATCH: $file"; fail=1; else echo "ok: $file"; fi
           done < SHA256SUMS.txt
           [ "$fail" = 0 ] || { echo "SHA256SUMS.txt is out of date — regenerate it."; exit 1; }
+      - name: Launcher parity (bash vs PowerShell installer)
+        run: bash .github/scripts/check-launchers.sh
       - name: PowerShell parse + analyze
         shell: pwsh
         run: |

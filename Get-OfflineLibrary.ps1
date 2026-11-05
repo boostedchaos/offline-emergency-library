@@ -260,6 +260,8 @@ if($Translate){
   Log "model (translator): $TrModel"
   Fetch "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/$TrModel" (Join-Path $Root "AI-Offline\models\$TrModel")
 } else { Log '=== Translator not selected - add -Translate to include (~2.5 GB) ===' }
+# Every model the installer can download, for the self-check (only files on the drive are checked).
+$GgufUrls = @($models | ForEach-Object { $_.u }) + "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/$TrModel"
 
 # ================================================================ 3. GPT4All
 Log '=== [3/8] GPT4All (offline document Q&A) ==='
@@ -946,6 +948,27 @@ foreach($f in $pdfs){
 if(-not $pdfs){ ScWarn 'no PDF manuals found' }
 elseif(-not $pbad){ ScPass "$($pdfs.Count) PDF files: all start with %PDF" }
 else { ScFail ("file(s) named .pdf that are not PDFs - delete each one and re-run the installer:`n        " + ($pbad -join "`n        ")) }
+# 5. Every AI model (.gguf) has the size and SHA-256 that Hugging Face publishes, so a cut-off
+#    download is caught (#71). The hash is the one just written to CHECKSUMS-SHA256.txt: no extra read.
+$sums = @{}; foreach($l in $arr){ $sums[$l.Substring(66)] = $l.Substring(0,64) }
+$gn = 0; $gbad = @(); $gwarn = @()
+foreach($u in $GgufUrls){
+  $n = Split-Path $u -Leaf; $p = Join-Path $Root "AI-Offline\models\$n"
+  if(-not (Test-Path -LiteralPath $p -PathType Leaf)){ continue }
+  $gn++
+  if(Test-Path -LiteralPath "$p.aria2"){ $gbad += "AI-Offline/models/$n (download not finished)"; continue }
+  $hd = @(curl.exe -sI --max-time 30 $u 2>$null)
+  $want = ($hd | Where-Object { $_ -match '^x-linked-size:\s*(\d+)' } | Select-Object -First 1) -replace '[^\d]',''
+  $wsha = ''; foreach($h in $hd){ if($h -match '^x-linked-etag:\s*"?([0-9a-f]{64})'){ $wsha = $Matches[1]; break } }
+  $len = (Get-Item -LiteralPath $p).Length
+  if(-not $want){ $gwarn += $n }
+  elseif([int64]$want -ne $len){ $gbad += "AI-Offline/models/$n ($len of $want bytes)" }
+  elseif($wsha -and $sums["./AI-Offline/models/$n"] -ne $wsha){ $gbad += "AI-Offline/models/$n (SHA-256 does not match Hugging Face)" }
+}
+if(-not $gn){ ScWarn 'no AI models (.gguf) found' }
+elseif($gbad){ ScFail ("AI model(s) not complete or damaged - delete each one and re-run the installer:`n        " + ($gbad -join "`n        ")) }
+elseif($gwarn){ ScWarn ("could not reach Hugging Face to check these AI models (not verified): " + ($gwarn -join ' ')) }
+else { ScPass "$gn AI models (.gguf): size and SHA-256 match Hugging Face" }
 
 if($scFail -eq 0){
   Log '=== DONE. Open README.html (full index) or START-HERE.html ==='
