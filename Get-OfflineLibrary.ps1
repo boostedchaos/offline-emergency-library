@@ -28,6 +28,8 @@ param(
   [switch]$Kolibri,          # OPT-IN: add the Kolibri learning app (pick subjects/low-res in-app)
   [switch]$BrowserMaps,      # OPT-IN: street maps in any web browser (US states, ~16.5 GB for all of the US)
   [switch]$ExtraZims,        # OPT-IN: add Wikivoyage travel guide + Wikibooks textbooks (Kiwix ZIM, ~5.8 GB)
+  [switch]$Translate,        # OPT-IN: offline translator (Qwen3 4B model on the AI engine, ~2.5 GB)
+  [switch]$MedlinePlus,      # OPT-IN: MedlinePlus plain-language health topics (public domain, ~30 MB)
   [switch]$NoAria            # force curl even if aria2c is installed
 )
 
@@ -252,6 +254,12 @@ foreach($m in $models){
   if($SkipModels -and $m.big){ Log "model (skipped): $($m.n)"; continue }
   Log "model: $($m.n)"; Fetch $m.u (Join-Path $Root "AI-Offline\models\$($m.n)")
 }
+# Translator (opt-in): one small multilingual model run by the same engine, so no new runtime.
+$TrModel = 'Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf'
+if($Translate){
+  Log "model (translator): $TrModel"
+  Fetch "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/$TrModel" (Join-Path $Root "AI-Offline\models\$TrModel")
+} else { Log '=== Translator not selected - add -Translate to include (~2.5 GB) ===' }
 
 # ================================================================ 3. GPT4All
 Log '=== [3/8] GPT4All (offline document Q&A) ==='
@@ -349,6 +357,39 @@ if($ExtraZims){
     else { Log "zim: NOT FOUND for prefix $($z.pre)" }
   }
 } else { Log "=== [5d] Extra archives (Wikivoyage + Wikibooks) not selected - add -ExtraZims to include (~5.8 GB) ===" }
+
+# ================================================================ 5e. MedlinePlus (opt-in)
+# Plain-language health topic summaries (English + Spanish) from the US National Library of
+# Medicine's daily XML file: public domain. Only the summaries: the MedlinePlus encyclopedia
+# (A.D.A.M.) and drug pages (ASHP) are copyrighted, so the Kiwix MedlinePlus ZIM is not used.
+# The XML goes inside one offline page (medlineplus\MedlinePlus.html) that lists and searches it.
+if($MedlinePlus){
+  Log '=== [5e] MedlinePlus health topics (public domain, ~30 MB) ==='
+  $md = Join-Path $Root 'Medical\MedlinePlus'; New-Item -ItemType Directory -Force $md | Out-Null
+  $mx = [regex]::Matches((curl.exe -sL -A (UA) 'https://medlineplus.gov/xml.html' | Out-String), 'mplus_topics_\d{4}-\d{2}-\d{2}\.xml') | ForEach-Object {$_.Value} | Sort-Object -Unique | Select-Object -Last 1
+  if($mx){
+    $xf = Join-Path $md $mx
+    Log "medlineplus: $mx"; Fetch "https://medlineplus.gov/xml/$mx" $xf
+    $xt = [System.IO.File]::ReadAllText($xf, [System.Text.Encoding]::UTF8)
+    # '</script' would end the data block early; real topic XML never has it (all HTML is escaped).
+    if(-not $xt.StartsWith('<?xml', [StringComparison]::Ordinal) -or -not $xt.Contains('<health-topics') -or $xt -match '(?i)</script'){
+      Remove-Item -LiteralPath $xf -Force; Log "ERROR: $mx is not MedlinePlus topic XML (removed). Re-run the installer."; exit 1 }
+    $sd = if($PSScriptRoot){$PSScriptRoot}else{(Get-Location).Path}
+    $lp = Join-Path $sd 'medlineplus\MedlinePlus.html'; $tpl = Join-Path $md '_MedlinePlus.html'
+    if(Test-Path $lp){ Copy-Item $lp $tpl -Force }
+    else { curl.exe -fLsS "$RepoRaw/medlineplus/MedlinePlus.html" -A (UA) -o $tpl
+      if($LASTEXITCODE -ne 0){ Log 'ERROR: download failed: medlineplus/MedlinePlus.html'; exit 1 } }
+    $page = [System.IO.File]::ReadAllText($tpl, [System.Text.Encoding]::UTF8)
+    $mark = '<script type="text/xml" id="data"></script>'
+    if(-not $page.Contains($mark)){ Log 'ERROR: medlineplus/MedlinePlus.html has no data marker. Re-run the installer.'; exit 1 }
+    if(-not $xt.EndsWith("`n")){ $xt += "`n" }  # match the Bash awk splice, which always ends the data with a newline
+    $out = Join-Path $md 'MedlinePlus-Health-Topics.html'
+    [System.IO.File]::WriteAllText($out, $page.Replace($mark, '<script type="text/xml" id="data">' + $xt + '</script>'), [System.Text.UTF8Encoding]::new($false))
+    # The page holds all the data: drop the XML (and any older day's copy) and the template.
+    Get-ChildItem -LiteralPath $md -File | Where-Object { $_.Name -like 'mplus_topics_*' -or $_.Name -eq '_MedlinePlus.html' } | Remove-Item -Force
+    Log ("medlineplus: Medical\MedlinePlus\MedlinePlus-Health-Topics.html ({0:N0} MB)" -f ((Get-Item $out).Length/1MB))
+  } else { Log 'medlineplus: NOT FOUND (no topic file listed on medlineplus.gov/xml.html)' }
+} else { Log '=== [5e] MedlinePlus health topics not selected - add -MedlinePlus to include (~30 MB) ===' }
 
 # ================================================================ 6. PDFs (Internet Archive)
 Log '=== [6/8] Public-domain manuals (PDF) ==='
@@ -711,6 +752,21 @@ WriteSh 'chat-8B-smart.sh'   'llama-cli'    'Meta-Llama-3.1-8B-Instruct-Q4_K_M.g
 WriteSh 'chat-GPU-Qwen7B.sh' 'llama-cli'    'Qwen2.5-7B-Instruct-Q4_K_M.gguf'        '1' '-c 4096 -ngl 99' 'Offline AI - Qwen2.5 7B on the GPU (Metal on a Mac, Vulkan on Linux).'
 }
 WriteSh 'web-ui.sh'          'llama-server' 'Llama-3.2-3B-Instruct-Q4_K_M.gguf'      '0' '-c 4096 --host 127.0.0.1 --port 8080' "Open http://127.0.0.1:8080 when it says 'server is listening'."
+if($Translate){
+# Same text as get-offline-library.sh. No batch special characters in the prompt or notes.
+$TrArgs = '-c 4096 --temp 0.2 -sys "You are an interpreter between two people. Their first message names two languages: reply only with Ready. After that, for every message: if it is written in the first language, translate it into the second language; if it is written in the second language, translate it into the first language. Never repeat a message in the language it was written in. Write only the translation, with no notes. Keep names, numbers, doses and times exactly as written."'
+WriteBat (Join-Path $ao 'TRANSLATE.bat') @"
+@echo off
+title Offline translator - Qwen3 4B
+cd /d "%~dp0"
+echo Offline translator. First type the two languages, for example: English and Spanish. Then type what to translate.
+echo Check anything about medicine, doses or safety by translating it back. Use short, simple sentences.
+echo The AI is a helper for finding and summarizing info - for anything safety-critical, follow the bundled manuals.
+"%~dp0engine\x64\llama-cli.exe" -m "%~dp0models\$TrModel" $TrArgs
+pause
+"@
+WriteSh 'translate.sh' 'llama-cli' $TrModel '0' $TrArgs 'Offline translator. First type the two languages, for example: English and Spanish. Check anything about medicine, doses or safety by translating it back. Ctrl+C to quit.'
+}
 
 # ================================================================ documentation
 Log '=== Documentation (Markdown + HTML) ==='
@@ -736,6 +792,7 @@ PlaceDoc 'EMERGENCY-ESSENTIALS.md'  (Join-Path $Root 'EMERGENCY-ESSENTIALS')    
 PlaceDoc 'POWER-AND-DEVICES.md'     (Join-Path $Root 'POWER-AND-DEVICES')                           'Power and devices'
 PlaceDoc 'HOW-TO-RUN-OFFLINE-AI.md' (Join-Path $Root 'AI-Offline\HOW-TO-RUN-OFFLINE-AI')            'Offline AI - How To Run'
 PlaceDoc 'HOW-TO-ASK-YOUR-DOCS.md'  (Join-Path $Root 'AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS') 'Ask Your Documents - GPT4All'
+PlaceDoc 'HOW-TO-TRANSLATE.md'      (Join-Path $Root 'AI-Offline\HOW-TO-TRANSLATE')                 'Offline translator - How To'
 PlaceDoc 'HOW-TO-USE-KIWIX.md'      (Join-Path $Root 'Kiwix-Reader\HOW-TO-USE-KIWIX')               'How to Use Kiwix'
 PlaceDoc 'Manuals-READ-ME-FIRST.md' (Join-Path $Root 'Manuals\READ-ME-FIRST')                       'Manuals - Read Me First'
 PlaceDoc 'Medical-READ-ME-FIRST.md' (Join-Path $Root 'Medical\READ-ME-FIRST')                       'Medical - Read Me First'

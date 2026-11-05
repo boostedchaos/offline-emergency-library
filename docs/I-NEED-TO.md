@@ -42,6 +42,10 @@ bookmarks or search (Ctrl+F) for the words in **bold**.
 Wikipedia) and `Medical\zimgit-medicine\` (first-aid guide). See the
 [medical read-me](Medical/READ-ME-FIRST.html).
 
+**What is this illness, symptom or test?** If you added it (`-MedlinePlus` /
+`--medlineplus`), [MedlinePlus health topics](Medical/MedlinePlus/MedlinePlus-Health-Topics.html)
+explains health problems and tests in plain language (English and Spanish), in any browser.
+
 ---
 
 ## 💧 Water, food, shelter
@@ -63,6 +67,7 @@ Wikipedia) and `Medical\zimgit-medicine\` (first-aid guide). See the
 |---|---|
 | **Call for help by radio** | [Radio guide](Manuals/Radio-Communications/RADIO-GUIDE.html) — how to call for help; which radio to use |
 | **Find the right frequency / channel** | [Radio frequency reference](Manuals/Radio-Communications/RADIO-FREQUENCIES.html) — weather, marine, FRS/GMRS, aviation, beacons |
+| **Talk with someone who speaks another language** | [Offline translator](AI-Offline/HOW-TO-TRANSLATE.html) (if you added `-Translate`) - short, simple sentences; check doses and numbers by translating back |
 | **Navigate without GPS / phone signal** | [Map and compass guide](OsmAnd/MAP-AND-COMPASS.html) (no device needed) · [How to view the maps](OsmAnd/HOW-TO-VIEW-MAPS.html) (OsmAnd, or `Maps-Browser\` if you added `-BrowserMaps`) · [FM 21-76 Survival](Manuals/ArmyFieldManuals/FM%2021-76%20Army%20Survival%20Manual.pdf) (search **"navigation"** / **"compass"**) |
 
 ---

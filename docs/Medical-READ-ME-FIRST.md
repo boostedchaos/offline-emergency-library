@@ -21,6 +21,30 @@ Also relevant: the **Army first-aid manuals** in `E:\Manuals\ArmyFieldManuals\`.
 
 ---
 
+## MedlinePlus health topics (opt-in)
+
+If the drive was made with `-MedlinePlus` (Windows) or `--medlineplus` (macOS/Linux), open
+[MedlinePlus/MedlinePlus-Health-Topics.html](MedlinePlus/MedlinePlus-Health-Topics.html) in
+any web browser. It is one page of plain-language health topics in English and
+the same in Spanish: what an illness, symptom or test is, and what to do about it. Type in the
+search box (a symptom, illness, test or body part), or switch language with the buttons.
+
+This is **consumer reference, not clinical advice**: the summaries are written for the public
+and do not cover doses, procedures or emergency treatment. For first aid use the books above.
+
+**What is not included:** MedlinePlus's Medical Encyclopedia (A.D.A.M.) and its drug and
+supplement pages (American Society of Health-System Pharmacists) are copyrighted and licensed
+to NLM only, so they are not on this drive. Links to them in a summary need internet.
+
+**Source and license:** the health topic summaries come from the official MedlinePlus XML
+file published by the US National Library of Medicine (https://medlineplus.gov/xml.html),
+downloaded when the drive was made (the page shows the date). NLM states that health topic
+summaries are not copyrighted (public domain) and asks for this credit: *Source: MedlinePlus,
+National Library of Medicine* (https://medlineplus.gov/about/using/usingcontent/). Images
+are not included.
+
+---
+
 ## Childbirth and maternal health
 
 **Seek skilled medical help and arrange transport whenever possible.** These WHO

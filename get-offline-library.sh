@@ -8,11 +8,13 @@
 #   flags: --lite  --skip-wikipedia  --skip-maps  --skip-models
 #   opt-in: --browser-maps   street maps in any web browser (US states, ~16.5 GB for all of the US)
 #   opt-in: --extra-zims     Wikivoyage travel guide + Wikibooks textbooks (Kiwix ZIM, ~5.8 GB)
+#   opt-in: --translate      offline translator (Qwen3 4B model on the AI engine, ~2.5 GB)
+#   opt-in: --medlineplus    MedlinePlus plain-language health topics (public domain, ~30 MB)
 
 REPO_RAW="https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main"
 DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0; LITE=0
 REGION="US"; LISTREGIONS=0; FILTER=""
-EDU=0; EDULANG="en"; KOLIBRI=0; BROWSER_MAPS=0; EXTRA_ZIMS=0
+EDU=0; EDULANG="en"; KOLIBRI=0; BROWSER_MAPS=0; EXTRA_ZIMS=0; TRANSLATE=0; MEDLINEPLUS=0
 CONTINENTS="africa asia australia-oceania centralamerica europe northamerica southamerica"
 # Map common names / ISO codes to the OsmAnd region token. Unknown input passes through.
 alias_region(){
@@ -67,6 +69,8 @@ while [ $# -gt 0 ]; do
     --edu-lang)       EDULANG="$2"; shift 2;;
     --kolibri)        KOLIBRI=1; shift;;
     --extra-zims)     EXTRA_ZIMS=1; shift;;
+    --translate)      TRANSLATE=1; shift;;
+    --medlineplus)    MEDLINEPLUS=1; shift;;
     --lite)           LITE=1; shift;;
     --browser-maps)   BROWSER_MAPS=1; shift;;
     --skip-wikipedia) SKIP_WIKI=1; shift;;
@@ -276,6 +280,13 @@ if [ "$SKIP_MODELS" = 0 ]; then
 else
   log "models: large models skipped"
 fi
+# Translator (opt-in): one small multilingual model run by the same engine, so no new runtime.
+TR_MODEL="Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+if [ "$TRANSLATE" = 1 ]; then
+  fetch "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/$TR_MODEL" "$ROOT/AI-Offline/models/$TR_MODEL"; log "model (translator): $TR_MODEL done"
+else
+  log "=== Translator not selected - add --translate to include (~2.5 GB) ==="
+fi
 
 # ================================================================ 3. GPT4All
 log "=== [3/8] GPT4All (offline document Q&A) ==="
@@ -361,6 +372,41 @@ if [ "$EXTRA_ZIMS" = 1 ]; then
   add_zim "https://download.kiwix.org/zim/wikibooks/"  "wikibooks_en_all_maxi_"  "$ROOT/Extra-Archives/Wikibooks"
 else
   log "=== [5d] Extra archives (Wikivoyage + Wikibooks) not selected - add --extra-zims to include (~5.8 GB) ==="
+fi
+
+# ================================================================ 5e. MedlinePlus (opt-in)
+# Plain-language health topic summaries (English + Spanish) from the US National Library of
+# Medicine's daily XML file: public domain. Only the summaries: the MedlinePlus encyclopedia
+# (A.D.A.M.) and drug pages (ASHP) are copyrighted, so the Kiwix MedlinePlus ZIM is not used.
+# The XML goes inside one offline page (medlineplus/MedlinePlus.html) that lists and searches it.
+if [ "$MEDLINEPLUS" = 1 ]; then
+  log "=== [5e] MedlinePlus health topics (public domain, ~30 MB) ==="
+  md="$ROOT/Medical/MedlinePlus"; mkdir -p "$md"
+  mx="$(curl -sL -A "$UA" 'https://medlineplus.gov/xml.html' | grep -oE 'mplus_topics_[0-9]{4}-[0-9]{2}-[0-9]{2}\.xml' | sort -u | tail -n1)"
+  if [ -n "$mx" ]; then
+    log "medlineplus: $mx"; fetch "https://medlineplus.gov/xml/$mx" "$md/$mx"
+    # '</script' would end the data block early; real topic XML never has it (all HTML is escaped).
+    if [ "$(head -c 5 "$md/$mx")" != "<?xml" ] || ! grep -q '<health-topics' "$md/$mx" || grep -qi '</script' "$md/$mx"; then
+      rm -f "$md/$mx"; log "ERROR: $mx is not MedlinePlus topic XML (removed). Re-run the installer."; exit 1
+    fi
+    SD="$(cd "$(dirname "$0")" && pwd)"; tpl="$md/_MedlinePlus.html"
+    if [ -f "$SD/medlineplus/MedlinePlus.html" ]; then cp "$SD/medlineplus/MedlinePlus.html" "$tpl"
+    else curl -fLsS -A "$UA" "$REPO_RAW/medlineplus/MedlinePlus.html" -o "$tpl" || { log "ERROR: download failed: medlineplus/MedlinePlus.html"; exit 1; }; fi
+    mark='<script type="text/xml" id="data"></script>'
+    grep -qF "$mark" "$tpl" || { log "ERROR: medlineplus/MedlinePlus.html has no data marker. Re-run the installer."; exit 1; }
+    awk -v mark="$mark" -v xf="$md/$mx" '{ i = index($0, mark)
+      if (!i) { print; next }
+      printf "%s<script type=\"text/xml\" id=\"data\">", substr($0, 1, i - 1)
+      while ((getline l < xf) > 0) print l
+      printf "</script>%s\n", substr($0, i + length(mark)) }' "$tpl" > "$md/MedlinePlus-Health-Topics.html"
+    # The page holds all the data: drop the XML (and any older day's copy) and the template.
+    rm -f "$md"/mplus_topics_* "$tpl"
+    log "medlineplus: Medical/MedlinePlus/MedlinePlus-Health-Topics.html ($(( ($(wc -c < "$md/MedlinePlus-Health-Topics.html") + 524288) / 1048576 )) MB)"
+  else
+    log "medlineplus: NOT FOUND (no topic file listed on medlineplus.gov/xml.html)"
+  fi
+else
+  log "=== [5e] MedlinePlus health topics not selected - add --medlineplus to include (~30 MB) ==="
 fi
 
 # ================================================================ 6. PDFs
@@ -638,6 +684,13 @@ make_bat "CHAT-GPU-Qwen7B.bat" "Offline AI - Qwen2.5 7B (GPU)"     'engine\vulka
 echo number (e.g. -ngl 20) or use a CPU launcher instead.'
 fi
 make_bat "WEB-UI.bat"          "Offline AI - Web UI"               'engine\x64\llama-server.exe' "Llama-3.2-3B-Instruct-Q4_K_M.gguf" "-c 4096 --host 127.0.0.1 --port 8080" 'echo When it says "server listening", open a browser to http://127.0.0.1:8080'
+if [ "$TRANSLATE" = 1 ]; then
+# Same text as Get-OfflineLibrary.ps1. No batch special characters, and no | & or \ (sed) in the prompt or notes.
+TR_ARGS='-c 4096 --temp 0.2 -sys "You are an interpreter between two people. Their first message names two languages: reply only with Ready. After that, for every message: if it is written in the first language, translate it into the second language; if it is written in the second language, translate it into the first language. Never repeat a message in the language it was written in. Write only the translation, with no notes. Keep names, numbers, doses and times exactly as written."'
+make_bat "TRANSLATE.bat" "Offline translator - Qwen3 4B" 'engine\x64\llama-cli.exe' "$TR_MODEL" "$TR_ARGS" 'echo Offline translator. First type the two languages, for example: English and Spanish. Then type what to translate.
+echo Check anything about medicine, doses or safety by translating it back. Use short, simple sentences.'
+make_sh "translate.sh" llama-cli "$TR_MODEL" 0 "$TR_ARGS" "Offline translator. First type the two languages, for example: English and Spanish. Check anything about medicine, doses or safety by translating it back. Ctrl+C to quit."
+fi
 
 # ================================================================ documentation
 log "=== Documentation (Markdown + HTML) ==="
@@ -658,6 +711,7 @@ place_doc "EMERGENCY-ESSENTIALS"  "$ROOT/EMERGENCY-ESSENTIALS"
 place_doc "POWER-AND-DEVICES"     "$ROOT/POWER-AND-DEVICES"
 place_doc "HOW-TO-RUN-OFFLINE-AI" "$ROOT/AI-Offline/HOW-TO-RUN-OFFLINE-AI"
 place_doc "HOW-TO-ASK-YOUR-DOCS"  "$ROOT/AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS"
+place_doc "HOW-TO-TRANSLATE"      "$ROOT/AI-Offline/HOW-TO-TRANSLATE"
 place_doc "HOW-TO-USE-KIWIX"      "$ROOT/Kiwix-Reader/HOW-TO-USE-KIWIX"
 place_doc "Manuals-READ-ME-FIRST" "$ROOT/Manuals/READ-ME-FIRST"
 place_doc "Medical-READ-ME-FIRST" "$ROOT/Medical/READ-ME-FIRST"

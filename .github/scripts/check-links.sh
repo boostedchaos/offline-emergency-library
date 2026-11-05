@@ -18,6 +18,7 @@ urls=(
   "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF"
   "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF"
   "https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF"
+  "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF"
   "https://f-droid.org/api/v1/packages/net.osmand.plus"
   "https://archive.org/metadata/fm-21-76-us-army-survival-manual"
   "https://iris.who.int/server/api/core/bitstreams/3bda1306-da5d-487d-b2ad-aff995112a7a/content"
@@ -27,6 +28,7 @@ urls=(
   "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"
   "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"
   "https://unpkg.com/pmtiles@4.4.0/dist/pmtiles.js"
+  "https://medlineplus.gov/xml.html"
 )
 
 check() { # url

@@ -15,6 +15,10 @@ Once this folder is on your drive, you never need the internet again to use it.
 > from the kit's own manuals and *shows the sources it used*, so you can check them - see
 > HOW-TO-ASK-YOUR-DOCS.html. Plain chat is the tool for everything else.
 >
+> **Translator:** if you added `-Translate` / `--translate`, `TRANSLATE.bat` / `translate.sh`
+> is a two-way translator for talking with someone in another language - see
+> HOW-TO-TRANSLATE.html.
+>
 > **Lite installs:** `--lite` / `-Lite` does **not** include GPT4All, so a lite drive has
 > only the plain chat model with **no source-citing RAG**. Treat its answers as *leads* and
 > verify anything safety-critical against the manuals. To add the citing workflow, re-run the

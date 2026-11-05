@@ -12,6 +12,10 @@ Contributor-driven reliability and portability work, from people running the kit
 hardware.
 
 ### Added
+- **README: resale note.** The License section now says a drive made with this kit cannot be
+  sold (giving copies away is fine) and names the non-commercial content: iFixit, the
+  *Prolonged Casualty Care* guide, the WHO childbirth references, the two Hesperian books and
+  the opt-in Khan Academy archive. Resolves #70. _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #89._
 - **WHO childbirth and maternal-health references.** Both installers now download two WHO
   PDFs from `iris.who.int` into `Medical/Manuals-PDF/` (~9 MB), each checked to start with
   `%PDF`: *Managing complications in pregnancy and childbirth* (2nd ed., 2017) and *WHO
@@ -135,6 +139,21 @@ hardware.
   included:** download.kiwix.org no longer lists it (the newest copy is a 2023 archive build of
   ~51 GB), and wikiHow stopped licensing new user content under CC BY-NC-SA 3.0 on
   24 March 2025. The CI link check now covers the two new Kiwix folders.
+- **Offline translator (opt-in): `-Translate` / `--translate`.** Both installers can add
+  Qwen3-4B-Instruct-2507 (Q4_K_M, ~2.5 GB, Apache 2.0) and `AI-Offline/TRANSLATE.bat` /
+  `translate.sh`, a two-way text translator for talking with someone who speaks another
+  language. It runs on the bundled llama.cpp engine, so no Python or other runtime is added;
+  it needs about 6 GB RAM. Off by default. The new `HOW-TO-TRANSLATE` guide covers the checks
+  that catch mistakes and which languages worked in testing (weak for Swahili, Somali and
+  Amharic). Resolves #21. _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #62._
+- **MedlinePlus health topics (opt-in): `-MedlinePlus` / `--medlineplus`.** Both installers can
+  add the MedlinePlus health topic summaries from the US National Library of Medicine (public
+  domain), English and Spanish, as one searchable page that opens offline in any browser:
+  `Medical/MedlinePlus/MedlinePlus-Health-Topics.html` (~30 MB). It is built from NLM's
+  official XML file, not the Kiwix MedlinePlus ZIM, because the ZIM also contains the
+  copyrighted A.D.A.M. encyclopedia and ASHP drug pages; those are not included. The page
+  makes no network requests. Off by default. Resolves #64.
+  _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #87._
 
 ### Changed
 - **Lite no longer leaves the AI's trust gap silent.** `--lite` / `-Lite` still omits GPT4All

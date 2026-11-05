@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>MedlinePlus health topics (offline)</title>
+<style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;color:var(--accent)}h2{font-size:24px;border-bottom:2px solid var(--line);padding-bottom:6px}h3{font-size:18px;color:var(--accent)}h4{font-size:16px;color:var(--accent2)}a{color:var(--accent)}.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent2);border-radius:10px;padding:12px 16px;margin:14px 0}.muted{color:var(--muted);font-size:14px}input{width:100%;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}button{font:inherit;padding:6px 14px;margin:0 6px 10px 0;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:bold}#list{padding-left:22px}#list li{margin:4px 0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}</style>
+</head><body><div class="wrap">
+<h1>MedlinePlus health topics (offline)</h1>
+<div class="note"><b>Plain-language reference, not medical advice.</b> These summaries explain health problems, tests and healthy habits for the public. They cannot diagnose you or replace a doctor, nurse or pharmacist. In an emergency, get medical help whenever you can.</div>
+<p><button type="button" data-lang="English">English</button><button type="button" data-lang="Spanish" lang="es">Espa&ntilde;ol</button></p>
+<input id="q" type="search" placeholder="Search: a symptom, illness, test, or body part" aria-label="Search health topics">
+<p id="count" class="muted" aria-live="polite"></p>
+<ul id="list"></ul>
+<article id="topic" hidden></article>
+<hr>
+<p class="muted">Source: MedlinePlus, National Library of Medicine (<a href="https://medlineplus.gov/">medlineplus.gov</a>). These health topic summaries are US government works in the public domain. Links that leave this page need internet. <span id="when"></span></p>
+</div>
+<script type="text/xml" id="data"></script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var raw = $('data').textContent.trim();
+  if(!raw){ $('count').textContent = 'No topics in this copy. Re-run the installer with -MedlinePlus (Windows) or --medlineplus (macOS/Linux).'; return; }
+  var xml = new DOMParser().parseFromString(raw, 'application/xml');
+  if(xml.getElementsByTagName('parsererror').length){ $('count').textContent = 'The topic data in this file is damaged. Re-run the installer to rebuild it.'; return; }
+  $('when').textContent = 'Downloaded from MedlinePlus: ' + (xml.documentElement.getAttribute('date-generated') || 'date unknown') + '.';
+
+  function texts(el, tag){ var out = [], n = el.getElementsByTagName(tag); for(var i = 0; i < n.length; i++) out.push(n[i].textContent); return out; }
+  function norm(u){ return (u || '').replace(/^http:/i, 'https:').replace('://www.', '://').split('#')[0]; }
+  var all = {}, byUrl = {}, lists = {}, lang = 'English';
+  var hs = xml.getElementsByTagName('health-topic');
+  for(var i = 0; i < hs.length; i++){
+    var h = hs[i], m = h.getElementsByTagName('language-mapped-topic')[0];
+    var t = { id: h.getAttribute('id'), title: h.getAttribute('title') || '', url: h.getAttribute('url') || '',
+      lang: h.getAttribute('language') || 'English', also: texts(h, 'also-called'), groups: texts(h, 'group'),
+      sum: texts(h, 'full-summary').join(''), other: m ? m.getAttribute('id') : null };
+    t.key = [t.title].concat(t.also, texts(h, 'see-reference')).join(' | ').toLowerCase();
+    all[t.id] = t; byUrl[norm(t.url)] = t.id; (lists[t.lang] = lists[t.lang] || []).push(t);
+  }
+
+  // Summaries are HTML. Rebuild them from an inert copy: keep simple text markup, drop
+  // anything active or remote (scripts, styles, images), and point topic links at this page.
+  var KEEP = /^(p|ul|ol|li|a|h2|h3|h4|strong|b|em|i|u|br|table|thead|tbody|tr|th|td)$/;
+  var DROP = /^(script|style|img|iframe|object|embed|svg|link|meta|form|input|button|textarea|select|video|audio|source|picture)$/;
+  function link(href, text){ var a = document.createElement('a'); a.href = href; a.textContent = text; return a; }
+  function clean(node){
+    for(var c = node.firstChild; c; ){
+      var next = c.nextSibling;
+      if(c.nodeType === 1){
+        var tag = c.tagName.toLowerCase();
+        if(DROP.test(tag)){ node.removeChild(c); }
+        else if(tag === 'topic'){ var tid = c.getAttribute('id'), lt = c.getAttribute('linktext') || c.textContent;
+          node.replaceChild(all[tid] ? link('#t' + tid, lt) : document.createTextNode(lt), c); }
+        else {
+          clean(c);
+          if(!KEEP.test(tag)){ while(c.firstChild) node.insertBefore(c.firstChild, c); node.removeChild(c); }
+          else {
+            var href = tag === 'a' ? (c.getAttribute('href') || '') : '';
+            while(c.attributes.length) c.removeAttribute(c.attributes[0].name);
+            if(href){ var id = byUrl[norm(href)]; if(id) c.setAttribute('href', '#t' + id); else if(/^https?:/i.test(href)) c.setAttribute('href', href); }
+          }
+        }
+      } else if(c.nodeType !== 3){ node.removeChild(c); }
+      c = next;
+    }
+  }
+  function para(cls, text){ var p = document.createElement('p'); if(cls) p.className = cls; if(text) p.textContent = text; return p; }
+
+  function showTopic(t){
+    var art = $('topic'); art.textContent = ''; art.lang = t.lang === 'Spanish' ? 'es' : 'en';
+    var back = para(); back.appendChild(link('#', t.lang === 'Spanish' ? '< Todos los temas' : '< All topics')); art.appendChild(back);
+    var h = document.createElement('h2'); h.textContent = t.title; art.appendChild(h);
+    if(t.also.length) art.appendChild(para('muted', (t.lang === 'Spanish' ? 'Otros nombres: ' : 'Also called: ') + t.also.join(', ')));
+    var body = new DOMParser().parseFromString(t.sum, 'text/html').body; clean(body);
+    while(body.firstChild) art.appendChild(body.firstChild);
+    if(t.groups.length) art.appendChild(para('muted', (t.lang === 'Spanish' ? 'Grupos: ' : 'Groups: ') + t.groups.join(', ')));
+    var p = para('muted');
+    if(t.other && all[t.other]){ p.appendChild(link('#t' + t.other, t.lang === 'Spanish' ? 'Read in English' : 'Leer en español')); p.appendChild(document.createTextNode(' · ')); }
+    p.appendChild(link(t.url, t.lang === 'Spanish' ? 'Versión en línea (necesita internet)' : 'Online version (needs internet)'));
+    art.appendChild(p);
+    art.hidden = false; $('list').hidden = true; $('count').textContent = ''; window.scrollTo(0, 0);
+  }
+
+  function showList(){
+    $('topic').hidden = true; $('list').hidden = false;
+    var q = $('q').value.trim().toLowerCase(), src = lists[lang] || [], hit = [], more = [];
+    for(var i = 0; i < src.length; i++){
+      var t = src[i];
+      if(!q || t.key.indexOf(q) >= 0) hit.push(t);
+      else { if(t.text === undefined) t.text = t.sum.replace(/<[^>]*>/g, ' ').toLowerCase(); if(t.text.indexOf(q) >= 0) more.push(t); }
+    }
+    var ul = $('list'), frag = document.createDocumentFragment(); ul.textContent = '';
+    hit.concat(more).forEach(function(t){ var li = document.createElement('li'); li.appendChild(link('#t' + t.id, t.title));
+      if(t.also.length) li.appendChild(document.createTextNode(' (' + t.also.join(', ') + ')')); frag.appendChild(li); });
+    ul.appendChild(frag);
+    $('count').textContent = q ? (hit.length + more.length) + ' topics match "' + $('q').value.trim() + '"' + (more.length ? ' (' + more.length + ' only in the text)' : '') : src.length + ' topics, A to Z';
+    var b = document.querySelectorAll('button[data-lang]');
+    for(var j = 0; j < b.length; j++) b[j].setAttribute('aria-pressed', String(b[j].getAttribute('data-lang') === lang));
+  }
+
+  function route(){
+    var m = /^#t(\d+)$/.exec(location.hash), t = m && all[m[1]];
+    if(t){ lang = t.lang; showTopic(t); } else showList();
+  }
+  document.addEventListener('click', function(e){ var l = e.target.getAttribute && e.target.getAttribute('data-lang');
+    if(l){ lang = l; if(location.hash) location.hash = ''; showList(); } });
+  $('q').addEventListener('input', function(){ if(location.hash) history.replaceState(null, '', location.pathname); showList(); });
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body></html>
