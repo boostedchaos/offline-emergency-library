@@ -27,14 +27,21 @@ is best). The download is about 85 GB and can take several hours.
    protected your PC", click **More info**, then **Run anyway**.
 3. Type where to save the files, for example `E:\`, and press Enter.
 
-**Mac or Linux**
-1. Open **Terminal** (Mac: Applications > Utilities > Terminal).
-2. Paste this line and press Enter (Mac: Return):
+**Mac**
+1. [Download this project as a ZIP](https://github.com/elhajahmadj/offline-emergency-library/archive/refs/heads/main.zip).
+   If the Mac does not open it for you, double-click it in Downloads.
+2. In the folder, double-click **`install.command`**. The first time, the Mac says
+   *"install.command" Not Opened*: click **Done**, open **System Settings > Privacy & Security**,
+   click **Open Anyway** (twice), and type your password.
+3. Type where to save the files, for example `/Volumes/MyDrive`, and press Return.
+
+**Linux**
+1. Open a terminal.
+2. Paste this line and press Enter:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/get-offline-library.sh | bash
    ```
-3. Type where to save the files, for example `/Volumes/MyDrive` (Mac) or `/media/you/MyDrive`
-   (Linux), and press Enter.
+3. Type where to save the files, for example `/media/you/MyDrive`, and press Enter.
 
 That is the only question. Leave the window open until it says **Finished**, then open
 **`START-HERE.html`** in the `OfflineLibrary` folder it made there. If the download stops, run it again the same
@@ -144,7 +151,7 @@ Downloading ~85 GB can take several hours.
 
 ## 🚀 Other ways to install
 
-### A) Double-click `install.bat` (Windows)
+### A) Double-click `install.bat` (Windows) or `install.command` (Mac)
 The steps are in [Start here](#start-here) at the top of this page.
 
 ### B) In Claude Code (one prompt)
@@ -184,7 +191,7 @@ and it continues where it left off.
 ### Platform support
 | | Windows | macOS | Linux |
 |---|---|---|---|
-| Installer | `Get-OfflineLibrary.ps1` / `install.bat` | `get-offline-library.sh` | `get-offline-library.sh` |
+| Installer | `Get-OfflineLibrary.ps1` / `install.bat` | `get-offline-library.sh` / `install.command` | `get-offline-library.sh` |
 | Offline AI chat | ✅ (x64/ARM + Vulkan GPU) | ✅ (Metal GPU) | ✅ (x64/ARM + Vulkan GPU) |
 | GPT4All doc-Q&A | ✅ `.exe` | ✅ `.dmg` | ✅ `.run` |
 | Kiwix desktop | ✅ bundled portable | App Store / kiwix.org | ✅ bundled AppImage (x64) |

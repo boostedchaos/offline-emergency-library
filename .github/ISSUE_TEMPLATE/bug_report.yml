@@ -22,6 +22,7 @@ body:
       label: How did you run it?
       options:
         - install.bat (double-click)
+        - install.command (double-click, macOS)
         - PowerShell one-liner (irm | iex)
         - macOS/Linux one-liner (curl | bash)
         - Clone and run
