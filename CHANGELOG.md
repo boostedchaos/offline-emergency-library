@@ -209,6 +209,11 @@ hardware.
   page is not updated. Resolves #91. _[@boostedchaos](https://github.com/boostedchaos) - PR #97._
 
 ### Fixed
+- **Windows self-check no longer passes the AI engine when Windows blocks it.** When Smart App
+  Control (or another app-control policy) blocks `llama-cli.exe`, PowerShell throws and keeps the
+  old exit code, so the check read 0 and printed "PASS AI engine starts" with no version. It now
+  clears the exit code first and fails with a hint (Windows Security > App & browser control).
+  Resolves #124. _[@boostedchaos](https://github.com/boostedchaos)._
 - **Desktop viewer needs internet on Windows and macOS: the docs and launchers now say so.** The bundled OsmAndMapCreator has only the Linux offline renderer, so on Windows and macOS it draws online tiles from `tile.osmand.net` and shows a blank map with no internet (reproduced on Windows 11 and macOS). HOW-TO-VIEW-MAPS, the README, START-HERE, POWER-AND-DEVICES and both viewer launchers no longer call it an offline viewer; they point to browser maps (US) or an Android phone. `VIEW-MAPS-ON-PC.sh` also launched a second viewer when the first exited non-zero (`sh ... || bash ...`); it now launches once. Addresses #15. _Tested by [@boostedchaos](https://github.com/boostedchaos) - issue #15._
 - **The upstream link check no longer fails on one-off errors.** `check-links.sh` retries a
   failed URL up to 3 times (5xx, timeouts, resets) before counting it as dead, and sends the

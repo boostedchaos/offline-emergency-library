@@ -1010,10 +1010,17 @@ if(Test-Path $build){
 if($env:OS -eq 'Windows_NT'){
   $exe = Join-Path $e 'x64\llama-cli.exe'
   if(Test-Path $exe){
-    $out = @(& $exe --version 2>&1 | ForEach-Object { "$_" }); $rc = $LASTEXITCODE
+    # Clear the exit code first: when Windows blocks the program (Smart App Control or another
+    # app-control policy), PowerShell throws and leaves the OLD exit code, which passed as 0 (#124).
+    $global:LASTEXITCODE = $null; $runErr = ''
+    try { $out = @(& $exe --version 2>&1 | ForEach-Object { "$_" }) } catch { $out = @(); $runErr = (("$($_.Exception.Message)" -split "`r?`n")[0] -replace 'At [A-Za-z]:\\.*$','').Trim() }
+    $rc = $global:LASTEXITCODE
     if($rc -eq 0){
       $v = ($out | Where-Object { $_ -match 'version:' } | Select-Object -First 1)
       ScPass "AI engine starts on this computer (x64): $v"
+    } elseif($null -eq $rc){
+      ScFail "AI engine does not start on this computer (x64): Windows did not let llama-cli.exe run. $runErr"
+      Log '        Smart App Control or another app-control policy may block it: see Windows Security > App & browser control. The drive itself is fine.'
     } else {
       ScFail "AI engine does not start on this computer (x64): exit code $rc"
       if($rc -eq -1073741515){ Log '        A DLL is missing (0xC0000135). If a file is missing from engine\x64, re-run the installer. Otherwise install the Microsoft Visual C++ Redistributable (x64) and run the AI again.' }
