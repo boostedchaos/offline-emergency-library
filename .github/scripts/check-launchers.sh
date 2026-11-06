@@ -126,4 +126,26 @@ rm "$F/models/$TR_MODEL"
 out="$(PATH="$T/bin:$PATH" OEL_PLATFORM=Linux-x86_64 bash "$F/translate-browser.sh" 2>&1)"; rc=$?
 [ "$rc" = 1 ] && echo "$out" | grep -q 'Translator model missing' || { echo "FAIL: missing model: $out"; fail=1; }
 
+echo "== Manual Q&A launcher finds the engine in its version folder (doc-qa/start-docs.sh)"
+D="$T/docs fixture/AI-Offline"
+mkdir -p "$D/Manual-QA" "$D/models"
+cp doc-qa/start-docs.sh "$D/Manual-QA/start-docs.command"
+printf 'fixture model\n' > "$D/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@" > "$OEL_FIXTURE/docs-args"\n' > "$T/docs-server"
+chmod +x "$T/docs-server"
+for platform in Darwin-arm64 Darwin-x86_64 Linux-aarch64 Linux-x86_64; do
+  case "$platform" in Darwin-arm64) p=macos-arm64;; Darwin-*) p=macos-x64;; Linux-aarch64) p=linux-arm64;; *) p=linux-x64;; esac
+  # Real macOS/Linux engine archives unpack one level down, e.g. engine/macos-arm64/llama-b12177/.
+  mkdir -p "$D/engine/$p/llama-b99999"; cp "$T/docs-server" "$D/engine/$p/llama-b99999/llama-server"
+  run="$T/docs-$platform"; mkdir -p "$run"; rm -f "$run/docs-args"
+  out="$(PATH="$T/bin:$PATH" OEL_PLATFORM="$platform" OEL_FIXTURE="$run" bash "$D/Manual-QA/start-docs.command" 2>&1)"; rc=$?
+  if [ "$rc" != 0 ] || [ ! -s "$run/docs-args" ]; then echo "FAIL: $platform Manual Q&A launcher did not start the engine (exit $rc): $out"; fail=1; continue; fi
+  for arg in --offline 8081 "$D/Manual-QA/../models/Llama-3.2-3B-Instruct-Q4_K_M.gguf"; do
+    grep -qxF -- "$arg" "$run/docs-args" || { echo "FAIL: $platform Manual Q&A launcher lost server argument $arg"; fail=1; }
+  done
+done
+rm -rf "$D/engine/linux-x64"
+out="$(PATH="$T/bin:$PATH" OEL_PLATFORM=Linux-x86_64 OEL_FIXTURE="$T" bash "$D/Manual-QA/start-docs.command" 2>&1)"; rc=$?
+[ "$rc" = 1 ] && echo "$out" | grep -q 'AI engine for this computer not found' || { echo "FAIL: missing engine: $out"; fail=1; }
+
 [ "$fail" = 0 ] && echo "Launcher parity: OK" || { echo "Launcher parity: FAILED - make the same change in both installers."; exit 1; }

@@ -10,4 +10,10 @@ case "$(uname -s)/$(uname -m)" in
 esac
 echo "Open http://127.0.0.1:8081/AI-Offline/Manual-QA/ when the server is ready."
 echo "Keep this window open. Press Ctrl+C to stop."
-exec "$HERE/../engine/$engine/llama-server" -m "$HERE/../models/Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 0 -t 4 --offline --host 127.0.0.1 --port 8081 --path "$HERE/../.."
+# The macOS and Linux engine archives unpack into a version folder (engine/<platform>/llama-bNNNNN/).
+BIN="$(find "$HERE/../engine/$engine" -name llama-server -type f 2>/dev/null | head -n1)"
+[ -n "$BIN" ] || { echo "AI engine for this computer not found: $HERE/../engine/$engine. Re-run the installer."; exit 1; }
+chmod +x "$BIN" 2>/dev/null || true
+LIBDIR="$(dirname "$BIN")"
+export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}" DYLD_LIBRARY_PATH="$LIBDIR:${DYLD_LIBRARY_PATH:-}"
+exec "$BIN" -m "$HERE/../models/Llama-3.2-3B-Instruct-Q4_K_M.gguf" -c 4096 -ngl 0 -t 4 --offline --host 127.0.0.1 --port 8081 --path "$HERE/../.."
