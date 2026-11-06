@@ -44,6 +44,9 @@ public class AriaFixture {
   $cases = @(
     @{ Name='blocked-aria-stale-zero'; Mode='blocked'; Stale=0; Exit=0; Bytes=$true; Fallback=$true },
     @{ Name='blocked-aria-stale-three'; Mode='blocked'; Stale=3; Exit=0; Bytes=$true; Fallback=$true },
+    # On a PC with Smart App Control on, Windows can block the unsigned stub aria2c.exe
+    # built above. Fetch then falls back to curl, so aria-success fails locally with
+    # 'wrong fallback behavior'. That is the #132 fix working, not a regression (#140).
     @{ Name='aria-success'; Mode='success'; Stale=3; Exit=0; Bytes=$true; Fallback=$false },
     @{ Name='aria-missing-output'; Mode='missing'; Stale=0; Exit=0; Bytes=$true; Fallback=$true },
     @{ Name='aria-nonzero'; Mode='failure'; Stale=0; Exit=0; Bytes=$true; Fallback=$true },
