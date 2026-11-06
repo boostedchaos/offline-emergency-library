@@ -79,6 +79,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .github/scripts/check-map-refresh.ps1
+      - name: Catalog ids with Windows PowerShell 5.1 (#139)
+        if: runner.os == 'Windows'
+        shell: bash
+        env:
+          OEL_PS: powershell.exe
+        run: bash .github/scripts/check-catalog.sh
 
   links:
     name: Upstream source health

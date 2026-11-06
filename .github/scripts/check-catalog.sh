@@ -9,10 +9,12 @@
 #      which stops before anything is created or downloaded) and print the same result; each
 #      "needs" is enforced; bad files, an unknown id and mixed flags are refused with exit 1.
 # Needs bash and pwsh. Used by CI (lint job). OEL_CATALOG=<file> checks another copy of the
-# catalog (to prove this check fails on a bad one).
+# catalog (to prove this check fails on a bad one). OEL_PS=powershell.exe runs the PowerShell
+# side with Windows PowerShell 5.1 (from Git Bash).
 set -u
 cd "$(dirname "$0")/../.." || exit 1
 CAT="${OEL_CATALOG:-catalog.json}"
+PS="${OEL_PS:-pwsh}"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 fail=0; bad(){ echo "FAIL: $*"; fail=1; }
 
@@ -41,7 +43,7 @@ foreach($p in $pieces){
   }
 }
 EOF
-pwsh -NoProfile -NonInteractive -File "$T/read.ps1" "$CAT" > "$T/cat.txt" 2>&1 || { cat "$T/cat.txt"; echo "FAIL: $CAT does not parse"; exit 1; }
+"$PS" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$T/read.ps1" "$CAT" > "$T/cat.txt" 2>&1 || { cat "$T/cat.txt"; echo "FAIL: $CAT does not parse"; exit 1; }
 tr -d '\r' < "$T/cat.txt" > "$T/cat.tsv"   # id|gb|needs|required|label ("|": a tab would let read merge empty fields)
 ids="$(awk -F'|' '$1=="PIECE"{printf "%s ", $2}' "$T/cat.tsv" | sed 's/ $//')"
 [ "$(echo "$ids" | wc -w | tr -d ' ')" -ge 5 ] || { cat "$T/cat.tsv"; echo "FAIL: too few pieces read from $CAT"; exit 1; }
@@ -93,7 +95,7 @@ run(){ # name json [installer args, bash form] : runs both installers on the sel
   # shellcheck disable=SC2086
   bash get-offline-library.sh --select "$T/$name.json" --check-selection -d "$T/dest" $sh_extra </dev/null > "$T/$name.sh" 2>&1; sh_rc=$?
   # shellcheck disable=SC2086
-  pwsh -NoProfile -NonInteractive -File Get-OfflineLibrary.ps1 -Selection "$T/$name.json" -CheckSelection -Destination "$T/dest" $ps_extra </dev/null 2>&1 | tr -d '\r' > "$T/$name.ps"
+  "$PS" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File Get-OfflineLibrary.ps1 -Selection "$T/$name.json" -CheckSelection -Destination "$T/dest" $ps_extra </dev/null 2>&1 | tr -d '\r' > "$T/$name.ps"
   ps_rc="${PIPESTATUS[0]}"
   n=$((n+1))
 }
@@ -160,10 +162,10 @@ no with-lite "cannot be combined with" '{"pieces":["core"]}' lite
 no with-region "cannot be combined with" '{"pieces":["core","maps"]}' region
 rm -f "$T/missing.json"
 sh_rc=0; out="$(bash get-offline-library.sh --select "$T/missing.json" --check-selection </dev/null 2>&1)" || sh_rc=$?
-ps_out="$(pwsh -NoProfile -NonInteractive -File Get-OfflineLibrary.ps1 -Selection "$T/missing.json" -CheckSelection </dev/null 2>&1)"; ps_rc=$?
+ps_out="$("$PS" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File Get-OfflineLibrary.ps1 -Selection "$T/missing.json" -CheckSelection </dev/null 2>&1)"; ps_rc=$?
 case "$sh_rc $ps_rc $out $ps_out" in "1 1 "*"selection file not found"*"selection file not found"*) echo "  ok: missing file refused";; *) bad "missing file: bash $sh_rc '$out' / PowerShell $ps_rc '$ps_out'";; esac
 sh_rc=0; out="$(bash get-offline-library.sh --check-selection </dev/null 2>&1)" || sh_rc=$?
-ps_out="$(pwsh -NoProfile -NonInteractive -File Get-OfflineLibrary.ps1 -CheckSelection </dev/null 2>&1)"; ps_rc=$?
+ps_out="$("$PS" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File Get-OfflineLibrary.ps1 -CheckSelection </dev/null 2>&1)"; ps_rc=$?
 case "$sh_rc $ps_rc $out $ps_out" in "1 1 "*"needs"*"needs"*) echo "  ok: --check-selection alone refused";; *) bad "--check-selection alone: bash $sh_rc '$out' / PowerShell $ps_rc '$ps_out'";; esac
 
 echo "== $n selection files run through both installers"
