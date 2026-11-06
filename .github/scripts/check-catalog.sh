@@ -38,8 +38,9 @@ foreach($p in $pieces){
   $gb = if($null -eq $p.gb){ 'null' } else { ([double]$p.gb).ToString($inv) }
   $req = if($p.required){ 1 } else { 0 }
   "PIECE|$($p.id)|$gb|$($needs -join ' ')|$req|$($p.label)"
-  foreach($pr in $p.PSObject.Properties){
-    if($pr.Name -cnotin 'id','required','needs','gb','label'){ "NUM|$($p.id)|$($pr.Name)|$(([double]$pr.Value).ToString($inv))" }
+  foreach($pr in $p.PSObject.Properties){   # every other number is a size constant (text fields are not checked here)
+    $v = $pr.Value; $isNum = ($v -is [int]) -or ($v -is [long]) -or ($v -is [double]) -or ($v -is [decimal])
+    if($isNum -and $pr.Name -cnotin 'id','required','needs','gb','label'){ "NUM|$($p.id)|$($pr.Name)|$(([double]$v).ToString($inv))" }
   }
 }
 EOF
