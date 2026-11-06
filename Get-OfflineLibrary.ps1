@@ -328,7 +328,7 @@ $dirs = @(
  'AI-Offline','AI-Offline\engine','AI-Offline\models','AI-Offline\DocReader-GPT4All',
  'Manuals','Manuals\ArmyFieldManuals','Manuals\Repair-iFixit','Manuals\DIY-Appropedia','Manuals\Household-DIY',
  'Manuals\Survival-Preparedness','Manuals\Radio-Communications','Manuals\Food-Preservation\USDA-Complete-Guide-to-Home-Canning-2015',
- 'Medical','Medical\WikiMed','Medical\Manuals-PDF','Medical\Natural-Medicine',
+ 'Medical','Medical\WikiMed','Medical\Manuals-PDF','Medical\Natural-Medicine','Medical\Emergency-Childbirth',
  'Wikipedia','OsmAnd','Kiwix-Reader','Kiwix-Reader\app','Phone-Apps','Education'
 )
 if(-not $Only){ foreach($d in $dirs){ New-Item -ItemType Directory -Force (Join-Path $Root $d) | Out-Null } }
@@ -626,6 +626,25 @@ foreach($p in $pdfs){
       } else { Log "  WARN: $($p.n) failed to download" }
     } else { Log "pdf: NO PDF for $($p.id)" }
   }catch{ Log "pdf ERROR $($p.n): $($_.Exception.Message)" }
+}
+
+# Emergency Childbirth (US Office of Civil Defense + Public Health Service; US-government work,
+# public domain). Project Gutenberg #26923 e-text (HTML + figures), header kept. Opens offline in a browser.
+if(-not $Only){
+  try{
+    $ecBase = 'https://www.gutenberg.org/cache/epub/26923'
+    $ecDir  = Join-Path $Root 'Medical\Emergency-Childbirth'
+    $ecHtml = Join-Path $ecDir 'Emergency Childbirth (US Civil Defense).html'
+    Log 'html: Emergency Childbirth (US Civil Defense).html'
+    Fetch "$ecBase/pg26923-images.html" $ecHtml
+    if(Test-Path $ecHtml){
+      $body = Get-Content -LiteralPath $ecHtml -Raw
+      if($body -notmatch '(?i)<html|<!doctype'){ Log '  ERROR: Emergency Childbirth was not HTML (removed)'; Remove-Item $ecHtml -Force; exit 1 }
+      $imgs = [regex]::Matches($body,'src="images/([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
+      if($imgs){ New-Item -ItemType Directory -Force (Join-Path $ecDir 'images') | Out-Null }
+      foreach($im in $imgs){ Fetch "$ecBase/images/$im" (Join-Path $ecDir "images\$im") }
+    } else { Log '  WARN: Emergency Childbirth failed to download' }
+  }catch{ Log "html ERROR Emergency Childbirth: $($_.Exception.Message)" }
 }
 
 # ================================================================ 7. Wikipedia + Maps

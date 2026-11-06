@@ -16,6 +16,7 @@ Offline medical reference for emergencies. **Two kinds of files:**
 | `Manuals-PDF\` | Browser (PDF) | *Where There Is No Doctor*, *Where There Is No Dentist* (Hesperian); *A Practical Guide to Prolonged Casualty Care* (Uniformed Services University + Henry M. Jackson Foundation, 2025; © 2025 Henry M. Jackson Foundation, CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), included unchanged). **Advanced reference** for when medical help is delayed for hours or days — **not a substitute for a clinician.** WHO childbirth and maternal-health references are in the section below. |
 | `PSYCHOLOGICAL-FIRST-AID.html` | Browser (html) | **Psychological first aid** — plain-language guide to helping people (and yourself) cope with fear, panic, grief and stress during a crisis. Mental health matters as much as physical injury. |
 | `Natural-Medicine\` | Browser (PDF) | **Historical** herbal/medicinal-plant references (public domain): *King's American Dispensatory* (Felter & Lloyd) and Culpeper's *Complete Herbal*. **Not current medical advice** — see the caution below. |
+| `Emergency-Childbirth\` | Browser (HTML) | *Emergency Childbirth* (US Office of Civil Defense / Public Health Service, public domain) — a plain-language guide, written for anyone, to delivering a baby when skilled help is delayed. See the childbirth section below. |
 
 Also relevant: the **Army first-aid manuals** in `E:\Manuals\ArmyFieldManuals\`.
 
@@ -55,6 +56,11 @@ are not included.
 **Seek skilled medical help and arrange transport whenever possible.** These WHO
 references support trained health workers; they do not make unassisted childbirth safe
 or replace hands-on training, medicines, equipment or emergency care.
+
+For an emergency delivery when no skilled help is reachable, the plain-language
+[Emergency Childbirth](Emergency-Childbirth/Emergency%20Childbirth%20%28US%20Civil%20Defense%29.html)
+guide (US Office of Civil Defense / Public Health Service, public domain) is written for anyone,
+not just clinicians. It opens in any browser. The WHO references below are for trained workers.
 
 Open these PDFs directly in a browser, without Kiwix or AI:
 

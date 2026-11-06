@@ -33,6 +33,7 @@ urls=(
   "https://archive.org/metadata/kingsamericandis01kinguoft"
   "https://archive.org/metadata/kingsamericandis02kinguoft"
   "https://archive.org/metadata/53357467.6000.emory.edu"
+  "https://www.gutenberg.org/cache/epub/26923/pg26923-images.html"
   "https://www.epa.gov/sites/default/files/2017-09/documents/emergency_disinfection_of_drinking_water_sept2017.pdf"
   "https://iris.who.int/server/api/core/bitstreams/3bda1306-da5d-487d-b2ad-aff995112a7a/content"
   "https://iris.who.int/server/api/core/bitstreams/12fdb499-733d-4614-aafc-88dcbbb3c829/content"

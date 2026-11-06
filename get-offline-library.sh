@@ -319,7 +319,7 @@ log "Platform: $PLAT/$CPU   Destination: $ROOT"
 for d in AI-Offline AI-Offline/engine AI-Offline/models AI-Offline/DocReader-GPT4All \
          Manuals Manuals/ArmyFieldManuals Manuals/Repair-iFixit Manuals/DIY-Appropedia Manuals/Household-DIY \
          Manuals/Survival-Preparedness Manuals/Radio-Communications Manuals/Food-Preservation/USDA-Complete-Guide-to-Home-Canning-2015 \
-         Medical Medical/WikiMed Medical/Manuals-PDF Medical/Natural-Medicine \
+         Medical Medical/WikiMed Medical/Manuals-PDF Medical/Natural-Medicine Medical/Emergency-Childbirth \
          Wikipedia OsmAnd Kiwix-Reader Phone-Apps Education; do
   [ -z "$ONLY" ] && mkdir -p "$ROOT/$d"
 done
@@ -632,6 +632,18 @@ get_pdf_url(){ # url  localname  destdir   (direct link)
     if [ "$(head -c 4 "$out" 2>/dev/null)" != "%PDF" ]; then log "  ERROR: $2 was not a valid PDF (removed)"; rm -f "$out"; exit 1; fi
   else log "  WARN: $2 failed to download"; fi
 }
+get_html_doc(){ # baseurl  htmlfile  localname  destdir   (an HTML page + the images/ it references)
+  # Grabs the page and every images/<file> it links, so it opens fully offline in a browser.
+  out="$4/$3"
+  log "html: $3"
+  fetch "$1/$2" "$out"
+  if ! head -c 400 "$out" 2>/dev/null | grep -qi '<html\|<!doctype'; then
+    log "  ERROR: $3 was not HTML (removed)"; rm -f "$out"; exit 1
+  fi
+  imgs="$(grep -oE 'src="images/[^"]+"' "$out" | sed -E 's/.*images\/([^"]+)".*/\1/' | sort -u)"
+  [ -n "$imgs" ] && mkdir -p "$4/images"
+  for im in $imgs; do fetch "$1/images/$im" "$4/images/$im"; done
+}
 AFM="$ROOT/Manuals/ArmyFieldManuals"; MPDF="$ROOT/Medical/Manuals-PDF"
 if [ -n "$ONLY" ]; then log "pdf: manuals not touched (--only)"; else
 get_pdf "fm-21-76-us-army-survival-manual"                    "FM 21-76 Army Survival Manual.pdf" "$AFM"
@@ -686,6 +698,10 @@ get_pdf "kingsamericandis01kinguoft" "Kings American Dispensatory Vol 1.pdf" "$N
 get_pdf "kingsamericandis02kinguoft" "Kings American Dispensatory Vol 2.pdf" "$NAT"
 # Culpeper's Complete Herbal (public domain): classic English herbal. Historical reference only; do not attempt the remedies.
 get_pdf "53357467.6000.emory.edu" "Culpepers Complete Herbal.pdf" "$NAT"
+# Emergency Childbirth (US Office of Civil Defense + Public Health Service; US-government work, public domain).
+# Project Gutenberg #26923 e-text (HTML + figures), header kept. Emergency-delivery reference for when help is delayed.
+EC="$ROOT/Medical/Emergency-Childbirth"
+get_html_doc "https://www.gutenberg.org/cache/epub/26923" "pg26923-images.html" "Emergency Childbirth (US Civil Defense).html" "$EC"
 fi
 
 # ================================================================ 7. Wikipedia + Maps

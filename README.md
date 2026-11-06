@@ -75,6 +75,7 @@ Smaller drive, another country's maps, or extra content? See
 | **Medical books** | *Where There Is No Doctor / No Dentist* (Hesperian) | ~60 MB | Any browser (PDF) |
 | **Delayed-care guide** | *A Practical Guide to Prolonged Casualty Care* (USUHS + Henry M. Jackson Foundation, 2025; CC BY-NC-SA 4.0) — advanced care when help is hours or days away; not a substitute for a clinician | ~15 MB | Any browser (PDF) |
 | **Childbirth references** | WHO *Managing complications in pregnancy and childbirth* (2017) + *Recommendations on maternal health* (2025); trained-worker references with update cautions and CC BY-NC-SA 3.0 IGO terms in the [medical guide](docs/Medical-READ-ME-FIRST.md) | ~9 MB | Any browser (PDF) |
+| **Emergency childbirth** | *Emergency Childbirth* (US Office of Civil Defense / Public Health Service, public domain) — plain-language guide to delivering a baby when skilled help is delayed | <1 MB | Any browser (HTML) |
 | **Home canning** | *USDA Complete Guide to Home Canning* (2015 revision; US-government work) — safe canning of fruit, tomatoes, vegetables, meat, pickles, jams | ~14 MB | Any browser (PDF) |
 | **Radio guide** | How ham/CB/shortwave/GMRS radio works + emergency comms | tiny | Any browser |
 | **Kiwix reader** | Portable app to read all `.zim` archives (no install) | ~0.15 GB | — |
@@ -506,6 +507,7 @@ each source is downloaded from is in [Trust & verification](#-trust--verificatio
 | *The Boy Mechanic, Vol. 1* (1913) | Public domain in the US (published 1913) | Yes |
 | *King's American Dispensatory* (Felter & Lloyd, 1898/1905) | Public domain in the US (pre-1929) | Yes |
 | Culpeper, *The Complete Herbal* (1653; this ed. pre-1929) | Public domain | Yes |
+| *Emergency Childbirth* (US Office of Civil Defense / PHS; Project Gutenberg #26923 e-text) | US government work (public domain) | Yes |
 | MedlinePlus health topics (opt-in) | Public domain (US NLM) — **summaries only** | Yes |
 | iFixit repair archive | [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) | **No — non-commercial** |
 | *A Practical Guide to Prolonged Casualty Care* | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) | **No — non-commercial** |
