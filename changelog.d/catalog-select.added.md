@@ -9,4 +9,4 @@
   Windows PowerShell 5.1) and fails when a catalog size differs from the installers' estimate.
   No picker page yet (milestone 2). Plan by [@EnragedAntelope](https://github.com/EnragedAntelope)
   and [@elhajahmadj](https://github.com/elhajahmadj) in #139.
-  _[@boostedchaos](https://github.com/boostedchaos)._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #151._
