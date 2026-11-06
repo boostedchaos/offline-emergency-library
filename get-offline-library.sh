@@ -240,8 +240,8 @@ log "Platform: $PLAT/$CPU   Destination: $ROOT"
 [ -n "$ONLY" ] && log "Adding to the finished library: $ONLY (nothing else is downloaded)"
 for d in AI-Offline AI-Offline/engine AI-Offline/models AI-Offline/DocReader-GPT4All \
          Manuals Manuals/ArmyFieldManuals Manuals/Repair-iFixit Manuals/DIY-Appropedia \
-         Manuals/Survival-Water-Food Manuals/Radio-Communications Manuals/Food-Preservation/USDA-Complete-Guide-to-Home-Canning-2015 \
-         Medical Medical/WikiMed Medical/zimgit-medicine Medical/Manuals-PDF \
+         Manuals/Radio-Communications Manuals/Food-Preservation/USDA-Complete-Guide-to-Home-Canning-2015 \
+         Medical Medical/WikiMed Medical/Manuals-PDF \
          Wikipedia OsmAnd Kiwix-Reader Phone-Apps Education; do
   [ -z "$ONLY" ] && mkdir -p "$ROOT/$d"
 done
@@ -443,12 +443,13 @@ if [ "$LITE" = 0 ]; then
   add_zim "https://download.kiwix.org/zim/ifixit/"    "ifixit_en_all_"            "$ROOT/Manuals/Repair-iFixit"
   add_zim "https://download.kiwix.org/zim/other/"     "appropedia_en_all_maxi_"   "$ROOT/Manuals/DIY-Appropedia"
 fi
-add_zim "https://download.kiwix.org/zim/other/"     "zimgit-post-disaster_en_"  "$ROOT/Manuals/Survival-Water-Food"
-add_zim "https://download.kiwix.org/zim/other/"     "zimgit-water_en_"          "$ROOT/Manuals/Survival-Water-Food"
-add_zim "https://download.kiwix.org/zim/other/"     "zimgit-food-preparation_en_" "$ROOT/Manuals/Survival-Water-Food"
-add_zim "https://download.kiwix.org/zim/other/"     "zimgit-knots_en_"          "$ROOT/Manuals/Survival-Water-Food"
+# NOTE: the zimgit-* collections (post-disaster, water, food-preparation, knots, medicine)
+# were removed in #122: they are collections of third-party PDFs with no stated license, and
+# some items are all rights reserved (e.g. the SAS Survival Handbook, Foxfire). This kit only
+# ships content that is free, openly licensed, or public domain. Survival/water/food/first-aid
+# are covered by the Army field manuals, USDA canning guide, Appropedia, WikiMed and the
+# Hesperian/WHO PDFs. A license-cleared replacement for knots is tracked in #78.
 add_zim "https://download.kiwix.org/zim/wikipedia/" "wikipedia_en_medicine_maxi_" "$ROOT/Medical/WikiMed"
-add_zim "https://download.kiwix.org/zim/other/"     "zimgit-medicine_en_"       "$ROOT/Medical/zimgit-medicine"
 fi
 
 # ================================================================ 5b. Education (opt-in)

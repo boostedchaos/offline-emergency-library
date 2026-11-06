@@ -36,7 +36,7 @@ the bottom; practice the steps before you need them.
 
 - When in doubt, **boil it**: a **rolling boil for 1 minute** (**3 minutes above ~2,000 m /
   6,500 ft**) kills germs. Let cloudy water settle and pour off the clear water first.
-- No way to boil? Use the filtering and chemical-treatment steps in the survival/water manual.
+- No way to boil? Use the filtering and chemical-treatment steps in the Army survival manual (`Manuals/ArmyFieldManuals/`).
 
 ## Signal for help
 
@@ -73,8 +73,9 @@ a promise someone is listening. Transmit only as the law allows (emergencies are
 - **Where There Is No Doctor** (Hesperian) — `Medical/Manuals-PDF/`: bleeding, burns, water.
 - **Radio frequency reference** — `Manuals/Radio-Communications/RADIO-FREQUENCIES.html`:
   the frequencies above, with the rules and cautions.
-- **Survival / water / food archives** — `Manuals/Survival-Water-Food/` (open in Kiwix):
-  water purification, food, knots, first hours of a disaster.
+- **Survival / water / food** — the US Army survival manual in `Manuals/ArmyFieldManuals/`
+  (water purification, food, knots, shelter, first hours of a disaster) and Appropedia DIY
+  (open `Manuals/DIY-Appropedia/` in Kiwix).
 
 _This is a reminder card, not a substitute for the manuals or for trained help. Doses, exact
 steps and local rules are in the sources above — follow them, and use your own judgement._

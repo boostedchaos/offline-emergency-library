@@ -14,10 +14,8 @@ PDF manuals do **not** need Kiwix; they open in Edge or any browser.
 | File / folder | Contents |
 |---|---|
 | `E:\Medical\WikiMed\` | Offline medical Wikipedia (with images) |
-| `E:\Medical\zimgit-medicine\` | Curated medical/first-aid guide |
 | `E:\Manuals\Repair-iFixit\` | iFixit repair guides (auto, appliances, electronics, phones) |
 | `E:\Manuals\DIY-Appropedia\` | DIY: plumbing, electrical, construction, energy, water, food |
-| `E:\Manuals\Survival-Water-Food\` | Survival (post-disaster), water, food prep, knots |
 | `E:\Wikipedia\` | Full Wikipedia (all articles, no images) |
 | `E:\Education\KhanAcademy\` | Khan Academy courses + videos (opt-in) |
 | `E:\Extra-Archives\Wikivoyage\` | Wikivoyage travel guide (opt-in, `-ExtraZims`) |

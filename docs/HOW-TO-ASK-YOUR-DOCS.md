@@ -114,7 +114,7 @@ and several code/office formats. (See Section 6 for ZIM and the Wikipedia XML.)
 
 ## 6. What about ZIM files and the Wikipedia XML?
 
-- **ZIM files** (iFixit, Appropedia, WikiMed, zimgit — in `E:\Manuals` and
+- **ZIM files** (iFixit, Appropedia, WikiMed — in `E:\Manuals` and
   `E:\Medical`) are **not** read by GPT4All. Open those in the **Kiwix** reader
   instead (see `E:\Kiwix-Reader\HOW-TO-USE-KIWIX`). Kiwix has its own fast full-text
   search across all articles.

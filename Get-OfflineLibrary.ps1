@@ -260,8 +260,8 @@ try {
 $dirs = @(
  'AI-Offline','AI-Offline\engine','AI-Offline\models','AI-Offline\DocReader-GPT4All',
  'Manuals','Manuals\ArmyFieldManuals','Manuals\Repair-iFixit','Manuals\DIY-Appropedia',
- 'Manuals\Survival-Water-Food','Manuals\Radio-Communications','Manuals\Food-Preservation\USDA-Complete-Guide-to-Home-Canning-2015',
- 'Medical','Medical\WikiMed','Medical\zimgit-medicine','Medical\Manuals-PDF',
+ 'Manuals\Radio-Communications','Manuals\Food-Preservation\USDA-Complete-Guide-to-Home-Canning-2015',
+ 'Medical','Medical\WikiMed','Medical\Manuals-PDF',
  'Wikipedia','OsmAnd','Kiwix-Reader','Kiwix-Reader\app','Phone-Apps','Education'
 )
 if(-not $Only){ foreach($d in $dirs){ New-Item -ItemType Directory -Force (Join-Path $Root $d) | Out-Null } }
@@ -401,16 +401,17 @@ try{
 }
 
 # ================================================================ 5. ZIM archives
-Log '=== [5/8] Offline archives (Kiwix ZIM: repair, DIY, medical, survival) ==='
+Log '=== [5/8] Offline archives (Kiwix ZIM: repair, DIY, medical) ==='
+# NOTE: the zimgit-* collections (post-disaster, water, food-preparation, knots, medicine)
+# were removed in #122: they are collections of third-party PDFs with no stated license, and
+# some items are all rights reserved (e.g. the SAS Survival Handbook, Foxfire). This kit only
+# ships content that is free, openly licensed, or public domain. Survival/water/food/first-aid
+# are covered by the Army field manuals, USDA canning guide, Appropedia, WikiMed and the
+# Hesperian/WHO PDFs. A license-cleared replacement for knots is tracked in #78.
 $zims = @(
  @{dir='https://download.kiwix.org/zim/ifixit/'; pre='ifixit_en_all_';            d='Manuals\Repair-iFixit'}
  @{dir='https://download.kiwix.org/zim/other/';  pre='appropedia_en_all_maxi_';   d='Manuals\DIY-Appropedia'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-post-disaster_en_';  d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-water_en_';          d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-food-preparation_en_'; d='Manuals\Survival-Water-Food'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-knots_en_';          d='Manuals\Survival-Water-Food'}
  @{dir='https://download.kiwix.org/zim/wikipedia/'; pre='wikipedia_en_medicine_maxi_'; d='Medical\WikiMed'}
- @{dir='https://download.kiwix.org/zim/other/';  pre='zimgit-medicine_en_';       d='Medical\zimgit-medicine'}
 )
 foreach($z in $zims){
   if($Only){ Log 'zim: core archives not touched (-Only)'; break }
