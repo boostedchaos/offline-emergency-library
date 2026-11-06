@@ -1,0 +1,33 @@
+name: Update SHA256SUMS
+
+# SHA256SUMS.txt is owned by this workflow. PRs must not edit it: every PR that
+# changed an installer used to conflict with every other one on that file.
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ 'SHA256SUMS.txt' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sha256sums
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Regenerate SHA256SUMS.txt
+        run: bash .github/scripts/update-sha256sums.sh
+      - name: Commit if changed
+        run: |
+          if git diff --quiet SHA256SUMS.txt; then echo "SHA256SUMS.txt already current"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update SHA256SUMS.txt" -m "- Regenerated from the installer scripts on main" SHA256SUMS.txt
+          git push origin HEAD:main

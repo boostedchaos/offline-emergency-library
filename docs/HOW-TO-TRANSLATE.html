@@ -1,53 +1,130 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline translator - talk with someone who speaks another language</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
 <h1>Offline translator - talk with someone who speaks another language</h1>
-<p>The translator turns what one person types into the other person's language, and back. It runs <strong>entirely on this computer</strong>: nothing is sent anywhere and no internet is needed. It uses the same AI engine as the rest of <code>AI-Offline\</code> with a small multilingual model (Qwen3 4B, about 2.5 GB).</p>
-<blockquote>Added only if you ran the installer with <code>-Translate</code> / <code>--translate</code>. If you see <code>TRANSLATE.bat</code> and <code>translate.sh</code> in <code>AI-Offline\</code>, you're set. To add it later, run the installer again into the same drive with that flag; files you already have are kept.</blockquote>
-<blockquote><strong>Machine translation can be wrong.</strong> It is a way to talk when there is no interpreter, not a replacement for one. For medicine, doses, consent or anything safety-critical, use the checks in section 3, and get a human interpreter if one can be reached.</blockquote>
-<hr>
+<p>The translator turns what one person types into the other person's language, and back.
+It runs <strong>entirely on this computer</strong>: nothing is sent anywhere and no internet is needed.
+It uses the same AI engine as the rest of <code>AI-Offline\</code> with a small multilingual model
+(Qwen3 4B, about 2.5 GB).</p>
+<blockquote>
+<p>Added only if you ran the installer with <code>-Translate</code> / <code>--translate</code>. If you see
+<code>TRANSLATE-BROWSER.bat</code> and <code>translate-browser.sh</code> in <code>AI-Offline\</code>, you're set. To add it later, run the
+installer again into the same drive with that flag; files you already have are kept.</p>
+</blockquote>
+<blockquote>
+<p><strong>Machine translation can be wrong.</strong> It is a way to talk when there is no interpreter,
+not a replacement for one. For medicine, doses, consent or anything safety-critical, use
+the checks in section 3, and get a human interpreter if one can be reached.</p>
+</blockquote>
+<hr />
 <h2>1. Start it</h2>
-<table><thead><tr><th>Computer</th><th>What to do</th></tr></thead><tbody>
-<tr><td>Windows</td><td>Double-click <code>AI-Offline\TRANSLATE.bat</code></td></tr>
-<tr><td>macOS / Linux</td><td>Open Terminal in <code>AI-Offline</code> and run <code>bash translate.sh</code></td></tr>
-</tbody></table>
-<p>It needs a 64-bit computer with about <strong>6 GB of RAM</strong> (it uses about 4.8 GB while it runs). No graphics card is needed. Close other programs, especially web browsers, if it is slow.</p>
+<table>
+<thead>
+<tr><th>Computer</th><th>What to do</th></tr>
+</thead>
+<tbody>
+<tr><td>Windows</td><td>Double-click <code>AI-Offline\TRANSLATE-BROWSER.bat</code></td></tr>
+<tr><td>macOS</td><td>Double-click <code>AI-Offline/translate-browser.command</code></td></tr>
+<tr><td>Linux</td><td>Open <code>AI-Offline/translate-browser.sh</code> with your desktop's <strong>Run in Terminal</strong> action, or run <code>bash translate-browser.sh</code> in Terminal</td></tr>
+</tbody>
+</table>
+<p>On macOS, if permission to run the copied <code>.command</code> file is missing, open Terminal
+in <code>AI-Offline</code> and run <code>chmod +x translate-browser.command</code>, then double-click it.
+Linux file managers differ: some require marking the <code>.sh</code> executable and enabling
+&quot;run executable text files&quot; before double-click can launch it in a terminal.</p>
+<p>It opens the engine's bundled chat page at <strong>http://127.0.0.1:8087</strong> with the interpreter
+instructions already set. Keep the launcher window open. It waits up to two minutes for
+its own server; an occupied port or a failed model load prints an error instead of
+opening another service. On Windows, press Enter in the launcher to stop it; on
+macOS/Linux, press Ctrl+C. Closing the browser tab does not stop the server.</p>
+<p>For the original terminal interface, use <code>TRANSLATE.bat</code> on Windows or
+<code>bash translate.sh</code> on macOS/Linux. Its prompt and temperature are unchanged.</p>
+<p>It needs a 64-bit computer with about <strong>6 GB of RAM</strong> (it uses about 4.8 GB while it runs).
+The browser needs some additional memory. No graphics card is needed; the browser
+launcher uses the CPU. Close other programs if it is slow.</p>
+<p>The browser launcher needs Windows PowerShell 5.1 on Windows, or Bash, <code>curl</code> and
+<code>open</code> (macOS) / <code>xdg-open</code> (Linux), plus a desktop browser. If opening the browser
+fails after startup, open the printed address yourself. A missing engine, model or
+configuration is reported in the launcher; re-run the installer with Translate enabled.</p>
 <h2>2. Use it</h2>
 <ol>
-<li><strong>Type the two languages first</strong>, for example <code>English and Spanish</code>, and press Enter. It answers <code>Ready</code>.</li>
-<li><strong>Take turns.</strong> Each person types in their own language and presses Enter. The answer is the same message in the other language. Turn the screen so the other person can read it.</li>
-<li>To switch to other languages, type <code>/clear</code> and press Enter, then type the two new languages. To quit, type <code>/exit</code> or press Ctrl+C.</li>
-<li>A long talk can fill the launcher's 4096-token conversation limit. In llama.cpp b12110, <code>--context-shift</code> does not remove this chat-mode limit. If it reports <code>exceeds the available context size</code>, type <code>/clear</code> and name the two languages again. This discards the old conversation; repeat any details still needed.</li>
+<li><strong>Start a new chat and send the two languages first</strong>, for example <code>English and Spanish</code>.
+It answers <code>Ready</code>.</li>
+<li><strong>Take turns.</strong> Each person types in their own language and sends the message. The answer is
+the same message in the other language. Turn the screen so the other person can read it.</li>
+<li>To change languages or start over in the browser, start a <strong>new chat</strong>, then send
+the two languages again. The browser's Settings should show the interpreter system
+message and temperature <strong>0.2</strong>. Saved settings can override the launcher's defaults:
+use <strong>Reset to Default</strong> or a fresh private browser window if those settings differ.
+The launcher supplies defaults; it does not lock the browser's settings.</li>
+<li>Long talks can fill the 4096-token conversation limit. Start a new chat and name
+the languages again; repeat any details still needed.</li>
 </ol>
-<pre><code>&gt; English and Spanish
+<p>In the terminal interface, type the languages and press Enter, then take turns. Use
+<code>/clear</code> to start over and <code>/exit</code> or Ctrl+C to quit. In llama.cpp
+b12110, <code>--context-shift</code> does not remove this chat-mode limit. If it reports
+<code>exceeds the available context size</code>, type <code>/clear</code> and name the two languages
+again. This discards the old conversation; repeat any details still needed.</p>
+<pre><code class="language-text">&gt; English and Spanish
 Ready
 &gt; Do you have any allergies to medicine?
 ¿Tiene alguna alergia a medicamentos?
 &gt; Sí, a la penicilina.
-Yes, to penicillin.</code></pre>
+Yes, to penicillin.
+</code></pre>
 <h2>3. Checks that catch most mistakes</h2>
 <ul>
 <li><strong>Short, simple sentences.</strong> One idea per sentence. No slang, idioms or jokes.</li>
-<li><strong>Translate it back.</strong> Copy the translation and type it in as the next message: it comes back in your own language. If the meaning changed, say it a different way. (In testing, "Where is the shelter?" came out in Ukrainian as "Where is the headquarters?" - translating back shows that kind of mistake.)</li>
-<li><strong>Write numbers as digits</strong> (<code>500 mg</code>, <code>every 6 hours</code>, <code>7 pm</code>) and check them in the answer. Point at the number, the pill bottle or a clock as well.</li>
+<li><strong>Translate it back.</strong> Copy the translation and type it in as the next message: it comes
+back in your own language. If the meaning changed, say it a different way. (In testing,
+&quot;Where is the shelter?&quot; came out in Ukrainian as &quot;Where is the headquarters?&quot; - translating
+back shows that kind of mistake.)</li>
+<li><strong>Write numbers as digits</strong> (<code>500 mg</code>, <code>every 6 hours</code>, <code>7 pm</code>) and check them in the
+answer. Point at the number, the pill bottle or a clock as well.</li>
 <li><strong>Ask yes/no questions</strong> and watch for a nod, a head shake or a gesture.</li>
 <li><strong>Use pictures.</strong> Point at a body part, draw a map, show the medicine.</li>
-<li>If an answer comes back in the <strong>same language you typed</strong>, it did not translate: type it again, or type <code>/clear</code> and say the two languages again.</li>
+<li>If an answer comes back in the <strong>same language you typed</strong>, it did not translate: type
+it again, or start a new chat (terminal: <code>/clear</code>) and say the two languages again.</li>
 </ul>
 <h2>4. Which languages work</h2>
-<p>The model was tested on 30 sentences per direction from NTREX-128, a public translation test set, in both directions with English. That is a small test, so treat the groups as a rough guide:</p>
-<table><thead><tr><th>How well it did</th><th>Languages tested</th></tr></thead><tbody>
+<p>The model was tested on 30 sentences per direction from NTREX-128, a public translation
+test set, in both directions with English. That is a small test, so treat the groups as a
+rough guide:</p>
+<table>
+<thead>
+<tr><th>How well it did</th><th>Languages tested</th></tr>
+</thead>
+<tbody>
 <tr><td><strong>Good</strong> - usually understandable and accurate</td><td>Spanish, French, Vietnamese</td></tr>
 <tr><td><strong>Fair</strong> - often right, check carefully</td><td>Arabic, Hindi, Ukrainian</td></tr>
 <tr><td><strong>Fair into English, weaker from English</strong></td><td>Chinese</td></tr>
 <tr><td><strong>Rough into English, mostly wrong from English</strong></td><td>Swahili</td></tr>
 <tr><td><strong>Do not rely on it</strong> - mostly wrong</td><td>Somali, Amharic</td></tr>
-</tbody></table>
-<p>For Swahili, the 3B chat (<code>CHAT-3B-light</code>) did better in testing. Ask it to translate one sentence at a time.</p>
-<p>Other widely spoken languages (for example Portuguese, German, Italian, Russian, Japanese, Korean, Indonesian) were not tested. Translate back to check. Less widely spoken languages are likely to be weak.</p>
+</tbody>
+</table>
+<p>For Swahili, the 3B chat (<code>CHAT-3B-light</code>) did better in testing. Ask it to translate one
+sentence at a time.</p>
+<p>Other widely spoken languages (for example Portuguese, German, Italian, Russian, Japanese,
+Korean, Indonesian) were not tested. Translate back to check. Less widely spoken languages
+are likely to be weak.</p>
 <h2>5. Privacy</h2>
-<p>Everything stays on this computer. The translator does not use the internet and does not save the conversation; closing the window clears it.</p>
+<p>The server listens only on this computer's loopback address. The model runs offline;
+the launcher uses <code>--offline</code> and disables the UI's online model discovery defaults.
+No account or external translation service is required.</p>
+<p><strong>The browser can save chats and settings on this computer</strong>, even after you close the
+tab or stop the server. Use a private browser window for sensitive conversations,
+and close all private windows afterward. In a normal window, delete the chat and clear
+this site's browser data when finished. The terminal interface does not save chats.</p>
 <h2>6. Where it comes from</h2>
 <ul>
-<li>Model: <a href="https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507">Qwen3-4B-Instruct-2507</a> by the Qwen team, Apache License 2.0. The file on this drive is the Q4_K_M <a href="https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF">GGUF version</a>.</li>
-<li>Engine: <a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a>, MIT License (the same engine as the other AI launchers; see <a href="HOW-TO-RUN-OFFLINE-AI.html">HOW-TO-RUN-OFFLINE-AI</a>).</li>
+<li>Model: <a href="https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507">Qwen3-4B-Instruct-2507</a>
+by the Qwen team, Apache License 2.0. The file on this drive is the Q4_K_M
+<a href="https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF">GGUF version</a>.</li>
+<li>Engine: <a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a>, MIT License (the same engine
+as the other AI launchers; see <a href="HOW-TO-RUN-OFFLINE-AI.html">HOW-TO-RUN-OFFLINE-AI</a>).</li>
 </ul>
+<p>The browser configuration uses the flat <code>systemMessage</code> and <code>temperature</code> preferences
+verified in <a href="https://github.com/ggml-org/llama.cpp/blob/b12110/tools/ui/src/lib/constants/settings-keys.constants.ts">llama.cpp b12110's UI settings keys</a>.
+The <a href="https://github.com/ggml-org/llama.cpp/blob/b12110/tools/server/README.md">server documentation</a>
+calls <code>--webui-config-file</code> an alias for <code>--ui-config-file</code>; both accept a JSON file.
+Older engines may lack these flags, and future UI versions may change preferences.
+Re-run the installer to refresh an old engine if startup reports an unknown flag.</p>
 </div></body></html>

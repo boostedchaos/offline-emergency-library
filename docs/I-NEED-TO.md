@@ -42,6 +42,11 @@ bookmarks or search (Ctrl+F) for the words in **bold**.
 `Medical\Manuals-PDF\` (first-aid PDFs: Where There Is No Doctor / No Dentist). See the
 [medical read-me](Medical/READ-ME-FIRST.html).
 
+**Historical herbals (not medical advice):** `Medical\Natural-Medicine\` holds *King's American
+Dispensatory* and Culpeper's *Complete Herbal* as **historical references** on medicinal plants.
+They are old (1600s–1900s), often inaccurate, and some remedies are unsafe. Use current sources
+(WikiMed, Where There Is No Doctor) for actual care — see the [medical read-me](Medical/READ-ME-FIRST.html).
+
 **What is this illness, symptom or test?** If you added it (`-MedlinePlus` /
 `--medlineplus`), [MedlinePlus health topics](Medical/MedlinePlus/MedlinePlus-Health-Topics.html)
 explains health problems and tests in plain language (English and Spanish), in any browser.
@@ -58,6 +63,8 @@ explains health problems and tests in plain language (English and Spanish), in a
 | **Build shelter and stay warm** | [FM 21-76 Survival](Manuals/ArmyFieldManuals/FM%2021-76%20Army%20Survival%20Manual.pdf) | search **"shelter"** / **"fire"** |
 | **Tie the right knot** | [Knots, Splices and Rope Work](Manuals/Survival-Preparedness/Knots%2C%20Splices%20and%20Rope%20Work%20%28Verrill%29.pdf) (150+ illustrated knots) | |
 | **Get through the first hours of a disaster** | [FEMA Are You Ready](Manuals/Survival-Preparedness/FEMA%20Are%20You%20Ready%20-%20Citizen%20Preparedness.pdf) · [FM 21-76 Army Survival Manual](Manuals/ArmyFieldManuals/FM%2021-76%20Army%20Survival%20Manual.pdf) | |
+| **Hunt or trap game for food** | [FM 21-76 Army Survival Manual](Manuals/ArmyFieldManuals/FM%2021-76%20Army%20Survival%20Manual.pdf) · [Hunting with the Bow and Arrow](Manuals/Survival-Preparedness/Hunting%20with%20the%20Bow%20and%20Arrow%20%28Pope%201923%29.pdf) | FM 21-76: search **"trap"** / **"snare"** / **"fishing"**. Pope (1923): making and shooting a bow |
+| **Make or fix things from common materials** | [The Boy Mechanic Vol 1](Manuals/Household-DIY/The%20Boy%20Mechanic%20Vol%201%20-%20700%20Things%20to%20Do%20%281913%29.pdf) · Appropedia DIY (in **Kiwix**) | 700 illustrated projects (1913). **Dated** — some projects are unsafe by modern standards; skip anything using gunpowder, acids or mains electricity |
 
 ---
 
@@ -82,9 +89,12 @@ explains health problems and tests in plain language (English and Spanish), in a
 
 ---
 
-**Want to search across everything at once?** The offline AI's GPT4All **LocalDocs** can
-answer from the bundled manuals and show the sources it used — a good way to find the right
-page fast. It is a helper, not an authority: for anything safety-critical, open the manual it
-points to and follow that. See `AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS.html`.
+**Want to search across everything at once?** **Ask the manuals** searches the downloaded
+manual text, shows the passages behind an answer, and links each one to the PDF. It is
+already set up: run `AI-Offline\Manual-QA\START-DOCS.bat` (`start-docs.command` on macOS, `start-docs.sh` on Linux),
+then open `http://127.0.0.1:8081/AI-Offline/Manual-QA/`. GPT4All LocalDocs can also index
+folders of your own documents. It is a helper, not an authority: for anything safety-critical,
+open the manual it points to and follow that. See
+`AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS.html`.
 
 _Browse everything: open **README.html** (full index) or **START-HERE.html** (guided intro)._

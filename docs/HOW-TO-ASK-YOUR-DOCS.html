@@ -1,11 +1,23 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask Your Documents — Offline AI Q&A with GPT4All</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
-<h1>Ask Your Documents — Offline AI Q&amp;A with GPT4All</h1>
-<p>This tool lets you <strong>point an AI at your PDFs and text files and ask questions</strong> — it</p>
-<p>reads the documents and answers using what's *in them*, with citations to the source.</p>
-<p>It runs <strong>entirely offline on your CPU</strong> (no internet, no graphics card required).</p>
-<p>Example: *"According to the Army survival manual, how do I purify water?"* → it finds</p>
-<p>the relevant pages in your PDFs and answers, showing which file/page it used.</p>
-<blockquote><strong>Not included in a <code>--lite</code> install.</strong> If you built this drive with <code>--lite</code> / <code>-Lite</code>, the GPT4All installer is not here, so you have only the plain AI chat (no source-citing answers). To add this tool, re-run the installer into the same drive <strong>without</strong> the lite flag, or download GPT4All from <strong>gpt4all.io</strong> while you still have internet.</blockquote>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask Your Documents - Offline AI Q&amp;A</title><style>:root{--bg:#0f1420;--card:#171f2e;--ink:#e7ecf3;--muted:#9fb0c3;--accent:#4fd1c5;--accent2:#f6ad55;--line:#273246;--code:#0b0f17}@media(prefers-color-scheme:light){:root{--bg:#f4f6fb;--card:#fff;--ink:#15202b;--muted:#56657a;--accent:#0d9488;--accent2:#b45309;--line:#e2e8f0;--code:#f1f5f9}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}h1{font-size:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:6px;margin-top:30px}h3{font-size:17px;color:var(--accent)}h4{font-size:15px;color:var(--accent2)}a{color:var(--accent)}code{background:var(--code);padding:2px 6px;border-radius:6px;font-family:Consolas,monospace;font-size:14px}pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}th{background:rgba(127,127,127,.12)}blockquote{border-left:4px solid var(--accent);background:rgba(79,209,197,.08);padding:10px 16px;border-radius:0 10px 10px 0}hr{border:none;border-top:1px solid var(--line);margin:26px 0}ul,ol{padding-left:26px}</style></head><body><div class="wrap">
+<h1>Ask Your Documents - Offline AI Q&amp;A</h1>
+<p>Two tools answer questions from documents on this drive, both <strong>entirely offline on your CPU</strong> (no internet, no graphics card required):</p>
+<ul>
+<li><strong>Ask the manuals</strong> reads downloaded manual text, shows the passages behind its answer, and links each passage to the PDF. It is already set up, including on lite drives.</li>
+<li><strong>GPT4All LocalDocs</strong> indexes folders of your own PDFs and text files after a one-time setup. That part of this guide starts at section 0.</li>
+</ul>
+<p>Example: <em>"According to the Army survival manual, how do I purify water?"</em> - either tool finds the relevant text and shows which document it used.</p>
+<h2>Start here: Ask the manuals (already set up)</h2>
+<p>Every install, including <code>--lite</code> / <code>-Lite</code>, now has a reader that is ready on the drive. It needs no collection setup and no internet:</p>
+<ol>
+<li><strong>Windows:</strong> open <code>AI-Offline\Manual-QA\START-DOCS.bat</code>. <strong>macOS:</strong> double-click <code>AI-Offline/Manual-QA/start-docs.command</code>. <strong>Linux:</strong> run <code>AI-Offline/Manual-QA/start-docs.sh</code> in a terminal.</li>
+<li>When it says it is ready, open <strong>http://127.0.0.1:8081/AI-Offline/Manual-QA/</strong> in a browser on the same computer.</li>
+<li>Ask a question, for example <em>"How do I control bleeding?"</em>. The page shows the passages it found and links that open the matching PDF.</li>
+</ol>
+<p>It uses keyword search over downloaded text, then the bundled 3B model explains the passages it was given. Keep the launcher window open; press Ctrl+C to stop. The reader works from any folder, including a different drive letter, because its paths are relative.</p>
+<p>A manual whose text cannot be downloaded, or whose PDF changes after its text was published, is left out rather than guessed at. Its name appears under "Unavailable sources" in the reader, and the installer self-check reports the gap.</p>
+<blockquote><strong>What the citations mean.</strong> A numbered citation points to one of the passages shown under the answer, and each passage links to a PDF. It does not prove the AI understood the passage. Read the PDF before acting on anything safety-critical. Keyword search can also miss relevant wording.</blockquote>
+<blockquote><strong>Not included in a <code>--lite</code> install: GPT4All.</strong> If you built this drive with <code>--lite</code> / <code>-Lite</code>, the GPT4All installer below is not here. The Ask the manuals reader still works. To also add GPT4All's LocalDocs workflow, re-run the installer into the same drive <strong>without</strong> the lite flag, or download GPT4All from <strong>gpt4all.io</strong> while you still have internet.</blockquote>
+<p>The rest of this guide covers GPT4All LocalDocs, which can index extra folders of your own PDFs and text files.</p>
 <hr>
 <h2>0. Dependencies — there are (almost) none</h2>
 <p><strong>GPT4All is completely self-contained.</strong> The installer bundles its own AI engine. You</p>
@@ -43,13 +55,12 @@
 <p>   *If the models don't appear:* use the <strong>"Add Model" / "Download Models"</strong> screen and</p>
 <p>   download any small model it offers (e.g. Llama 3.2 3B) — this needs internet and is</p>
 <p>   a one-time step.</p>
-<h3>2b. Enable the document reader (LocalDocs) — fetches the embedding model once</h3>
+<h3>2b. Enable the document reader (LocalDocs)</h3>
 <ol>
 <li>Click <strong>LocalDocs</strong> (left sidebar).</li>
 <li>Click <strong>"+ Add Collection"</strong> / <strong>"Add Docs"</strong>.</li>
-<li>The first time, GPT4All will <strong>download a small embedding model automatically</strong></li>
+<li>If GPT4All says its local embedding model is missing, keep the release's <code>nomic-embed-text-v1.5.f16.gguf</code> resource next to the installed application and restart it. The v3.10.0 release loads this file from its own resources folder; do not assume it is downloaded when a collection is created.</li>
 </ol>
-<p>   (needs internet, ~tens of MB, one time only). Let it finish.</p>
 <p>Once 2a and 2b are done, <strong>everything works offline from now on.</strong></p>
 <hr>
 <h2>3. Point it at your manuals (create collections)</h2>

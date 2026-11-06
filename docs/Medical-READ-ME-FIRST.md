@@ -15,8 +15,14 @@ Offline medical reference for emergencies. **Two kinds of files:**
 | `WikiMed\` | Kiwix (.zim) | **Offline medical Wikipedia** (with images) — ~50,000 health articles |
 | `Manuals-PDF\` | Browser (PDF) | *Where There Is No Doctor*, *Where There Is No Dentist* (Hesperian); *A Practical Guide to Prolonged Casualty Care* (Uniformed Services University + Henry M. Jackson Foundation, 2025; © 2025 Henry M. Jackson Foundation, CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/), included unchanged). **Advanced reference** for when medical help is delayed for hours or days — **not a substitute for a clinician.** WHO childbirth and maternal-health references are in the section below. |
 | `PSYCHOLOGICAL-FIRST-AID.html` | Browser (html) | **Psychological first aid** — plain-language guide to helping people (and yourself) cope with fear, panic, grief and stress during a crisis. Mental health matters as much as physical injury. |
+| `Natural-Medicine\` | Browser (PDF) | **Historical** herbal/medicinal-plant references (public domain): *King's American Dispensatory* (Felter & Lloyd) and Culpeper's *Complete Herbal*. **Not current medical advice** — see the caution below. |
 
 Also relevant: the **Army first-aid manuals** in `E:\Manuals\ArmyFieldManuals\`.
+
+> **About `Natural-Medicine\`:** these are **historical documents** (1600s–1900s), kept for
+> reference and interest. Much of their content is outdated or simply wrong by modern science,
+> and **some remedies are toxic or dangerous.** Do **not** use them to treat illness. For real
+> care use WikiMed, *Where There Is No Doctor*, and qualified help whenever possible.
 
 ---
 

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'">
+<title>Ask the manuals</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="reader.css">
+<main>
+<h1>Ask the manuals</h1>
+<p>Search the downloaded medical and Army manuals, then ask the local AI to explain the passages it found. Keyword search can miss relevant text. Read the original source before acting on an answer.</p>
+<p id="coverage">Loading source text...</p>
+<details id="missing-box" hidden><summary id="missing-label"></summary><ul id="missing"></ul></details>
+<form id="ask">
+<label for="question">Question about the manuals</label>
+<textarea id="question" maxlength="500" required placeholder="How do I control bleeding?"></textarea>
+<button id="submit" disabled>Ask manuals</button>
+</form>
+<p id="status" role="status" aria-live="polite">Building the local search index...</p>
+<section aria-labelledby="answer-title">
+<h2 id="answer-title">Answer</h2>
+<div id="answer">Your answer will appear here.</div>
+</section>
+<section aria-labelledby="sources-title">
+<h2 id="sources-title">Source passages</h2>
+<p>The links open the downloaded PDFs. An excerpt number is not a PDF page number.</p>
+<ol id="sources"></ol>
+</section>
+<noscript>This reader needs JavaScript enabled. You can still open the manuals directly.</noscript>
+</main>
+<script type="module" src="reader.mjs"></script>
+</html>

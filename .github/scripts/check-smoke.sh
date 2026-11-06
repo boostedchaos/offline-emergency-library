@@ -55,6 +55,9 @@ E="$ROOT/AI-Offline/engine"
 TAG="$(tr -d ' \r\n' < "$E/BUILD.txt")"
 [ -n "$(find "$E/$WANT_DIR" -name llama-cli -type f 2>/dev/null | head -n1)" ] || die "build $TAG has no llama-cli in engine/$WANT_DIR"
 ( set +u; LITE=1; TRANSLATE=0; . "$T/launchers.sh" ) || die "the installer's launcher section stopped with an error"
+[ -z "$(find "$ROOT/AI-Offline" -iname '*translat*')" ] || die "translator files were written without --translate"
+eval "$(grep -m1 '^TR_MODEL=' get-offline-library.sh)"
+( set +u; LITE=1; TRANSLATE=1; . "$T/launchers.sh" ) || die "the installer's translator launcher section stopped with an error"
 ( set +u; SCRIPTDIR="$REPO"; UA=Mozilla/5.0; . "$T/checkdrive.sh" ) || die "the installer's CHECK-DRIVE section stopped with an error"
 ( set +u; . "$T/sums.sh" ) || die "the installer's checksum section stopped with an error"
 ls "$ROOT/AI-Offline"/*.sh >/dev/null 2>&1 || die "no .sh launcher was written"
@@ -79,6 +82,7 @@ echo "  none"
 
 echo "== launchers run from the new path (--version)"
 for s in "$NEW/AI-Offline"/*.sh; do
+  [ "$(basename "$s")" = translate-browser.sh ] && continue
   c="$NEW/AI-Offline/_smoke-$(basename "$s")"
   sed 's|^exec "\$BIN" |exec "$BIN" --version |' "$s" > "$c"
   [ "$(grep -c -- '--version' "$c")" = 1 ] || die "$(basename "$s"): its last line is not 'exec \"\$BIN\" ...' any more"
@@ -91,6 +95,18 @@ $out"
 $out"
   echo "  ok: $(basename "$s"): $v"
 done
+
+echo "== generated browser launcher rejects missing and invalid models without opening a browser"
+mkdir -p "$T/browser-bin" "$NEW/AI-Offline/models"
+printf '#!/usr/bin/env bash\necho UNEXPECTED_BROWSER_OPEN\n' > "$T/browser-bin/open"
+cp "$T/browser-bin/open" "$T/browser-bin/xdg-open"; chmod +x "$T/browser-bin/"*
+out="$(PATH="$T/browser-bin:$PATH" bash "$NEW/AI-Offline/translate-browser.sh" </dev/null 2>&1)"; rc=$?
+[ "$rc" = 1 ] && echo "$out" | grep -q 'Translator model missing' || die "missing translator model (exit $rc): $out"
+printf 'not a GGUF model\n' > "$NEW/AI-Offline/models/$TR_MODEL"
+out="$(PATH="$T/browser-bin:$PATH" bash "$NEW/AI-Offline/translate-browser.sh" </dev/null 2>&1)"; rc=$?
+rm -f "$NEW/AI-Offline/models/$TR_MODEL"
+[ "$rc" = 1 ] && echo "$out" | grep -q 'Translator did not start' || die "invalid translator model (exit $rc): $out"
+echo "$out" | grep -q 'UNEXPECTED_BROWSER_OPEN' && die "failed translator opened the browser"
 
 echo "== CHECK-DRIVE from the new path"
 for c in CHECK-DRIVE.sh CHECK-DRIVE.command; do

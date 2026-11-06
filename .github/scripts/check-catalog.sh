@@ -143,7 +143,7 @@ ok all "{\"pieces\":[$(q $ids)],\"regions\":[\"US_delaware\",\"Gb\"]}" \
   "lite=0 skip-models=0 skip-wikipedia=0 skip-maps=0 region=US_delaware,Gb browser-maps=1 education=1 kolibri=1 extra-zims=1 translate=1 medlineplus=1"
 ok core-only '{"pieces":["core"]}' \
   "lite=1 skip-models=1 skip-wikipedia=1 skip-maps=1 region=US browser-maps=0 education=0 kolibri=0 extra-zims=0 translate=0 medlineplus=0"
-ok maps-default-us '{"pieces":["core","docqa-repair","maps"]}' \
+ok maps-default-us '{"pieces":["core","gpt4all-repair","maps"]}' \
   "lite=0 skip-models=1 skip-wikipedia=1 skip-maps=0 region=US browser-maps=0 education=0 kolibri=0 extra-zims=0 translate=0 medlineplus=0"
 ok pretty-bom "$(printf '\357\273\277{\r\n  "regions": [ "US_delaware" ],\r\n\t"pieces": [\r\n    "core",\r\n    "maps"\r\n  ]\r\n}\r\n')"
 [ ! -e "$T/dest" ] || bad "--check-selection created the destination folder"

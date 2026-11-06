@@ -31,7 +31,9 @@ for f in "${files[@]}"; do
       if (index($src, "\x27sha256-$h\x27") >= 0) { printf "ok: %s: script %d (%d bytes) sha256-%s\n", $f, $n, length($body), $h }
       else { printf "FAIL: %s: script %d (%d bytes) sha256-%s is not in script-src. Put \x27sha256-%s\x27 in the CSP.\n", $f, $n, length($body), $h, $h; $fail = 1 }
     }
-    if (!$n) { print "FAIL: $f: no inline script found (the check would prove nothing)\n"; $fail = 1 }
+    # A page can carry a CSP for inline styles only and load all its JavaScript from a file;
+    # then there is no inline script to hash, and the rule below is trivially satisfied.
+    if (!$n) { print "ok: $f: no inline script (nothing to hash)\n" }
     exit $fail;
   ' "$f" || fail=1
 done

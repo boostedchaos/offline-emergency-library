@@ -59,6 +59,17 @@ try {
   $tag = (Get-Content (Join-Path $e 'BUILD.txt') -TotalCount 1).Trim()
   if(-not (Get-ChildItem -LiteralPath (Join-Path $e $WantDir) -Recurse -File -Filter 'llama-cli.exe' -ErrorAction SilentlyContinue)){ Fail "build $tag has no llama-cli.exe in engine\$WantDir" }
   . ([scriptblock]::Create($launchers))
+  if(Get-ChildItem (Join-Path $Root 'AI-Offline') -Filter '*translat*'){ Fail 'translator files were written without -Translate' }
+  # Exercise the real opt-in generator too; derive the model and prompt from production.
+  . ([scriptblock]::Create(([regex]::Match($src, '(?m)^\$TrModel = .+$')).Value))
+  $Translate = $true
+  . ([scriptblock]::Create($launchers))
+  $config = Get-Content (Join-Path $Root 'AI-Offline\translate-webui.json') -Raw | ConvertFrom-Json
+  $cli = Get-Content (Join-Path $Root 'AI-Offline\TRANSLATE.bat') -Raw
+  $prompt = [regex]::Match($cli, '-sys "([^"]+)"').Groups[1].Value
+  $temperature = [double]([regex]::Match($cli, '--temp ([0-9.]+)').Groups[1].Value)
+  if(-not $prompt -or $config.systemMessage -cne $prompt -or $config.temperature -ne $temperature){ Fail 'browser defaults differ from the CLI interpreter prompt or temperature' }
+  if($config.useHuggingFaceHub -ne $false -or $config.enableDiscoverModels -ne $false){ Fail 'browser UI must not discover online models' }
   . ([scriptblock]::Create($checkDrv))
   . ([scriptblock]::Create($sums))
   if(-not (Get-ChildItem (Join-Path $Root 'AI-Offline') -Filter *.bat)){ Fail 'no .bat launcher was written' }
@@ -93,7 +104,7 @@ try {
 
   Write-Host '== launchers run from the new path (--version)'
   $ao = Join-Path $new 'AI-Offline'
-  foreach($b in @(Get-ChildItem $ao -Filter *.bat)){
+  foreach($b in @(Get-ChildItem $ao -Filter *.bat | Where-Object { $_.Name -ne 'TRANSLATE-BROWSER.bat' })){
     # A copy that asks for --version and does not wait on 'pause'; everything else is the launcher as written.
     $t = [System.IO.File]::ReadAllText($b.FullName)
     $c = $t.Replace('.exe" -m ', '.exe" --version -m ') -replace '(?m)^pause\r?$', ''
@@ -108,6 +119,31 @@ try {
     if(-not $v){ Fail "$($b.Name) did not report build ${tag}:`n$out" }
     Write-Host "  ok: $($b.Name): $v"
   }
+
+  Write-Host '== generated browser launcher rejects missing and invalid models without opening a browser'
+  # Intercept only the browser action. Engine execution is the generated launcher's real code.
+  $wrapper = Join-Path $tmp 'browser-check.ps1'
+  @'
+param($Launcher)
+function Start-Process {
+  param($FilePath,$ArgumentList,$WorkingDirectory,[switch]$NoNewWindow,[switch]$PassThru,$RedirectStandardOutput,$RedirectStandardError)
+  if($FilePath -like 'http*'){ Write-Host 'UNEXPECTED_BROWSER_OPEN'; return }
+  Microsoft.PowerShell.Management\Start-Process @PSBoundParameters
+}
+& $Launcher
+exit $LASTEXITCODE
+'@ | Set-Content -Path $wrapper -Encoding ascii
+  $browser = Join-Path $ao 'translate-browser.ps1'
+  $out = (& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $wrapper $browser 2>&1 | Out-String); $rc = $LASTEXITCODE
+  if($rc -ne 1 -or $out -notmatch 'Translator model missing' -or $out -match 'UNEXPECTED_BROWSER_OPEN'){ Fail "missing translator model (exit ${rc}):`n$out" }
+  New-Item -ItemType Directory -Force (Join-Path $ao 'models') | Out-Null
+  $model = Join-Path $ao "models\$TrModel"
+  Set-Content -Path $model -Value 'not a GGUF model' -Encoding ascii
+  try {
+    $out = (& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $wrapper $browser 2>&1 | Out-String); $rc = $LASTEXITCODE
+    if($rc -ne 1 -or $out -notmatch 'Translator did not start' -or $out -match 'UNEXPECTED_BROWSER_OPEN'){ Fail "invalid translator model (exit ${rc}):`n$out" }
+  } finally { Remove-Item -LiteralPath $model -Force }
+  $global:LASTEXITCODE = 0
 
   Write-Host '== CHECK-DRIVE from the new path'
   $bat = [System.IO.File]::ReadAllText((Join-Path $new 'CHECK-DRIVE.bat')) -replace '(?m)^pause\r?$', ''

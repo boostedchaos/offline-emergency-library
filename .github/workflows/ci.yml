@@ -21,15 +21,8 @@ jobs:
         run: bash -n get-offline-library.sh
       - name: Browser-only additions preserve OsmAnd metadata
         run: bash .github/scripts/check-browser-map-isolation.sh
-      - name: Verify SHA256SUMS are in sync
-        run: |
-          fail=0
-          while read -r expected file; do
-            [ -z "$file" ] && continue
-            actual=$(git show "HEAD:$file" | sha256sum | awk '{print $1}')
-            if [ "$expected" != "$actual" ]; then echo "MISMATCH: $file"; fail=1; else echo "ok: $file"; fi
-          done < SHA256SUMS.txt
-          [ "$fail" = 0 ] || { echo "SHA256SUMS.txt is out of date — regenerate it."; exit 1; }
+      - name: Changelog fragments are named correctly
+        run: bash .github/scripts/compile-changelog.sh > /dev/null
       - name: Launcher parity (bash vs PowerShell installer)
         run: bash .github/scripts/check-launchers.sh
       - name: Catalog ids and sizes match both installers (#139)
@@ -79,6 +72,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .github/scripts/check-map-refresh.ps1
+      - name: Manual Q&A source pairing and relocation (PowerShell and Git Bash)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: .\.github\scripts\check-doc-qa.ps1
       - name: Catalog ids with Windows PowerShell 5.1 (#139)
         if: runner.os == 'Windows'
         shell: bash
@@ -95,3 +92,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash .github/scripts/check-links.sh
+      - name: Verify manual Q&A source text
+        run: bash .github/scripts/check-doc-sources.sh

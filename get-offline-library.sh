@@ -28,8 +28,8 @@ piece_needs(){ case "$1" in translate) echo "AI-Offline/engine/BUILD.txt|the AI 
 # Pieces a --select file can name (#139): the ids in catalog.json, in the same order, and what
 # each one needs in the same selection. .github/scripts/check-catalog.sh keeps this list,
 # select_needs, Get-OfflineLibrary.ps1 and catalog.json the same.
-SELECT_PIECES="core docqa-repair models wikipedia maps browser-maps education kolibri extra-zims translate medlineplus"
-select_needs(){ case "$1" in models|wikipedia) echo docqa-repair;; browser-maps) echo maps;; translate) echo core;; esac; }
+SELECT_PIECES="core gpt4all-repair models wikipedia maps browser-maps education kolibri extra-zims translate medlineplus"
+select_needs(){ case "$1" in models|wikipedia) echo gpt4all-repair;; browser-maps) echo maps;; translate) echo core;; esac; }
 SELECT=""; SELECT_SET=0; CHECK_SEL=0; REGION_SET=0
 ONLY=""; ONLY_SET=0; BM_ONLY=0
 DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0; LITE=0
@@ -137,7 +137,7 @@ if [ "$SELECT_SET" = 1 ]; then
     sel_has "$n" || sel_fail "'$p' needs '$n' in the same selection; add \"$n\" to the pieces."
   done; done
   [ -z "$SEL_R" ] || sel_has maps || sel_fail "the selection lists regions but not 'maps'; add \"maps\" or remove the regions."
-  sel_has docqa-repair || LITE=1
+  sel_has gpt4all-repair || LITE=1
   sel_has models || SKIP_MODELS=1
   sel_has wikipedia || SKIP_WIKI=1
   sel_has maps || SKIP_MAPS=1
@@ -317,9 +317,9 @@ log "Platform: $PLAT/$CPU   Destination: $ROOT"
 # ---- folder tree ----
 [ -n "$ONLY" ] && log "Adding to the finished library: $ONLY (nothing else is downloaded)"
 for d in AI-Offline AI-Offline/engine AI-Offline/models AI-Offline/DocReader-GPT4All \
-         Manuals Manuals/ArmyFieldManuals Manuals/Repair-iFixit Manuals/DIY-Appropedia \
+         Manuals Manuals/ArmyFieldManuals Manuals/Repair-iFixit Manuals/DIY-Appropedia Manuals/Household-DIY \
          Manuals/Survival-Preparedness Manuals/Radio-Communications Manuals/Food-Preservation/USDA-Complete-Guide-to-Home-Canning-2015 \
-         Medical Medical/WikiMed Medical/Manuals-PDF \
+         Medical Medical/WikiMed Medical/Manuals-PDF Medical/Natural-Medicine \
          Wikipedia OsmAnd Kiwix-Reader Phone-Apps Education; do
   [ -z "$ONLY" ] && mkdir -p "$ROOT/$d"
 done
@@ -504,9 +504,9 @@ else
   printf '%s\n' \
     "GPT4All (offline document Q&A) is NOT included in a --lite install." \
     "" \
-    "This lite drive has only the plain AI chat (the 3B model), which does not cite" \
-    "sources. Treat its answers as leads and verify anything safety-critical against the" \
-    "manuals on this drive." \
+    "This lite drive includes the source-citing manual reader:" \
+    "  AI-Offline/Manual-QA/start-docs.command (macOS) or start-docs.sh (Linux)" \
+    "It uses the 3B model and downloaded source text. Check the original PDF before acting." \
     "" \
     "To add GPT4All and its source-citing LocalDocs workflow:" \
     "  - re-run the installer into this same drive WITHOUT --lite, or" \
@@ -673,6 +673,19 @@ get_pdf "FemaEmergencyHandbook-areYouReady" "FEMA Are You Ready - Citizen Prepar
 get_pdf "knotssplicesrope00verr" "Knots, Splices and Rope Work (Verrill).pdf" "$SP"
 # EPA Emergency Disinfection of Drinking Water (US-government work, public domain): making water safe when the tap is unsafe.
 get_pdf_url "https://www.epa.gov/sites/default/files/2017-09/documents/emergency_disinfection_of_drinking_water_sept2017.pdf" "EPA Emergency Disinfection of Drinking Water.pdf" "$SP"
+# Hunting with the Bow and Arrow, Saxton Pope (1923; public domain): making and shooting bows, hunting game.
+get_pdf "hunting-with-the-bow-and-arrow" "Hunting with the Bow and Arrow (Pope 1923).pdf" "$SP"
+# Household do-it-yourself from common materials (public domain):
+DIY="$ROOT/Manuals/Household-DIY"
+# The Boy Mechanic, Volume 1: 700 Things for Boys to Do (1913; public domain). Dated; some projects are unsafe by modern standards -- see Manuals/READ-ME-FIRST.
+get_pdf "boymechanicthing01unse" "The Boy Mechanic Vol 1 - 700 Things to Do (1913).pdf" "$DIY"
+# Natural-medicine historical references (public domain; historical, NOT current medical advice -- see Medical/READ-ME-FIRST):
+NAT="$ROOT/Medical/Natural-Medicine"
+# King's American Dispensatory (Felter & Lloyd; public domain): the major eclectic materia medica of medicinal plants.
+get_pdf "kingsamericandis01kinguoft" "Kings American Dispensatory Vol 1.pdf" "$NAT"
+get_pdf "kingsamericandis02kinguoft" "Kings American Dispensatory Vol 2.pdf" "$NAT"
+# Culpeper's Complete Herbal (public domain): classic English herbal. Historical reference only; do not attempt the remedies.
+get_pdf "53357467.6000.emory.edu" "Culpepers Complete Herbal.pdf" "$NAT"
 fi
 
 # ================================================================ 7. Wikipedia + Maps
@@ -914,10 +927,145 @@ make_bat "WEB-UI.bat"          "Offline AI - Web UI"               'engine\x64\l
 fi
 if [ "$TRANSLATE" = 1 ]; then
 # Same text as Get-OfflineLibrary.ps1. No batch special characters, and no | & or \ (sed) in the prompt or notes.
-TR_ARGS='-c 4096 --temp 0.2 -sys "You are an interpreter between two people. Their first message names two languages: reply only with Ready. After that, for every message: if it is written in the first language, translate it into the second language; if it is written in the second language, translate it into the first language. Never repeat a message in the language it was written in. Write only the translation, with no notes. Keep names, numbers, doses and times exactly as written."'
+TR_PROMPT='You are an interpreter between two people. Their first message names two languages: reply only with Ready. After that, for every message: if it is written in the first language, translate it into the second language; if it is written in the second language, translate it into the first language. Never repeat a message in the language it was written in. Write only the translation, with no notes. Keep names, numbers, doses and times exactly as written.'
+TR_ARGS="-c 4096 --temp 0.2 -sys \"$TR_PROMPT\""
 make_bat "TRANSLATE.bat" "Offline translator - Qwen3 4B" 'engine\x64\llama-cli.exe' "$TR_MODEL" "$TR_ARGS" 'echo Offline translator. First type the two languages, for example: English and Spanish. Then type what to translate.
 echo Check anything about medicine, doses or safety by translating it back. Use short, simple sentences.'
 make_sh "translate.sh" llama-cli "$TR_MODEL" 0 "$TR_ARGS" "Offline translator. First type the two languages, for example: English and Spanish. Check anything about medicine, doses or safety by translating it back. Ctrl+C to quit."
+# Flat UI defaults, verified against llama.cpp b12110 settings-keys.constants.ts.
+# The prompt contains no JSON escapes. Keep it shared with the tested CLI.
+printf '{"systemMessage":"%s","temperature":0.2,"useHuggingFaceHub":false,"enableDiscoverModels":false}\n' "$TR_PROMPT" > "$AO/translate-webui.json"
+cat > "$AO/translate-browser.sh" <<'EOS'
+#!/usr/bin/env bash
+# Offline translator in llama.cpp's bundled browser UI.
+DIR="$(cd "$(dirname "$0")" && pwd)"
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) P=macos-arm64 ;;
+  Darwin-*) P=macos-x64 ;;
+  Linux-aarch64|Linux-arm64) P=linux-arm64 ;;
+  *) P=linux-x64 ;;
+esac
+BIN="$(find "$DIR/engine/$P" -name llama-server -type f 2>/dev/null | head -n1)"
+[ -n "$BIN" ] || { echo "Translator server missing: $DIR/engine/$P. Re-run the installer."; exit 1; }
+[ -s "$DIR/models/__MODEL__" ] || { echo "Translator model missing. Re-run the installer with --translate."; exit 1; }
+[ -s "$DIR/translate-webui.json" ] || { echo "Missing translate-webui.json. Re-run the installer with --translate."; exit 1; }
+command -v curl >/dev/null || { echo "The browser translator needs curl. Install curl or use translate.sh."; exit 1; }
+case "$P" in macos-*) OPENER=open ;; *) OPENER=xdg-open ;; esac
+command -v "$OPENER" >/dev/null || { echo "The browser translator needs $OPENER and a desktop browser. Use translate.sh instead."; exit 1; }
+chmod +x "$BIN" 2>/dev/null
+LIBDIR="$(dirname "$BIN")"
+export LD_LIBRARY_PATH="$LIBDIR:${LD_LIBRARY_PATH:-}" DYLD_LIBRARY_PATH="$LIBDIR:${DYLD_LIBRARY_PATH:-}"
+LOG="$(mktemp "${TMPDIR:-/tmp}/oel-translator.XXXXXX")" || exit 1
+PID=
+cleanup(){
+  if [ -n "$PID" ]; then kill "$PID" 2>/dev/null; wait "$PID" 2>/dev/null; fi
+  rm -f "$LOG"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM HUP
+URL=http://127.0.0.1:8087
+ALIAS="oel-translator-$$-$(date +%s)"
+echo "Starting offline translator (up to 120 seconds). Ctrl+C stops the server."
+"$BIN" -m "$DIR/models/__MODEL__" -c 4096 -ngl 0 --temp 0.2 --offline --host 127.0.0.1 --port 8087 --alias "$ALIAS" --webui-config-file "$DIR/translate-webui.json" >"$LOG" 2>&1 &
+PID=$!
+READY=0
+SECONDS=0
+for ((attempt=0; attempt<120 && SECONDS<120; attempt++)); do
+  kill -0 "$PID" 2>/dev/null || break
+  # A response from an occupied port must never open an unrelated service.
+  if curl --noproxy '*' -fsS --max-time 1 "$URL/v1/models" 2>/dev/null | grep -qE '"id"[[:space:]]*:[[:space:]]*"'"$ALIAS"'"'; then
+    kill -0 "$PID" 2>/dev/null && READY=1
+    break
+  fi
+  sleep 1
+done
+if [ "$READY" != 1 ]; then
+  cat "$LOG"
+  echo "Translator did not start within 120 seconds. Check port 8087, available RAM and the engine version (b12110 or compatible)."
+  exit 1
+fi
+echo "Opening $URL. First send the two languages, for example: English and Spanish."
+echo "Use a private browser window for sensitive conversations. Closing the tab does not stop the server."
+"$OPENER" "$URL" >/dev/null 2>&1 || echo "Could not open the browser. Open $URL manually."
+wait "$PID"; RC=$?
+PID=
+[ "$RC" = 0 ] || cat "$LOG"
+exit "$RC"
+EOS
+sed -i.bak "s|__MODEL__|$TR_MODEL|g" "$AO/translate-browser.sh" && rm -f "$AO/translate-browser.sh.bak"
+chmod +x "$AO/translate-browser.sh" 2>/dev/null
+cat > "$AO/translate-browser.command" <<'EOS'
+#!/usr/bin/env bash
+cd "$(dirname "$0")" || exit 1
+bash ./translate-browser.sh
+RC=$?
+read -r -p "Press Return to close this window. "
+exit "$RC"
+EOS
+chmod +x "$AO/translate-browser.command" 2>/dev/null
+cat <<'EOS' | sed 's/$/\r/' > "$AO/TRANSLATE-BROWSER.bat"
+@echo off
+title Offline translator - browser
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0translate-browser.ps1"
+set "RC=%ERRORLEVEL%"
+pause
+exit /b %RC%
+EOS
+cat <<'EOS' | sed "s|__MODEL__|$TR_MODEL|g; s/$/\r/" > "$AO/translate-browser.ps1"
+# Offline translator in llama.cpp's bundled browser UI. Windows PowerShell 5.1.
+$ErrorActionPreference = 'Stop'
+$server = $null
+$logs = @()
+try {
+  $arch = if($env:PROCESSOR_ARCHITEW6432){ $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+  $p = if($arch -eq 'ARM64'){ 'arm64' } else { 'x64' }
+  $bin = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot "engine\$p") -Filter llama-server.exe -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+  if(-not $bin){ throw "Translator server missing: engine\$p. Re-run the installer." }
+  $model = Join-Path $PSScriptRoot 'models\__MODEL__'
+  $config = Join-Path $PSScriptRoot 'translate-webui.json'
+  if(-not (Test-Path -LiteralPath $model -PathType Leaf)){ throw 'Translator model missing. Re-run the installer with -Translate.' }
+  if(-not (Test-Path -LiteralPath $config -PathType Leaf)){ throw 'Missing translate-webui.json. Re-run the installer with -Translate.' }
+  $id = 'oel-translator-' + [guid]::NewGuid().ToString('N')
+  $logs = @((Join-Path ([IO.Path]::GetTempPath()) "$id.out"), (Join-Path ([IO.Path]::GetTempPath()) "$id.err"))
+  $url = 'http://127.0.0.1:8087'
+  Write-Host 'Starting offline translator (up to 120 seconds). Ctrl+C stops the server.'
+  $argv = "-m `"$model`" -c 4096 -ngl 0 --temp 0.2 --offline --host 127.0.0.1 --port 8087 --alias $id --webui-config-file `"$config`""
+  $server = Start-Process -FilePath $bin.FullName -ArgumentList $argv -WorkingDirectory $bin.DirectoryName -NoNewWindow -PassThru -RedirectStandardOutput $logs[0] -RedirectStandardError $logs[1]
+  $timer = [Diagnostics.Stopwatch]::StartNew()
+  $ready = $false
+  for($attempt = 0; $attempt -lt 120 -and $timer.Elapsed.TotalSeconds -lt 120; $attempt++){
+    if($server.HasExited){ break }
+    try {
+      $request = [Net.HttpWebRequest]::Create("$url/v1/models")
+      $request.Proxy = $null
+      $request.Timeout = 1000
+      $request.ReadWriteTimeout = 1000
+      $response = $request.GetResponse()
+      try {
+        $reader = New-Object IO.StreamReader($response.GetResponseStream())
+        try { $models = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+        if($models.data.id -contains $id -and -not $server.HasExited){ $ready = $true; break }
+      } finally { $response.Dispose() }
+    } catch [Net.WebException] {
+      if($_.Exception.Response){ $_.Exception.Response.Dispose() }
+    }
+    Start-Sleep -Milliseconds 1000
+  }
+  if(-not $ready){ throw 'Translator did not start within 120 seconds. Check port 8087, available RAM and the engine version (b12110 or compatible).' }
+  Write-Host "Opening $url. First send the two languages, for example: English and Spanish."
+  Write-Host 'Use a private browser window for sensitive conversations. Closing the tab does not stop the server.'
+  try { Start-Process $url } catch { Write-Host "Could not open the browser. Open $url manually." }
+  [void](Read-Host 'Press Enter here to stop the translator')
+} catch {
+  Write-Host $_.Exception.Message
+  foreach($log in $logs){ if(Test-Path -LiteralPath $log){ Get-Content -LiteralPath $log -Tail 30 } }
+  exit 1
+} finally {
+  if($server -and -not $server.HasExited){ Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue; $server.WaitForExit() }
+  foreach($log in $logs){ Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue }
+}
+EOS
 fi
 
 # ================================================================ documentation
@@ -952,6 +1100,22 @@ place_doc "MAP-AND-COMPASS"       "$ROOT/OsmAnd/MAP-AND-COMPASS"
 place_doc "USE-ON-PHONE"          "$ROOT/Phone-Apps/USE-ON-PHONE"
 place_doc "Education-READ-ME-FIRST" "$ROOT/Education/READ-ME-FIRST"
 place_doc "HOW-TO-KOLIBRI"          "$ROOT/Education/HOW-TO-KOLIBRI"
+fi
+
+# ================================================================ manual Q&A
+DOC_QA_FAILED=0
+if [ -z "$ONLY" ]; then
+  setup="$SCRIPTDIR/doc-qa/install.sh"
+  if [ ! -f "$setup" ]; then
+    setup="$ROOT/AI-Offline/install-doc-qa.sh"
+    rm -f "$setup"
+    # Not fetch: a failed helper download must not fail a library that otherwise installed.
+    curl -fLsS --retry 3 -A "$UA" "$REPO_RAW/doc-qa/install.sh" -o "$setup" 2>/dev/null || true
+  fi
+  if [ -s "$setup" ]; then
+    . "$setup"
+    install_manual_qa "$ROOT" "$SCRIPTDIR" || DOC_QA_FAILED=1
+  else log "doc-QA ERROR: setup helper missing"; DOC_QA_FAILED=1; fi
 fi
 
 # CHECK-DRIVE scripts (#28), placed before the index so README.html lists them.
@@ -1045,6 +1209,7 @@ SC_FAIL=0
 sc_pass(){ log "  PASS  $*"; }
 sc_warn(){ log "  WARN  $*"; }
 sc_fail(){ log "  FAIL  $*"; SC_FAIL=$((SC_FAIL+1)); }
+[ "$DOC_QA_FAILED" = 0 ] || sc_warn "manual Q&A source coverage is incomplete (see doc-QA lines above); those PDFs still open directly"
 E="$ROOT/AI-Offline/engine"
 # 1. Every engine folder has its program (a failed unpack leaves a folder empty).
 if [ -f "$E/BUILD.txt" ]; then

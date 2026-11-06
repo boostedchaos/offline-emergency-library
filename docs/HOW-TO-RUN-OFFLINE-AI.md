@@ -10,20 +10,21 @@ different AI models** so it works on anything from a weak laptop to a gaming PC:
 Once this folder is on your drive, you never need the internet again to use it.
 
 > **How to use the AI well:** think of it as a fast **assistant** over the kit - great for
-> brainstorming, checklists and summarizing. For medical or survival questions, the best
-> workflow in this kit is **GPT4All LocalDocs** (`AI-Offline\DocReader-GPT4All\`): it answers
-> from the kit's own manuals and *shows the sources it used*, so you can check them - see
-> HOW-TO-ASK-YOUR-DOCS.html. Plain chat is the tool for everything else.
+> brainstorming, checklists and summarizing. For medical or survival questions, start with
+> **Ask the manuals** (`AI-Offline\Manual-QA\`): it searches downloaded manual text, shows
+> the passages it used, and links each one to the original PDF. No setup is needed - see
+> HOW-TO-ASK-YOUR-DOCS.html. GPT4All LocalDocs can also index folders of your own documents.
+> Plain chat is the tool for everything else.
 >
 > **Translator:** if you added `-Translate` / `--translate`, `TRANSLATE.bat` / `translate.sh`
 > is a two-way translator for talking with someone in another language - see
 > HOW-TO-TRANSLATE.html.
 >
-> **Lite installs:** `--lite` / `-Lite` does **not** include GPT4All, so a lite drive has
-> only the plain chat model with **no source-citing RAG**. Treat its answers as *leads* and
-> verify anything safety-critical against the manuals. To add the citing workflow, re-run the
-> installer into the same drive **without** the lite flag (or install GPT4All from gpt4all.io
-> while you still have internet).
+> **Lite installs:** `--lite` / `-Lite` does **not** include GPT4All, but it **does** include
+> the **Ask the manuals** reader (`AI-Offline\Manual-QA\`), which cites the downloaded text
+> and links the PDFs. To also get GPT4All LocalDocs for your own folders, re-run the installer
+> into the same drive **without** the lite flag (or install GPT4All from gpt4all.io while you
+> still have internet).
 
 ---
 
@@ -269,8 +270,9 @@ to be installed. This is why it works in an emergency with no internet.
 - **It can be wrong or make things up** ("hallucinate"). For an emergency, treat it
   as a knowledgeable helper, not an infallible authority - for anything safety-critical
   (medical, legal, survival), the manuals in this kit are the authority: read them and
-  follow them. To ask questions *with the sources shown*, use GPT4All LocalDocs
-  (`AI-Offline\DocReader-GPT4All\`) - see HOW-TO-ASK-YOUR-DOCS.html.
+  follow them. To search them and see the passages behind an answer, use Ask the manuals
+  (`AI-Offline\Manual-QA\`) - see HOW-TO-ASK-YOUR-DOCS.html. GPT4All LocalDocs can also
+  index your own document folders.
 - These are open-weight models (Meta Llama, Alibaba Qwen) distributed for free. The
   quantized `.gguf` files were produced by the community (bartowski) from the official
   models.

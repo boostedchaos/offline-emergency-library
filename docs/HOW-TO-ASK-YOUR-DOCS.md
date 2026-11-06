@@ -1,16 +1,49 @@
-# Ask Your Documents — Offline AI Q&A with GPT4All
+# Ask Your Documents - Offline AI Q&A
 
-This tool lets you **point an AI at your PDFs and text files and ask questions** — it
-reads the documents and answers using what's *in them*, with citations to the source.
-It runs **entirely offline on your CPU** (no internet, no graphics card required).
+Two tools answer questions from documents on this drive, both **entirely offline on your
+CPU** (no internet, no graphics card required):
 
-Example: *"According to the Army survival manual, how do I purify water?"* → it finds
-the relevant pages in your PDFs and answers, showing which file/page it used.
+- **Ask the manuals** reads downloaded manual text, shows the passages behind its answer,
+  and links each passage to the PDF. It is already set up, including on lite drives.
+- **GPT4All LocalDocs** indexes folders of your own PDFs and text files after a one-time
+  setup. That part of this guide starts at section 0.
 
-> **Not included in a `--lite` install.** If you built this drive with `--lite` / `-Lite`,
-> the GPT4All installer is not here, so you have only the plain AI chat (no source-citing
-> answers). To add this tool, re-run the installer into the same drive **without** the lite
-> flag, or download GPT4All from **gpt4all.io** while you still have internet.
+Example: *"According to the Army survival manual, how do I purify water?"* - either tool
+finds the relevant text and shows which document it used.
+
+## Start here: Ask the manuals (already set up)
+
+Every install, including `--lite` / `-Lite`, now has a reader that is ready on the
+drive. It needs no collection setup and no internet:
+
+1. **Windows:** open `AI-Offline\Manual-QA\START-DOCS.bat`.
+   **macOS:** double-click `AI-Offline/Manual-QA/start-docs.command`. **Linux:** run `AI-Offline/Manual-QA/start-docs.sh` in a terminal.
+2. When it says it is ready, open
+   **http://127.0.0.1:8081/AI-Offline/Manual-QA/** in a browser on the same computer.
+3. Ask a question, for example *"How do I control bleeding?"*. The page shows the
+   passages it found and links that open the matching PDF.
+
+It uses keyword search over downloaded text, then the bundled 3B model explains the
+passages it was given. Keep the launcher window open; press Ctrl+C to stop. The reader
+works from any folder, including a different drive letter, because its paths are relative.
+
+A manual whose text cannot be downloaded, or whose PDF changes after its text was
+published, is left out rather than guessed at. Its name appears under "Unavailable
+sources" in the reader, and the installer self-check reports the gap.
+
+> **What the citations mean.** A numbered citation points to one of the passages shown
+> under the answer, and each passage links to a PDF. It does not prove the AI understood
+> the passage. Read the PDF before acting on anything safety-critical. Keyword search can
+> also miss relevant wording.
+
+> **Not included in a `--lite` install: GPT4All.** If you built this drive with `--lite` /
+> `-Lite`, the GPT4All installer below is not here. The Ask the manuals reader still works.
+> To also add GPT4All's LocalDocs workflow, re-run the installer into the same drive
+> **without** the lite flag, or download GPT4All from **gpt4all.io** while you still have
+> internet.
+
+The rest of this guide covers GPT4All LocalDocs, which can index extra folders of your own
+PDFs and text files.
 
 ---
 
@@ -58,11 +91,13 @@ your docs for search). We'll reuse our models for (a) and let it fetch the tiny 
    download any small model it offers (e.g. Llama 3.2 3B) — this needs internet and is
    a one-time step.
 
-### 2b. Enable the document reader (LocalDocs) — fetches the embedding model once
+### 2b. Enable the document reader (LocalDocs)
 1. Click **LocalDocs** (left sidebar).
 2. Click **"+ Add Collection"** / **"Add Docs"**.
-3. The first time, GPT4All will **download a small embedding model automatically**
-   (needs internet, ~tens of MB, one time only). Let it finish.
+3. If GPT4All says its local embedding model is missing, keep the release's
+   `nomic-embed-text-v1.5.f16.gguf` resource next to the installed application and
+   restart it. The v3.10.0 release loads this file from its own resources folder;
+   do not assume it is downloaded when a collection is created.
 
 Once 2a and 2b are done, **everything works offline from now on.**
 

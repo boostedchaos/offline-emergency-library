@@ -6,7 +6,7 @@
 <blockquote style="border-left-color:#ff5a5f;background:rgba(209,43,47,.1)">🖨️ <strong>Before the battery dies:</strong> print <strong><a href="EMERGENCY-ESSENTIALS.html">Emergency essentials</a></strong> — one page of the most critical reminders (bleeding, CPR, water, signalling, frequencies) that works on paper with no power.</blockquote>
 <blockquote><strong>How this kit is meant to be used:</strong> the books, manuals and maps are the authority. The offline AI is a fast <strong>assistant</strong>: it helps you <em>find and digest</em> the library - search it, summarize it, cross-reference it. For anything safety-critical (medical doses, water treatment, first-aid steps), read the manual itself and follow it.</blockquote>
 <blockquote><strong>Windows vs macOS/Linux:</strong> launchers are <code>.bat</code> files on Windows and <code>.sh</code> files on macOS/Linux (run them from a terminal). The content, PDFs, HTML guides, and phone apps are identical on every platform.</blockquote>
-<blockquote><strong>Three ways to read and use things on this drive:</strong> - <strong>PDFs and these guides (.html)</strong> open in <strong>Edge or any web browser</strong> — no software. - <strong><code>.zim</code> archives</strong> open in <strong>Kiwix</strong> (portable, no install) — see   <code>E:\Kiwix-Reader\</code>. - <strong>Ask questions of the bundled docs</strong> = <strong>GPT4All LocalDocs</strong> - see <code>E:\AI-Offline\DocReader-GPT4All\</code>.</blockquote>
+<blockquote><strong>Three ways to read and use things on this drive:</strong> - <strong>PDFs and these guides (.html)</strong> open in <strong>Edge or any web browser</strong> — no software. - <strong><code>.zim</code> archives</strong> open in <strong>Kiwix</strong> (portable, no install) — see   <code>E:\Kiwix-Reader\</code>. - <strong>Ask questions of the bundled docs</strong> = <strong>Ask the manuals</strong> - run <code>AI-Offline\Manual-QA\START-DOCS.bat</code> (<code>start-docs.command</code> on macOS, <code>start-docs.sh</code> on Linux), then open <code>http://127.0.0.1:8081/AI-Offline/Manual-QA/</code>. GPT4All LocalDocs can also index folders of your own files.</blockquote>
 <hr>
 <h2>What's on this drive</h2>
 <table><thead><tr>
@@ -22,14 +22,20 @@
 <td><code>AI-Offline\HOW-TO-RUN-OFFLINE-AI.html</code></td>
 </tr>
 <tr>
+<td><code>AI-Offline\Manual-QA\</code></td>
+<td>Ask the <strong>bundled manuals</strong> questions (shows the passages it used and links the PDFs) - works with no setup</td>
+<td><code>START-DOCS.bat</code> / <code>start-docs.command</code> / <code>start-docs.sh</code>, then the local page</td>
+<td><a href="AI-Offline/DocReader-GPT4All/HOW-TO-ASK-YOUR-DOCS.html">AI-Offline\DocReader-GPT4All\HOW-TO-ASK-YOUR-DOCS.html</a></td>
+</tr>
+<tr>
 <td><code>AI-Offline\DocReader-GPT4All\</code></td>
-<td>Ask the <strong>bundled manuals</strong> questions (shows the sources it used) - recommended for medical &amp; survival</td>
+<td>Optional: index <strong>your own</strong> PDFs and notes with LocalDocs</td>
 <td>Install once, then offline</td>
 <td><code>...\HOW-TO-ASK-YOUR-DOCS.html</code></td>
 </tr>
 <tr>
 <td><code>Manuals\</code></td>
-<td>Survival &amp; repair manuals (Army FMs, iFixit, Appropedia, FEMA/EPA/knots)</td>
+<td>Survival &amp; repair manuals (Army FMs, iFixit, Appropedia, FEMA/EPA/knots/bow-hunting, household DIY)</td>
 <td>PDF→browser, ZIM→Kiwix</td>
 <td><code>Manuals\READ-ME-FIRST.html</code></td>
 </tr>
@@ -138,6 +144,11 @@
 <td>with <code>-BrowserMaps</code> / <code>--browser-maps</code></td>
 </tr>
 <tr>
+<td><code>AI-Offline\Manual-QA\START-DOCS.bat</code> / <code>start-docs.sh</code></td>
+<td><strong>Ask the manuals</strong> with source passages and PDF links - starts a local server, then open <code>http://127.0.0.1:8081/AI-Offline/Manual-QA/</code></td>
+<td>always</td>
+</tr>
+<tr>
 <td><code>CHECK-DRIVE.bat</code> / <code>.sh</code></td>
 <td><strong>Re-check every file</strong> on the drive for damage and print only the problems</td>
 <td>always</td>
@@ -151,7 +162,7 @@
 <li><strong>Navigate without a device:</strong> open <code>OsmAnd\MAP-AND-COMPASS.html</code> and print it while preparing the kit. Keep a paper topographic map and compass.</li>
 <li><strong>Keep a device charged off-grid:</strong> read <a href="POWER-AND-DEVICES.html">Power and devices</a> for battery sizing, solar/car charging and low-power reading setups.</li>
 <li><strong>I want to chat with an AI offline:</strong> <code>AI-Offline\</code> → double-click <code>CHAT-3B-light.bat</code> (great for brainstorming and summaries; for anything safety-critical, follow the manuals).</li>
-<li><strong>I want the AI to answer from my manuals - recommended for medical &amp; survival questions:</strong> set up <code>DocReader-GPT4All</code> (see its guide); its <strong>LocalDocs</strong> feature answers from the bundled docs and <em>shows the sources it used</em>, so you can check them. Point it at <code>Manuals\ArmyFieldManuals</code> and <code>Medical\Manuals-PDF</code>, ask away.</li>
+<li><strong>I want the AI to answer from my manuals - recommended for medical &amp; survival questions:</strong> open <code>AI-Offline\Manual-QA\START-DOCS.bat</code> (<code>start-docs.command</code> on macOS, <code>start-docs.sh</code> on Linux), then open <code>http://127.0.0.1:8081/AI-Offline/Manual-QA/</code> and ask. The page shows the passages it used and links each one to the PDF, so you can check them. No setup or internet is needed.</li>
 </ul>
 <ul>
 <li><strong>I need to fix something (car/appliance/plumbing/electrical):</strong> open Kiwix →</li>
@@ -162,7 +173,7 @@
 </ul>
 <p>  <code>Medical\Manuals-PDF</code>; Army first aid in <code>Manuals\ArmyFieldManuals</code>.</p>
 <ul>
-<li><strong>Survival / water / food:</strong> <code>Manuals\Survival-Preparedness</code> has FEMA <em>Are You Ready?</em>, the EPA water-disinfection guide and a knots book; plus the Army survival PDFs in <code>Manuals\ArmyFieldManuals</code>, Appropedia DIY in Kiwix, and the USDA food guides in <code>Manuals\Food-Preservation</code>.</li>
+<li><strong>Survival / water / food:</strong> <code>Manuals\Survival-Preparedness</code> has FEMA <em>Are You Ready?</em>, the EPA water-disinfection guide, a knots book and a bow-hunting guide (Pope, 1923); plus the Army survival PDFs in <code>Manuals\ArmyFieldManuals</code>, make-it-yourself projects in <code>Manuals\Household-DIY</code>, Appropedia DIY in Kiwix, and the USDA food guides in <code>Manuals\Food-Preservation</code>.</li>
 </ul>
 <p>  survival PDFs.</p>
 <ul>
@@ -204,7 +215,7 @@
 </tr>
 <tr>
 <td>AI doc-Q&amp;A</td>
-<td><strong>GPT4All</strong> (one-time install; self-contained, CPU)</td>
+<td><strong>Ask the manuals</strong> (no setup, CPU) + optional <strong>GPT4All</strong> for your own folders</td>
 <td>✅ installer in <code>DocReader-GPT4All</code></td>
 </tr>
 <tr>

@@ -12,18 +12,14 @@ Contributor-driven reliability and portability work, from people running the kit
 hardware.
 
 ### Added
-- **Fresh install from a selection file: `-Selection` / `--select` (#139, milestone 1).** A new
-  `catalog.json` lists the pieces a selection can name: their ids, what each one needs and the
-  sizes the space estimate uses. `--select selection.json` (or `-Selection`) reads
-  `{"pieces":[...],"regions":[...]}`, turns it into the existing `--lite`, `--skip-*`,
-  `--region` and opt-in flags, and runs the normal install. `--check-selection` /
-  `-CheckSelection` prints the result and stops. A bad file, an unknown id or a missing piece
-  that another one needs stops the installer before it creates anything. A new CI check,
-  `.github/scripts/check-catalog.sh`, runs every catalog id through both installers and fails
-  when a catalog size differs from the installers' estimate. No picker page yet (milestone 2).
-  Plan by [@EnragedAntelope](https://github.com/EnragedAntelope) and
-  [@elhajahmadj](https://github.com/elhajahmadj) in #139.
-  _[@boostedchaos](https://github.com/boostedchaos)._
+- **More public-domain guides: bow-hunting, household DIY and historical herbals.** Four more
+  openly-usable references now ship on every drive: ***Hunting with the Bow and Arrow*** (Saxton
+  Pope, 1923) in `Manuals/Survival-Preparedness/`; ***The Boy Mechanic, Vol. 1: 700 Things to Do***
+  (1913) in the new `Manuals/Household-DIY/`; and ***King's American Dispensatory*** (Felter &
+  Lloyd) plus Culpeper's ***Complete Herbal*** in the new `Medical/Natural-Medicine/`. All are
+  public domain. The herbals are flagged as **historical references, not current medical advice**,
+  and the 1913 DIY book carries a note that some projects are unsafe by modern standards. Extends
+  the public-domain content work in #122; follow-up sources tracked in #78/#130.
 - **Public-domain survival, water, food and knots guides, replacing the removed zimgit
   collections.** Four openly-usable references now ship on every drive, in
   `Manuals/Survival-Preparedness/` and `Manuals/Food-Preservation/`: **FEMA *Are You Ready? —
@@ -33,6 +29,19 @@ hardware.
   Splices and Rope Work*** (A. Hyatt Verrill, 1912, public domain, 150+ illustrations). All are
   public domain, so they restore the survival/water/food/knots coverage dropped with the zimgit
   ZIMs (#122) without the licensing problem. Follow-up sources are tracked in #78/#130.
+- **Offline translator in the browser.** Opt-in Translate now also writes
+  `TRANSLATE-BROWSER.bat`, macOS `translate-browser.command` and `translate-browser.sh`, using llama.cpp's bundled UI
+  with the existing interpreter prompt and temperature 0.2. The launchers wait
+  for their own local server before opening the browser and stop it when finished.
+  The terminal translator remains available. The guide explains browser chat storage.
+  Resolves #75. _[@EnragedAntelope](https://github.com/EnragedAntelope)._
+- **Manual Q&A that works on first launch.** `AI-Offline/Manual-QA/` is a browser reader
+  served by the bundled llama.cpp server: it finds passages in the downloaded manual text,
+  asks the 3B model to answer from those passages only, and links each passage to the PDF.
+  No collection setup, embedding model, Python runtime or internet is needed, and it is
+  included in lite installs too. PDFs whose text is unavailable or has changed are listed
+  instead of being answered from stale text. Source pairing and a scheduled text-freshness
+  check keep it current. Resolves #63. _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #144._
 - **Interpreter temperature comparison.** `evaluations/issue-73/` records paired
   interpreter replies and chrF++ scores at 0 and 0.2, including repetition and
   mistranslation failures. The existing 0.2 default is retained in both installers.
