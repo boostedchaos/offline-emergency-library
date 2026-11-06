@@ -14,6 +14,10 @@
 #     pieces: translate medlineplus extra-zims browser-maps education kolibri wikipedia
 #     downloads only those pieces; stops with a plain message if one needs something missing
 #     (translate needs the AI engine). --region / --edu-lang still apply.
+#   fresh install from a selection file: --select <file> -d <drive>   (#139)
+#     the file names catalog.json ids and map regions, e.g.
+#     {"pieces":["core","maps","medlineplus"],"regions":["US_delaware"]}
+#     add --check-selection to print what it would install and stop (nothing is created).
 
 REPO_RAW="https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main"
 # Pieces --only can add to a finished drive (#74). A piece that needs something on the drive
@@ -21,6 +25,12 @@ REPO_RAW="https://raw.githubusercontent.com/elhajahmadj/offline-emergency-librar
 # table (#67) lands, read both from it.
 ONLY_PIECES="translate medlineplus extra-zims browser-maps education kolibri wikipedia"
 piece_needs(){ case "$1" in translate) echo "AI-Offline/engine/BUILD.txt|the AI engine (the translator runs on it)";; esac; }
+# Pieces a --select file can name (#139): the ids in catalog.json, in the same order, and what
+# each one needs in the same selection. .github/scripts/check-catalog.sh keeps this list,
+# select_needs, Get-OfflineLibrary.ps1 and catalog.json the same.
+SELECT_PIECES="core docqa-repair models wikipedia maps browser-maps education kolibri extra-zims translate medlineplus"
+select_needs(){ case "$1" in models|wikipedia) echo docqa-repair;; browser-maps) echo maps;; translate) echo core;; esac; }
+SELECT=""; SELECT_SET=0; CHECK_SEL=0; REGION_SET=0
 ONLY=""; ONLY_SET=0; BM_ONLY=0
 DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0; LITE=0
 REGION="US"; LISTREGIONS=0; FILTER=""
@@ -73,7 +83,9 @@ alias_region(){
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--destination) DEST="$2"; shift 2;;
-    --region)         REGION="$2"; shift 2;;
+    --region)         REGION="$2"; REGION_SET=1; shift 2;;
+    --select)         SELECT_SET=1; SELECT="${2:-}"; if [ $# -ge 2 ]; then shift 2; else shift; fi;;
+    --check-selection) CHECK_SEL=1; shift;;
     --list-regions)   LISTREGIONS=1; if [ -n "$2" ] && [ "${2#-}" = "$2" ]; then FILTER="$2"; shift 2; else shift; fi;;
     --education)      EDU=1; shift;;
     --edu-lang)       EDULANG="$2"; shift 2;;
@@ -91,6 +103,71 @@ while [ $# -gt 0 ]; do
     *) shift;;
   esac
 done
+# ---- --select: a fresh install from a selection file (#139) ----
+# The file names catalog.json ids and map regions. They are turned into the flags above
+# (--lite, --skip-*, --region, the opt-ins) and the normal install runs. Checked here,
+# before anything is created or downloaded.
+[ "$CHECK_SEL" = 0 ] || [ "$SELECT_SET" = 1 ] || { echo "ERROR: --check-selection needs --select <file>."; exit 1; }
+if [ "$SELECT_SET" = 1 ]; then
+  sel_fail(){ echo "ERROR: $*"; exit 1; }
+  [ "$ONLY_SET" = 0 ] || sel_fail "--select cannot be combined with --only. --only adds pieces to a finished drive; --select builds a new one from a selection file."
+  [ "$LITE$SKIP_WIKI$SKIP_MAPS$SKIP_MODELS$EDU$KOLIBRI$EXTRA_ZIMS$TRANSLATE$MEDLINEPLUS$BROWSER_MAPS$REGION_SET" = 00000000000 ] ||
+    sel_fail "--select cannot be combined with --lite, --skip-*, --region or a piece flag. The selection file names the pieces and regions."
+  [ -n "$SELECT" ] || sel_fail "--select needs a selection file."
+  [ -f "$SELECT" ] && [ -r "$SELECT" ] || sel_fail "selection file not found: $SELECT"
+  # The whole file must be exactly this shape (spaces and line breaks are ignored), so
+  # nothing in it is skipped unread: {"pieces":["id",...],"regions":["name",...]}
+  sel="$(LC_ALL=C tr '\t\r\n' '   ' < "$SELECT")"
+  sel="${sel#$'\xef\xbb\xbf'}"   # a UTF-8 byte order mark (Notepad adds one)
+  # A space between two name characters is inside a name ("co re"): not a selection file.
+  LC_ALL=C grep -Eq '[A-Za-z0-9_.-] +[A-Za-z0-9_.-]' <<< "$sel" && sel="bad"
+  sel="$(printf '%s' "$sel" | tr -d ' ')"
+  A='\[("[A-Za-z0-9_.-]+"(,"[A-Za-z0-9_.-]+")*)?\]'
+  LC_ALL=C grep -Eq "^\{(\"pieces\":$A(,\"regions\":$A)?|\"regions\":$A,\"pieces\":$A)\}\$" <<< "$sel" ||
+    sel_fail "$SELECT is not a selection file. Expected: {\"pieces\":[\"core\",\"maps\"],\"regions\":[\"US_delaware\"]} (regions optional). Pieces: $SELECT_PIECES"
+  SEL_P="$(printf '%s' "$sel" | sed -E 's/.*"pieces":\[([^]]*)\].*/\1/' | tr -d '"' | tr ',' ' ')"
+  SEL_R=""; case "$sel" in *'"regions":'*) SEL_R="$(printf '%s' "$sel" | sed -E 's/.*"regions":\[([^]]*)\].*/\1/' | tr -d '"')";; esac
+  [ -n "$SEL_P" ] || sel_fail "the selection names no pieces. Pieces: $SELECT_PIECES"
+  for p in $SEL_P; do
+    case " $SELECT_PIECES " in *" $p "*) ;; *) sel_fail "unknown piece '$p' in $SELECT. Pieces: $SELECT_PIECES";; esac
+  done
+  sel_has(){ case " $SEL_P " in *" $1 "*) return 0;; esac; return 1; }
+  sel_has core || sel_fail "'core' is always installed; add \"core\" to the pieces."
+  for p in $SEL_P; do for n in $(select_needs "$p"); do
+    sel_has "$n" || sel_fail "'$p' needs '$n' in the same selection; add \"$n\" to the pieces."
+  done; done
+  [ -z "$SEL_R" ] || sel_has maps || sel_fail "the selection lists regions but not 'maps'; add \"maps\" or remove the regions."
+  sel_has docqa-repair || LITE=1
+  sel_has models || SKIP_MODELS=1
+  sel_has wikipedia || SKIP_WIKI=1
+  sel_has maps || SKIP_MAPS=1
+  if sel_has browser-maps; then BROWSER_MAPS=1; fi
+  if sel_has education; then EDU=1; fi
+  if sel_has kolibri; then KOLIBRI=1; fi
+  if sel_has extra-zims; then EXTRA_ZIMS=1; fi
+  if sel_has translate; then TRANSLATE=1; fi
+  if sel_has medlineplus; then MEDLINEPLUS=1; fi
+  [ -n "$SEL_R" ] && REGION="$SEL_R"
+  SEL_LIST=""; for p in $SELECT_PIECES; do sel_has "$p" && SEL_LIST="$SEL_LIST $p"; done
+  SAME=""
+  if [ "$LITE" = 1 ]; then SAME="$SAME --lite"; else
+    [ "$SKIP_MODELS" = 1 ] && SAME="$SAME --skip-models"
+    [ "$SKIP_WIKI" = 1 ] && SAME="$SAME --skip-wikipedia"
+  fi
+  if [ "$SKIP_MAPS" = 1 ]; then SAME="$SAME --skip-maps"; else SAME="$SAME --region $REGION"; fi
+  [ "$BROWSER_MAPS" = 1 ] && SAME="$SAME --browser-maps"
+  [ "$EDU" = 1 ] && SAME="$SAME --education"
+  [ "$KOLIBRI" = 1 ] && SAME="$SAME --kolibri"
+  [ "$EXTRA_ZIMS" = 1 ] && SAME="$SAME --extra-zims"
+  [ "$TRANSLATE" = 1 ] && SAME="$SAME --translate"
+  [ "$MEDLINEPLUS" = 1 ] && SAME="$SAME --medlineplus"
+  echo "Selection file: $SELECT"
+  echo "Pieces:$SEL_LIST"
+  if [ "$SKIP_MAPS" = 1 ]; then echo "Regions: (no maps)"; else echo "Regions: $REGION"; fi
+  echo "Resolved: lite=$LITE skip-models=$SKIP_MODELS skip-wikipedia=$SKIP_WIKI skip-maps=$SKIP_MAPS region=$REGION browser-maps=$BROWSER_MAPS education=$EDU kolibri=$KOLIBRI extra-zims=$EXTRA_ZIMS translate=$TRANSLATE medlineplus=$MEDLINEPLUS"
+  echo "Same as:$SAME"
+  [ "$CHECK_SEL" = 1 ] && { echo "Selection OK (--check-selection: nothing was created or downloaded)."; exit 0; }
+fi
 # ---- --only: add pieces to a finished drive (#74) ----
 # Everything else the installer does (engine, models, manuals, maps, docs) is off; only the
 # named pieces run. Checked here, before anything is created or downloaded.
@@ -226,6 +303,7 @@ fetch_sized(){ # url out bytes
   rm -f "$2.aria2"; mv -f "$part" "$2"
 }
 if [ "$USE_ARIA" = 1 ]; then log "Downloader: aria2 (fast, multi-connection)"; else log "Downloader: curl (tip: install 'aria2' for much faster downloads)"; fi
+[ "$SELECT_SET" = 1 ] && log "Selection from $SELECT:$SEL_LIST (same as:$SAME)"
 if [ "$LITE" = 1 ]; then log "Lite preset: 3B AI, medical/survival references and maps for '$REGION' (unless skipped). Size depends on region; use --region for a small area or --skip-maps. Re-run without --lite to add the full library."; fi
 UA="Mozilla/5.0"
 

@@ -9,6 +9,7 @@
   Usage:
     .\Get-OfflineLibrary.ps1                      # will ask where to save
     .\Get-OfflineLibrary.ps1 -Destination E:\     # non-interactive
+    .\Get-OfflineLibrary.ps1 -Destination E:\ -Selection selection.json   # fresh install of a selection (#139)
   Everything is RESUMABLE: re-run to continue after an interruption.
 #>
 [CmdletBinding()]
@@ -31,12 +32,73 @@ param(
   [switch]$Translate,        # OPT-IN: offline translator (Qwen3 4B model on the AI engine, ~2.5 GB)
   [switch]$MedlinePlus,      # OPT-IN: MedlinePlus plain-language health topics (public domain, ~30 MB)
   [switch]$NoAria,           # force curl even if aria2c is installed
-  [string[]]$Only            # add just these pieces to a finished drive (#74): translate, medlineplus, extra-zims,
+  [string[]]$Only,           # add just these pieces to a finished drive (#74): translate, medlineplus, extra-zims,
                              #   browser-maps, education, kolibri, wikipedia. Example: -Only translate,medlineplus
+  [string]$Selection,        # fresh install from a selection file (#139) naming catalog.json ids and map regions:
+                             #   {"pieces":["core","maps","medlineplus"],"regions":["US_delaware"]}
+  [switch]$CheckSelection    # with -Selection: print what it would install, then stop (nothing is created)
 )
 
 $ErrorActionPreference = 'Continue'
 $ProgressPreference    = 'SilentlyContinue'
+# ---- -Selection: a fresh install from a selection file (#139) ----
+# The file names catalog.json ids and map regions. They are turned into the switches above
+# (-Lite, -Skip*, -Region, the opt-ins) and the normal install runs. Checked here, before
+# anything is created or downloaded. .github/scripts/check-catalog.sh keeps $SelectPieces,
+# $SelectNeeds, get-offline-library.sh and catalog.json the same.
+$SelectPieces = 'core','docqa-repair','models','wikipedia','maps','browser-maps','education','kolibri','extra-zims','translate','medlineplus'
+$SelectNeeds = @{ 'models' = 'docqa-repair'; 'wikipedia' = 'docqa-repair'; 'browser-maps' = 'maps'; 'translate' = 'core' }
+if($CheckSelection -and -not $PSBoundParameters.ContainsKey('Selection')){ Write-Host 'ERROR: -CheckSelection needs -Selection <file>.' -ForegroundColor Red; exit 1 }
+$SelList = ''
+if($PSBoundParameters.ContainsKey('Selection')){
+  function SelFail($m){ Write-Host "ERROR: $m" -ForegroundColor Red; exit 1 }
+  if($PSBoundParameters.ContainsKey('Only')){ SelFail '-Selection cannot be combined with -Only. -Only adds pieces to a finished drive; -Selection builds a new one from a selection file.' }
+  if($Lite -or $SkipWikipedia -or $SkipMaps -or $SkipModels -or $Education -or $Kolibri -or $ExtraZims -or $Translate -or $MedlinePlus -or $BrowserMaps -or $PSBoundParameters.ContainsKey('Region')){
+    SelFail '-Selection cannot be combined with -Lite, -Skip*, -Region or a piece switch. The selection file names the pieces and regions.' }
+  if(-not $Selection){ SelFail '-Selection needs a selection file.' }
+  if(-not (Test-Path -LiteralPath $Selection -PathType Leaf)){ SelFail "selection file not found: $Selection" }
+  # The whole file must be exactly this shape (spaces and line breaks are ignored), so
+  # nothing in it is skipped unread: {"pieces":["id",...],"regions":["name",...]}
+  $sel = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $Selection).ProviderPath) -replace '[\t\r\n]', ' '
+  # A space between two name characters is inside a name ("co re"): not a selection file.
+  if($sel -match '[A-Za-z0-9_.-] +[A-Za-z0-9_.-]'){ $sel = 'bad' }
+  $sel = $sel -replace ' ', ''
+  $A = '\[("[A-Za-z0-9_.-]+"(,"[A-Za-z0-9_.-]+")*)?\]'
+  if($sel -cnotmatch ('^\{("pieces":' + $A + '(,"regions":' + $A + ')?|"regions":' + $A + ',"pieces":' + $A + ')\}$')){
+    SelFail ("$Selection is not a selection file. Expected: {""pieces"":[""core"",""maps""],""regions"":[""US_delaware""]} (regions optional). Pieces: " + ($SelectPieces -join ' ')) }
+  $selP = @(([regex]::Match($sel, '"pieces":\[([^\]]*)\]').Groups[1].Value -split ',') | ForEach-Object { $_.Trim('"') } | Where-Object { $_ })
+  $selR = @(([regex]::Match($sel, '"regions":\[([^\]]*)\]').Groups[1].Value -split ',') | ForEach-Object { $_.Trim('"') } | Where-Object { $_ })
+  if(-not $selP.Count){ SelFail "the selection names no pieces. Pieces: $($SelectPieces -join ' ')" }
+  foreach($p in $selP){ if($SelectPieces -cnotcontains $p){ SelFail "unknown piece '$p' in $Selection. Pieces: $($SelectPieces -join ' ')" } }
+  if($selP -cnotcontains 'core'){ SelFail '''core'' is always installed; add "core" to the pieces.' }
+  foreach($p in $selP){ $n = $SelectNeeds[$p]; if($n -and $selP -cnotcontains $n){ SelFail "'$p' needs '$n' in the same selection; add ""$n"" to the pieces." } }
+  if($selR.Count -and $selP -cnotcontains 'maps'){ SelFail 'the selection lists regions but not ''maps''; add "maps" or remove the regions.' }
+  if($selP -cnotcontains 'docqa-repair'){ $Lite = $true }
+  if($selP -cnotcontains 'models'){ $SkipModels = $true }
+  if($selP -cnotcontains 'wikipedia'){ $SkipWikipedia = $true }
+  if($selP -cnotcontains 'maps'){ $SkipMaps = $true }
+  if($selP -ccontains 'browser-maps'){ $BrowserMaps = $true }
+  if($selP -ccontains 'education'){ $Education = $true }
+  if($selP -ccontains 'kolibri'){ $Kolibri = $true }
+  if($selP -ccontains 'extra-zims'){ $ExtraZims = $true }
+  if($selP -ccontains 'translate'){ $Translate = $true }
+  if($selP -ccontains 'medlineplus'){ $MedlinePlus = $true }
+  if($selR.Count){ $Region = $selR -join ',' }
+  $SelList = (@($SelectPieces | Where-Object { $selP -ccontains $_ }) -join ' ')
+  $same = @()
+  if($Lite){ $same += '-Lite' } else { if($SkipModels){ $same += '-SkipModels' }; if($SkipWikipedia){ $same += '-SkipWikipedia' } }
+  if($SkipMaps){ $same += '-SkipMaps' } else { $same += "-Region $Region" }
+  if($BrowserMaps){ $same += '-BrowserMaps' }; if($Education){ $same += '-Education' }; if($Kolibri){ $same += '-Kolibri' }
+  if($ExtraZims){ $same += '-ExtraZims' }; if($Translate){ $same += '-Translate' }; if($MedlinePlus){ $same += '-MedlinePlus' }
+  $SelSame = $same -join ' '
+  function B($x){ [int][bool]$x }
+  Write-Host "Selection file: $Selection"
+  Write-Host "Pieces: $SelList"
+  Write-Host $(if($SkipMaps){ 'Regions: (no maps)' } else { "Regions: $Region" })
+  Write-Host "Resolved: lite=$(B $Lite) skip-models=$(B $SkipModels) skip-wikipedia=$(B $SkipWikipedia) skip-maps=$(B $SkipMaps) region=$Region browser-maps=$(B $BrowserMaps) education=$(B $Education) kolibri=$(B $Kolibri) extra-zims=$(B $ExtraZims) translate=$(B $Translate) medlineplus=$(B $MedlinePlus)"
+  Write-Host "Same as: $SelSame"
+  if($CheckSelection){ Write-Host 'Selection OK (-CheckSelection: nothing was created or downloaded).'; exit 0 }
+}
 if($Lite){ $SkipWikipedia = $true; $SkipModels = $true }
 # ---- -Only: add pieces to a finished drive (#74) ----
 # Everything else the installer does (engine, models, manuals, maps, docs) is off; only the
@@ -196,6 +258,7 @@ function Fetch-Sized($url,$out,$bytes){
 }
 if($UseAria){ Log 'Downloader: aria2 (fast, multi-connection)' } else { Log "Downloader: curl (tip: install 'aria2' for much faster downloads)" }
 if($Lite){ Log "Lite preset: 3B AI, medical/survival references and maps for '$Region' (unless skipped). Size depends on region; use -Region for a small area or -SkipMaps. Re-run without -Lite to add the full library." }
+if($SelList){ Log "Selection from ${Selection}: $SelList (same as: $SelSame)" }
 if($Only){ Log "Adding to the finished library: $($Only -join ', ') (nothing else is downloaded)" }
 
 # OsmAnd map files for -Region, picked now so the space estimate below knows their size.

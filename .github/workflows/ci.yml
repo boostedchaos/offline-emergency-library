@@ -32,6 +32,8 @@ jobs:
           [ "$fail" = 0 ] || { echo "SHA256SUMS.txt is out of date — regenerate it."; exit 1; }
       - name: Launcher parity (bash vs PowerShell installer)
         run: bash .github/scripts/check-launchers.sh
+      - name: Catalog ids and sizes match both installers (#139)
+        run: bash .github/scripts/check-catalog.sh
       - name: MedlinePlus page CSP hash (inline script allowed by hash)
         run: bash .github/scripts/check-csp-hash.sh
       - name: PowerShell parse + analyze

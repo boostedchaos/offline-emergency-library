@@ -401,6 +401,8 @@ None of them are needed for a normal install.
 | `-SkipMaps` / `--skip-maps` | Don't download the maps (~17 GB saved for US) |
 | `-SkipModels` / `--skip-models` | Skip the large 8B/7B AI models, keep the small 3B (~9 GB saved) |
 | `-Only <piece>[,<piece>]` / `--only <piece>[,<piece>]` | **Add just these pieces to a drive you already made** (see below). Pieces: `translate`, `medlineplus`, `extra-zims`, `browser-maps`, `education`, `kolibri`, `wikipedia`. Cannot be combined with `-Lite`, the `-Skip` options or the piece switches above |
+| `-Selection <file>` / `--select <file>` | **Fresh install of just the pieces named in a selection file** (see below). Cannot be combined with `-Only`, `-Lite`, the `-Skip` options, `-Region` or the piece switches |
+| `-CheckSelection` / `--check-selection` | With `-Selection` / `--select`: show what the file would install, then stop (nothing is created or downloaded) |
 | `-NoAria` / `--no-aria` | Force `curl` even if `aria2c` is installed |
 
 Example: `./Get-OfflineLibrary.ps1 -Destination "F:\" -SkipWikipedia -SkipMaps`
@@ -421,6 +423,33 @@ plain message, before downloading anything, if the folder is not a finished libr
 needs something the drive lacks: `translate` needs the AI engine. Nothing is installed for you
 in that case. `browser-maps` follows `-Region` / `--region` and `education` follows
 `-EduLang` / `--edu-lang`, as in a full install.
+
+### Install from a selection file
+
+A selection file names the pieces to install and the map regions. The piece ids, what each
+one needs and their sizes are in [`catalog.json`](catalog.json):
+
+```
+{"pieces": ["core", "maps", "medlineplus"], "regions": ["US_delaware"]}
+```
+
+```
+.\Get-OfflineLibrary.ps1 -Destination "F:\" -Selection selection.json
+./get-offline-library.sh -d /mnt/usb --select selection.json
+```
+
+The installer turns the file into the usual options (it prints them as `Same as: ...`) and
+runs a normal fresh install:
+
+- `core` is always installed, so every selection names it.
+- `models` (8B + 7B) and `wikipedia` need `docqa-repair` (GPT4All, iFixit, Appropedia).
+  Leaving `docqa-repair` out is the `-Lite` / `--lite` preset.
+- `browser-maps` needs `maps`. `regions` need `maps`; `maps` with no `regions` gets the US.
+- An unknown piece, a missing piece that another one needs, or a file of any other shape
+  stops the installer before it creates or downloads anything.
+
+Add `-CheckSelection` / `--check-selection` to see what a file means without installing.
+To add pieces to a drive that is already finished, use `-Only` / `--only` instead.
 
 ---
 

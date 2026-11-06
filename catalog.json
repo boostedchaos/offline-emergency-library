@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "about": "Pieces a selection file can name: get-offline-library.sh --select <file> / Get-OfflineLibrary.ps1 -Selection <file> (#139). required: always installed. needs: other ids that must be in the same selection. gb: size in GB (1024^3 bytes) measured on a full drive, the numbers both installers' space estimate uses; null = sized at install time. CI (.github/scripts/check-catalog.sh) checks that both installers accept every id and use these numbers.",
+  "pieces": [
+    {"id": "core", "required": true, "needs": [], "gb": 6.3, "label": "core (AI engine, 3B model, medical, survival, manuals, Kiwix, phone apps)"},
+    {"id": "docqa-repair", "needs": [], "gb": 4.5, "label": "GPT4All, iFixit, Appropedia"},
+    {"id": "models", "needs": ["docqa-repair"], "gb": 8.9, "label": "8B + 7B AI models"},
+    {"id": "wikipedia", "needs": ["docqa-repair"], "gb": 49.1, "label": "Wikipedia"},
+    {"id": "maps", "needs": [], "gb": null, "gb_viewer": 0.5, "label": "OsmAnd maps for the selected regions + desktop viewer (map files are sized from the OsmAnd index)"},
+    {"id": "browser-maps", "needs": ["maps"], "gb": null, "gb_world_map": 0.2, "gb_all_us": 15.4, "state_share_of_osmand": 0.4, "label": "browser maps for the selected regions (US states)"},
+    {"id": "education", "needs": [], "gb": 168, "label": "Khan Academy"},
+    {"id": "kolibri", "needs": [], "gb": null, "label": "Kolibri learning app (content is picked in the app and not counted)"},
+    {"id": "extra-zims", "needs": [], "gb": 5.8, "label": "Wikivoyage + Wikibooks"},
+    {"id": "translate", "needs": ["core"], "gb": 2.3, "label": "translator model"},
+    {"id": "medlineplus", "needs": [], "gb": 0.1, "label": "MedlinePlus health topics"}
+  ]
+}
