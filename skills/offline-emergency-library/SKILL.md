@@ -61,9 +61,12 @@ When this skill is invoked, your job is simple:
   learning app, where the user picks subjects + video quality in-app (tens of GB). Only add
   either if the user asks for courses/education.
 - **Browser maps are opt-in.** `-BrowserMaps` / `--browser-maps` adds US street maps that open in
-  any web browser (`Maps-Browser\OPEN-MAPS`; ~16.5 GB for all states, follows `-Region`). Only add it
-  if the user asks for maps on a computer without an app. It adds to the OsmAnd maps (~17.8 GB for the
-  US), so a full US drive needs about 34 GB for maps.
+  any web browser (`Maps-Browser\OPEN-MAPS`; ~16.5 GB for all states, follows `-Region`). Offer it
+  whenever the user asks for maps on a computer: on Windows and macOS the bundled desktop viewer
+  (OsmAndMapCreator) needs internet — it draws online tiles, not the drive's maps — so browser maps
+  are the only offline computer viewer there (US only). It adds to the OsmAnd maps (~17.8 GB for the
+  US), so a full US drive needs about 34 GB for maps. For a non-US region on a computer, the only
+  offline path is still the Android app.
 - **Extra archives are opt-in.** `-ExtraZims` / `--extra-zims` adds the **Wikivoyage** travel
   guide and **Wikibooks** open textbooks (Kiwix ZIM, ~5.8 GB, CC BY-SA) in `Extra-Archives\`. Only
   add it if the user asks for travel guides or textbooks.

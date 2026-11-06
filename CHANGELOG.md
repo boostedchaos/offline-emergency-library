@@ -189,6 +189,19 @@ hardware.
   makes no network requests. Off by default. Resolves #64.
   _[@EnragedAntelope](https://github.com/EnragedAntelope) - PR #87._
 
+### Removed
+- **Dropped the five `zimgit-*` Kiwix collections (post-disaster, water, food preparation,
+  knots, medicine).** They are collections of third-party PDFs with no stated license, and
+  some items are all rights reserved (for example the SAS Survival Handbook and Foxfire), so
+  they do not meet this project's rule that everything bundled is free, openly licensed, or
+  public domain (#59). The goal of this kit is to help people, and to be a clean library
+  anyone can use however they like without taking something that is not ours to give — so we
+  removed them rather than risk the project being taken down over a licensing complaint.
+  Survival, water, food and first-aid are still covered by the public-domain US Army field
+  manuals (FM 21-76 covers water, food, knots and shelter), the USDA home-canning guide,
+  Appropedia, WikiMed and the Hesperian/WHO PDFs. A license-cleared replacement for the knots
+  guide is tracked in #78. Resolves #122.
+
 ### Changed
 - **Lite no longer leaves the AI's trust gap silent.** `--lite` / `-Lite` still omits GPT4All
   (keeping the preset lean — forcing it back in would undo the #32/#39 sizing work), but a lite

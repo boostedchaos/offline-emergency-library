@@ -23,7 +23,7 @@ recorded here so the scope and intent stay clear, and so the single-command inst
 
 7. **How many GB are survival & repair manuals (Army FMs, plumbing, electrical, auto)?** →
    Decided on a **focused core kit** from legal sources (public-domain Army manuals +
-   openly-licensed iFixit/Appropedia/zimgit), skipping copyrighted code/brand manuals.
+   openly-licensed iFixit/Appropedia), skipping copyrighted code/brand manuals.
 
 8. **How many GB is WikiMed / medical & first-aid?** → **WikiMed maxi** (~1.8 GB) + curated
    medical PDFs.

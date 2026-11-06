@@ -29,7 +29,7 @@
 </tr>
 <tr>
 <td><code>Manuals\</code></td>
-<td>Survival &amp; repair manuals (Army FMs, iFixit, Appropedia, survival/water/food)</td>
+<td>Survival &amp; repair manuals (Army FMs, iFixit, Appropedia)</td>
 <td>PDF→browser, ZIM→Kiwix</td>
 <td><code>Manuals\READ-ME-FIRST.html</code></td>
 </tr>
@@ -95,6 +95,56 @@
 </tr>
 </tbody></table>
 <hr>
+<h2>Launchers on this drive (double-click to run)</h2>
+<p>Every clickable launcher the installer wrote, and what it does. Which ones are present depends on what you installed (a <strong>lite</strong> drive skips the 8B and GPU chats; <strong>browser maps</strong> are opt-in).</p>
+<table><thead><tr>
+<th>Launcher (Windows / macOS-Linux)</th>
+<th>What it does</th>
+<th>On a full drive?</th>
+</tr></thead><tbody>
+<tr>
+<td><code>AI-Offline\CHAT-3B-light.bat</code> / <code>chat-3B-light.sh</code></td>
+<td>Offline AI chat, small <strong>3B</strong> model — ~4 GB RAM, CPU only; best on a weak PC</td>
+<td>always</td>
+</tr>
+<tr>
+<td><code>AI-Offline\CHAT-8B-smart.bat</code> / <code>chat-8B-smart.sh</code></td>
+<td>Offline AI chat, larger <strong>8B</strong> model — ~8 GB RAM, smarter answers</td>
+<td>full install</td>
+</tr>
+<tr>
+<td><code>AI-Offline\CHAT-GPU-Qwen7B.bat</code> / <code>chat-GPU-Qwen7B.sh</code></td>
+<td>Offline AI chat on a <strong>GPU</strong> (Qwen 7B, ~6 GB VRAM) for a big speed-up</td>
+<td>full install</td>
+</tr>
+<tr>
+<td><code>AI-Offline\WEB-UI.bat</code> / <code>web-ui.sh</code></td>
+<td>Offline AI in your <strong>browser</strong> — starts a local server, then open <code>http://127.0.0.1:8080</code></td>
+<td>always</td>
+</tr>
+<tr>
+<td><code>AI-Offline\TRANSLATE.bat</code> / <code>translate.sh</code></td>
+<td>Offline <strong>translator</strong> (Qwen3 4B); see <code>AI-Offline\HOW-TO-TRANSLATE.html</code></td>
+<td>with <code>-Translate</code> / <code>--translate</code></td>
+</tr>
+<tr>
+<td><code>OsmAnd\MapViewer-Desktop\VIEW-MAPS-ON-PC</code></td>
+<td>Open the <strong>desktop map viewer</strong> (OsmAndMapCreator); first run unzips the maps. <strong>Needs internet on Windows and macOS</strong> (draws online tiles); offline, use browser maps (US) or a phone</td>
+<td>with maps</td>
+</tr>
+<tr>
+<td><code>Maps-Browser\OPEN-MAPS.bat</code> / <code>.sh</code></td>
+<td><strong>Street maps in a web browser</strong> (opt-in browser maps); opens <code>http://localhost:8097</code></td>
+<td>with <code>-BrowserMaps</code> / <code>--browser-maps</code></td>
+</tr>
+<tr>
+<td><code>CHECK-DRIVE.bat</code> / <code>.sh</code></td>
+<td><strong>Re-check every file</strong> on the drive for damage and print only the problems</td>
+<td>always</td>
+</tr>
+</tbody></table>
+<blockquote><strong>Windows vs macOS/Linux:</strong> the chat / Web-UI / translator launchers, <code>OPEN-MAPS</code> and <code>CHECK-DRIVE</code> ship in <strong>both</strong> forms on every drive — <code>.bat</code> on Windows and <code>.sh</code> on macOS/Linux (run them from a terminal); macOS also gets <code>CHECK-DRIVE.command</code> for a double-click. <strong><code>VIEW-MAPS-ON-PC</code> is the exception:</strong> it's written in just one form, matching the OS that built the drive — <code>.bat</code> on a Windows-built drive, <code>.sh</code> on a macOS/Linux-built one. The GPU chat launcher uses Metal on a Mac and Vulkan on Linux.</blockquote>
+<hr>
 <h2>Quick start by need</h2>
 <ul>
 <li><strong>Prepare for a dead battery:</strong> print <code>EMERGENCY-ESSENTIALS.html</code> (one page of critical reminders) and your region's map now, while you have power.</li>
@@ -112,7 +162,7 @@
 </ul>
 <p>  <code>Medical\Manuals-PDF</code>; Army first aid in <code>Manuals\ArmyFieldManuals</code>.</p>
 <ul>
-<li><strong>Survival / water / food:</strong> Kiwix → <code>Manuals\Survival-Water-Food</code>; plus the Army</li>
+<li><strong>Survival / water / food:</strong> the Army survival PDFs in <code>Manuals\ArmyFieldManuals</code> (water, food, knots, shelter), plus Appropedia DIY in Kiwix and the USDA canning guide.</li>
 </ul>
 <p>  survival PDFs.</p>
 <ul>
