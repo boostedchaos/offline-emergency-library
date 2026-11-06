@@ -3,4 +3,4 @@
   archives unpack into a version folder (`engine/<platform>/llama-bNNNNN/`), so the launcher
   stopped with "No such file or directory". It now finds the engine the same way the other
   launchers do. A CI fixture checks the nested layout. Fixes a gap in #144.
-  _[@boostedchaos](https://github.com/boostedchaos)._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #150._
