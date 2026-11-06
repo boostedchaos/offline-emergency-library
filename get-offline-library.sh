@@ -865,39 +865,39 @@ hsz(){ du -h "$1" 2>/dev/null | cut -f1; }
   [ -f "$ROOT/START-HERE.html" ] && printf '%s' "<p>&#128073; New here? Start with <a href='START-HERE.html'><b>START-HERE.html</b></a>.</p>"
   # guides
   printf '%s' "<h2>&#128214; Guides &amp; Documentation</h2><table><tr><th>Guide</th><th>Folder</th><th>Open</th></tr>"
-  find "$ROOT" -type f -name '*.html' ! -name 'README.html' | sort | while read -r f; do
+  find "$ROOT" -type f ! -name '._*' -name '*.html' ! -name 'README.html' | sort | while read -r f; do
     rel="$(relp "$f")"; dir="$(dirname "$rel")"; [ "$dir" = "." ] && dir='(root)'
     mdrel="${rel%.html}.md"; ml=""; [ -f "$ROOT/$mdrel" ] && ml=" &middot; <a href='$mdrel'>md</a>"
     printf '%s' "<tr><td>$(nicen "$f")</td><td class='muted'>$dir</td><td><a href='$rel'>HTML</a>$ml</td></tr>"
   done
   printf '%s' "</table>"
   # pdfs
-  if find "$ROOT" -type f -name '*.pdf' | grep -q .; then
+  if find "$ROOT" -type f ! -name '._*' -name '*.pdf' | grep -q .; then
     printf '%s' "<h2>&#128218; Manuals &amp; Books (PDF)</h2><table><tr><th>Document</th><th>Folder</th><th>Size</th><th>Open</th></tr>"
-    find "$ROOT" -type f -name '*.pdf' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td>$(nicen "$f")</td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td><td><a href='$rel'>PDF</a></td></tr>"; done
+    find "$ROOT" -type f ! -name '._*' -name '*.pdf' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td>$(nicen "$f")</td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td><td><a href='$rel'>PDF</a></td></tr>"; done
     printf '%s' "</table>"
   fi
   # zims
-  if find "$ROOT" -type f -name '*.zim' | grep -q .; then
+  if find "$ROOT" -type f ! -name '._*' -name '*.zim' | grep -q .; then
     printf '%s' "<h2>&#127760; Offline Archives (ZIM &mdash; open with Kiwix)</h2><table><tr><th>Archive</th><th>Folder</th><th>Size</th><th>File</th></tr>"
-    find "$ROOT" -type f -name '*.zim' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td>$(nicen "$f")</td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td><td><a href='$rel'>open</a></td></tr>"; done
+    find "$ROOT" -type f ! -name '._*' -name '*.zim' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td>$(nicen "$f")</td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td><td><a href='$rel'>open</a></td></tr>"; done
     printf '%s' "</table>"
   fi
   # programs
   printf '%s' "<h2>&#9881; Programs &amp; Launchers</h2><table><tr><th>Item</th><th>Folder</th></tr>"
-  { find "$ROOT" -type f \( -name '*.bat' -o -name '*.sh' -o -name '*.command' -o -name '*.appimage' -o -name '*.run' -o -name '*.dmg' \); find "$ROOT" -type f -name '*.exe' | grep -iE 'installer|kiwix-desktop'; } | sort -u | while read -r f; do rel="$(relp "$f")"; dir="$(dirname "$rel")"; [ "$dir" = "." ] && dir='(root)'; printf '%s' "<tr><td><a href='$rel'>$(basename "$f")</a></td><td class='muted'>$dir</td></tr>"; done
+  { find "$ROOT" -type f ! -name '._*' \( -name '*.bat' -o -name '*.sh' -o -name '*.command' -o -name '*.appimage' -o -name '*.run' -o -name '*.dmg' \); find "$ROOT" -type f ! -name '._*' -name '*.exe' | grep -iE 'installer|kiwix-desktop'; } | sort -u | while read -r f; do rel="$(relp "$f")"; dir="$(dirname "$rel")"; [ "$dir" = "." ] && dir='(root)'; printf '%s' "<tr><td><a href='$rel'>$(basename "$f")</a></td><td class='muted'>$dir</td></tr>"; done
   printf '%s' "</table>"
   # apks
-  if find "$ROOT" -type f -name '*.apk' | grep -q .; then
+  if find "$ROOT" -type f ! -name '._*' -name '*.apk' | grep -q .; then
     printf '%s' "<h2>&#128241; Phone Apps (Android APK)</h2><table><tr><th>App</th><th>Folder</th><th>Size</th></tr>"
-    find "$ROOT" -type f -name '*.apk' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td><a href='$rel'>$(basename "$f")</a></td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td></tr>"; done
+    find "$ROOT" -type f ! -name '._*' -name '*.apk' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td><a href='$rel'>$(basename "$f")</a></td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td></tr>"; done
     printf '%s' "</table>"
   fi
   # data
-  if find "$ROOT" -type f \( -name '*.bz2' -o -name '*.obf.zip' \) | grep -q .; then
+  if find "$ROOT" -type f ! -name '._*' \( -name '*.bz2' -o -name '*.obf.zip' \) | grep -q .; then
     printf '%s' "<h2>&#128451; Data</h2><table><tr><th>Item</th><th>Folder</th><th>Size</th></tr>"
-    find "$ROOT" -type f -name '*.bz2' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td>$(basename "$f") <span class='muted'>(Wikipedia)</span></td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td></tr>"; done
-    mc=$(find "$ROOT" -type f -name '*.obf.zip' | wc -l | tr -d ' ')
+    find "$ROOT" -type f ! -name '._*' -name '*.bz2' | sort | while read -r f; do rel="$(relp "$f")"; printf '%s' "<tr><td>$(basename "$f") <span class='muted'>(Wikipedia)</span></td><td class='muted'>$(dirname "$rel")</td><td>$(hsz "$f")</td></tr>"; done
+    mc=$(find "$ROOT" -type f ! -name '._*' -name '*.obf.zip' | wc -l | tr -d ' ')
     [ "$mc" -gt 0 ] && printf '%s' "<tr><td>Offline US maps - $mc files</td><td class='muted'>OsmAnd</td><td>$(du -ch "$ROOT"/OsmAnd/*.obf.zip 2>/dev/null | tail -1 | cut -f1)</td></tr>"
     printf '%s' "</table>"
   fi
@@ -986,7 +986,7 @@ while IFS= read -r f; do
   if [ "$m" != 5a494d04 ] || [ -z "$cs" ] || [ "$sz" != "$((cs + 16))" ]; then zbad="$zbad
         $(relp "$f")"; fi
 done <<ZEOF
-$(find "$ROOT" -type f -name '*.zim' | LC_ALL=C sort)
+$(find "$ROOT" -type f ! -name '._*' -name '*.zim' | LC_ALL=C sort)
 ZEOF
 if [ "$zt" = 0 ]; then sc_warn "no Kiwix archives (.zim) found"
 elif [ -z "$zbad" ]; then sc_pass "$zt Kiwix archives (.zim): header and size OK"
@@ -998,7 +998,7 @@ while IFS= read -r f; do
   [ "$(head -c 4 "$f" 2>/dev/null)" = "%PDF" ] || pbad="$pbad
         $(relp "$f")"
 done <<PEOF
-$(find "$ROOT" -type f -name '*.pdf' | LC_ALL=C sort)
+$(find "$ROOT" -type f ! -name '._*' -name '*.pdf' | LC_ALL=C sort)
 PEOF
 if [ "$pt" = 0 ]; then sc_warn "no PDF manuals found"
 elif [ -z "$pbad" ]; then sc_pass "$pt PDF files: all start with %PDF"
