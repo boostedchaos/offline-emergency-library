@@ -10,4 +10,4 @@
   `check-catalog.sh` checks both installers use the same presets. Plan agreed with
   [@elhajahmadj](https://github.com/elhajahmadj) and
   [@EnragedAntelope](https://github.com/EnragedAntelope) in #66. Resolves #80.
-  _[@boostedchaos](https://github.com/boostedchaos) - PR #000._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #221._
