@@ -25,7 +25,8 @@ is best). The download is about 85 GB and can take several hours.
    right-click it and choose **Extract All**.
 2. In the extracted folder, double-click **`install.bat`**. If Windows says "Windows
    protected your PC", click **More info**, then **Run anyway**.
-3. Type where to save the files, for example `E:\`, and press Enter.
+3. Press Enter to install everything (or see [Pick what to install](#pick-what-to-install)).
+   Then type where to save the files, for example `E:\`, and press Enter.
 
 **Mac**
 1. [Download this project as a ZIP](https://github.com/elhajahmadj/offline-emergency-library/archive/refs/heads/main.zip).
@@ -33,7 +34,8 @@ is best). The download is about 85 GB and can take several hours.
 2. In the folder, double-click **`install.command`**. The first time, the Mac says
    *"install.command" Not Opened*: click **Done**, open **System Settings > Privacy & Security**,
    click **Open Anyway** (twice), and type your password.
-3. Type where to save the files, for example `/Volumes/MyDrive`, and press Return.
+3. Press Return to install everything (or see [Pick what to install](#pick-what-to-install)).
+   Then type where to save the files, for example `/Volumes/MyDrive`, and press Return.
 
 **Linux**
 1. Open a terminal.
@@ -43,9 +45,32 @@ is best). The download is about 85 GB and can take several hours.
    ```
 3. Type where to save the files, for example `/media/you/MyDrive`, and press Enter.
 
-That is the only question. Leave the window open until it says **Finished**, then open
+Or use the ZIP, like Windows and Mac: extract it, open a terminal in the folder and run
+`bash install.sh`. The file is not marked as executable, so start it with `bash` (or run
+`chmod +x install.sh` first). It asks the same first question as the other launchers.
+
+Leave the window open until it says **Finished**, then open
 **`START-HERE.html`** in the `OfflineLibrary` folder it made there. If the download stops, run it again the same
 way: it carries on where it left off.
+
+### Pick what to install
+
+`install.bat`, `install.command` and `install.sh` first ask **How would you like to install?**
+and offer two choices:
+
+- **A**, or just Enter: install everything. The installer then asks only where to save the files.
+- **P**: pick what to install. The launcher opens the picker page, `web/index.html`, in your
+  browser. Tick what you want, then use the button near the bottom of the page to save your
+  selection. It saves a `selection.json` file to your Downloads folder. Go back to the launcher
+  window and press a key (Return on Mac and Linux). The launcher takes the newest
+  `selection*.json` in Downloads, shows what it will install, and asks you to confirm before it
+  downloads anything. This is the same as
+  [installing from a selection file](#install-from-a-selection-file).
+
+The picker page needs the kit's `web/` folder next to the launcher. The ZIP has it. If
+`web/index.html` is not there, or there is no `selection*.json` in Downloads, the launcher says so
+and asks whether to install everything instead. Type `y` for a full install. Any other answer
+stops, with nothing downloaded.
 
 Smaller drive, another country's maps, or extra content? See
 [Advanced: options and flags](#advanced-options-and-flags).
@@ -158,7 +183,9 @@ Downloading ~85 GB can take several hours.
 ## 🚀 Other ways to install
 
 ### A) Double-click `install.bat` (Windows) or `install.command` (Mac)
-The steps are in [Start here](#start-here) at the top of this page.
+The steps are in [Start here](#start-here) at the top of this page. On Linux, run
+`bash install.sh` in the extracted ZIP. All three launchers first offer the
+[pick-or-install-everything menu](#pick-what-to-install).
 
 ### B) In Claude Code (one prompt)
 Install this repo's skill, then say:
@@ -200,7 +227,7 @@ and it continues where it left off.
 ### Platform support
 | | Windows | macOS | Linux |
 |---|---|---|---|
-| Installer | `Get-OfflineLibrary.ps1` / `install.bat` | `get-offline-library.sh` / `install.command` | `get-offline-library.sh` |
+| Installer | `Get-OfflineLibrary.ps1` / `install.bat` | `get-offline-library.sh` / `install.command` | `get-offline-library.sh` / `install.sh` |
 | Offline AI chat | ✅ (x64/ARM + Vulkan GPU) | ✅ (Metal GPU) | ✅ (x64/ARM + Vulkan GPU) |
 | GPT4All doc-Q&A | ✅ `.exe` | ✅ `.dmg` | ✅ `.run` |
 | Kiwix desktop | ✅ bundled portable | App Store / kiwix.org | ✅ bundled AppImage (x64) |
@@ -460,6 +487,7 @@ runs a normal fresh install:
 
 Add `-CheckSelection` / `--check-selection` to see what a file means without installing.
 To add pieces to a drive that is already finished, use `-Only` / `--only` instead.
+The launchers can make the file and run this for you: see [Pick what to install](#pick-what-to-install).
 
 ---
 

@@ -143,3 +143,5 @@ set up **now, while you still have internet**, so the kit is fully usable offlin
   **CHECK-DRIVE** (`CHECK-DRIVE.bat` on Windows, `CHECK-DRIVE.command` on macOS) every few
   months to find damaged files.
 - **Practice** using each tool now so it's familiar in an actual emergency.
+- **Making another drive?** That needs internet. The steps, with the launchers' "pick what to
+  install" menu, are in the project README: [Pick what to install](https://github.com/elhajahmadj/offline-emergency-library#pick-what-to-install).
