@@ -77,7 +77,8 @@ function Resolve-Pieces($selP, $selR, [switch]$Quiet){
   $script:SelList = (@($SelectPieces | Where-Object { $selP -ccontains $_ }) -join ' ')
   $same = @()
   if($Lite){ $same += '-Lite' } else { if($SkipModels){ $same += '-SkipModels' }; if($SkipWikipedia){ $same += '-SkipWikipedia' } }
-  if($SkipMaps){ $same += '-SkipMaps' } else { $same += "-Region $Region" }
+  # quoted when it lists several: at a PowerShell prompt -Region a,b is an array and does not bind (#80)
+  if($SkipMaps){ $same += '-SkipMaps' } elseif($Region -match ','){ $same += "-Region '$Region'" } else { $same += "-Region $Region" }
   if($BrowserMaps){ $same += '-BrowserMaps' }; if($Education){ $same += '-Education' }; if($Kolibri){ $same += '-Kolibri' }
   if($ExtraZims){ $same += '-ExtraZims' }; if($Translate){ $same += '-Translate' }; if($MedlinePlus){ $same += '-MedlinePlus' }
   $script:SelSame = $same -join ' '
@@ -293,7 +294,10 @@ if (-not $Destination) {
   Write-Host '  Offline Emergency Library installer' -ForegroundColor Cyan
   Write-Host '  -----------------------------------'
   $Destination = Read-Host $(if($Only){ 'Where is the drive you want to add to (the folder that holds OfflineLibrary)?' } else { 'Where would you like to save these files?' })
-  if($PSBoundParameters.Count -eq 0 -and $Destination -and -not [Console]::IsInputRedirected -and [Environment]::UserInteractive){ Invoke-GuidedQuestions }
+  # Someone just typed the destination at the console, so asking more is safe. Redirected input
+  # (CI, a pipe) keeps today's behaviour. Not [Environment]::UserInteractive: it is False in an
+  # ssh console, where the questions work like in bash.
+  if($PSBoundParameters.Count -eq 0 -and $Destination -and -not [Console]::IsInputRedirected){ Invoke-GuidedQuestions }
 }
 if (-not $Destination) { Write-Host 'No destination given. Exiting.' -ForegroundColor Red; exit 1 }
 $Root = Join-Path $Destination 'OfflineLibrary'
