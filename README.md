@@ -173,7 +173,7 @@ everything.
 irm https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/Get-OfflineLibrary.ps1 -OutFile Get-OfflineLibrary.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Get-OfflineLibrary.ps1
 ```
-It will prompt you for the save location, then download everything. Run the saved file
+It asks where to save, how much to install and which maps ([Guided install](#guided-install-no-flags)), then downloads it. Run the saved file
 rather than piping it to `iex`: piped, the installer's exit closes the PowerShell window and
 any error message with it.
 
@@ -181,7 +181,7 @@ any error message with it.
 ```bash
 curl -fsSL https://raw.githubusercontent.com/elhajahmadj/offline-emergency-library/main/get-offline-library.sh | bash
 ```
-It will prompt you for the save location, then download everything.
+It asks where to save, how much to install and which maps ([Guided install](#guided-install-no-flags)), then downloads it.
 (Requires `curl` and `tar`; `unzip` enables the desktop map viewer. All are standard.)
 
 ### E) Clone and run

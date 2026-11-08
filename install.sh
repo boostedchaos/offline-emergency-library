@@ -63,7 +63,7 @@ pick_and_install(){
 
 echo "How would you like to install?"
 echo "  [P] Pick what to install (opens a page in your browser)"
-echo "  [A] Install everything (asks only where to save) - default"
+echo "  [A] Install with a few questions (where to save, how much, which maps) - default"
 echo ""
 printf "Choose P or A [A]: "
 read -r choice

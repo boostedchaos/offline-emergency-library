@@ -21,7 +21,7 @@ if not exist "%PS1%" (
 
 echo How would you like to install?
 echo   [P] Pick what to install (opens a page in your browser)
-echo   [A] Install everything (asks only where to save) - default
+echo   [A] Install with a few questions (where to save, how much, which maps) - default
 echo.
 set "choice="
 set /p "choice=Choose P or A [A]: "

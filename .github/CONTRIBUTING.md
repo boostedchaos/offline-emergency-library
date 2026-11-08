@@ -86,8 +86,8 @@ items you checked.
 6. **Link check.** A new download URL is added to `.github/scripts/check-links.sh`.
    CI's `check-consistency.sh` fails if a manual is missing there or differs between the
    installers; other new downloads (models, archives, apps) still need a reviewer's eye.
-7. **Default behavior.** The installer still asks only where to save, maps still default
-   to US, and anything new and large is opt-in (off by default).
+7. **Default behavior.** With any flag, or with no terminal, the installer asks nothing new
+   (the guided questions from #80 appear only with no flags), maps still default to US, and anything new and large is opt-in (off by default).
 8. **CHANGELOG fragment.** A user-facing change adds one file in `changelog.d/` (Added /
    Changed / Fixed), starting with `- **Title.**` and ending with credit plus `PR #N`
    naming the PR it ships in, and does **not** edit `CHANGELOG.md`. See
