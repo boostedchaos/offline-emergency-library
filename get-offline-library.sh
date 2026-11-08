@@ -3,7 +3,7 @@
 # Mirrors Get-OfflineLibrary.ps1. Resumable: re-run to continue after an interruption.
 #
 # Usage:
-#   ./get-offline-library.sh                 # asks where to save
+#   ./get-offline-library.sh                 # guided: asks where to save, how much, which maps (#80)
 #   ./get-offline-library.sh -d /mnt/usb     # non-interactive
 #   flags: --lite  --skip-wikipedia  --skip-maps  --skip-models
 #   opt-in: --browser-maps   street maps in any web browser (US states, ~16.5 GB for all of the US)
@@ -30,6 +30,14 @@ piece_needs(){ case "$1" in translate) echo "AI-Offline/engine/BUILD.txt|the AI 
 # select_needs, Get-OfflineLibrary.ps1 and catalog.json the same.
 SELECT_PIECES="core gpt4all-repair models wikipedia maps browser-maps education kolibri extra-zims translate medlineplus"
 select_needs(){ case "$1" in models|wikipedia) echo gpt4all-repair;; browser-maps) echo maps;; translate) echo core;; esac; }
+# Size presets for the guided install (#80): the pieces in each one, in catalog order. They are
+# the "presets" in catalog.json; .github/scripts/check-catalog.sh keeps them the same.
+PRESET_SMALL="core maps"
+PRESET_STANDARD="core gpt4all-repair models wikipedia maps"
+PRESET_EVERYTHING="core gpt4all-repair models wikipedia maps browser-maps education kolibri extra-zims translate medlineplus"
+GUIDE_EXTRAS="extra-zims translate medlineplus"   # the one yes/no for Small and Standard
+GUIDE_US_GB=16.6   # US OsmAnd maps in GB (catalog.json maps.gb_default_us): preset sizes assume US maps
+NARGS=$#; GUIDED=0; GUIDED_CMD=""
 SELECT=""; SELECT_SET=0; CHECK_SEL=0; REGION_SET=0
 ONLY=""; ONLY_SET=0; BM_ONLY=0
 DEST=""; SKIP_WIKI=0; SKIP_MAPS=0; SKIP_MODELS=0; LITE=0
@@ -107,6 +115,44 @@ while [ $# -gt 0 ]; do
     *) echo "ERROR: unknown option '$1'. See the usage at the top of this script."; exit 1;;
   esac
 done
+sel_has(){ case " $SEL_P " in *" $1 "*) return 0;; esac; return 1; }
+# resolve_pieces "pieces" "regions": catalog ids -> the install flags above, then print them.
+# Used by --select (#139) and the guided install (#80), so both turn pieces into flags the
+# same way. Sets SEL_P, SEL_R, SEL_LIST and SAME (the flags as a command line).
+resolve_pieces(){
+  SEL_P="$1"; SEL_R="$2"
+  LITE=0; SKIP_MODELS=0; SKIP_WIKI=0; SKIP_MAPS=0
+  BROWSER_MAPS=0; EDU=0; KOLIBRI=0; EXTRA_ZIMS=0; TRANSLATE=0; MEDLINEPLUS=0
+  sel_has gpt4all-repair || LITE=1
+  sel_has models || SKIP_MODELS=1
+  sel_has wikipedia || SKIP_WIKI=1
+  sel_has maps || SKIP_MAPS=1
+  if sel_has browser-maps; then BROWSER_MAPS=1; fi
+  if sel_has education; then EDU=1; fi
+  if sel_has kolibri; then KOLIBRI=1; fi
+  if sel_has extra-zims; then EXTRA_ZIMS=1; fi
+  if sel_has translate; then TRANSLATE=1; fi
+  if sel_has medlineplus; then MEDLINEPLUS=1; fi
+  REGION="US"; [ -n "$SEL_R" ] && REGION="$SEL_R"
+  SEL_LIST=""; for p in $SELECT_PIECES; do sel_has "$p" && SEL_LIST="$SEL_LIST $p"; done
+  SAME=""
+  if [ "$LITE" = 1 ]; then SAME="$SAME --lite"; else
+    [ "$SKIP_MODELS" = 1 ] && SAME="$SAME --skip-models"
+    [ "$SKIP_WIKI" = 1 ] && SAME="$SAME --skip-wikipedia"
+  fi
+  if [ "$SKIP_MAPS" = 1 ]; then SAME="$SAME --skip-maps"; else SAME="$SAME --region $REGION"; fi
+  [ "$BROWSER_MAPS" = 1 ] && SAME="$SAME --browser-maps"
+  [ "$EDU" = 1 ] && SAME="$SAME --education"
+  [ "$KOLIBRI" = 1 ] && SAME="$SAME --kolibri"
+  [ "$EXTRA_ZIMS" = 1 ] && SAME="$SAME --extra-zims"
+  [ "$TRANSLATE" = 1 ] && SAME="$SAME --translate"
+  [ "$MEDLINEPLUS" = 1 ] && SAME="$SAME --medlineplus"
+  echo "Pieces:$SEL_LIST"
+  if [ "$SKIP_MAPS" = 1 ]; then echo "Regions: (no maps)"; else echo "Regions: $REGION"; fi
+  RREGION="$REGION"; [ "$SKIP_MAPS" = 1 ] && RREGION="-"   # no region is resolved when maps are skipped (#167)
+  echo "Resolved: lite=$LITE skip-models=$SKIP_MODELS skip-wikipedia=$SKIP_WIKI skip-maps=$SKIP_MAPS region=$RREGION browser-maps=$BROWSER_MAPS education=$EDU kolibri=$KOLIBRI extra-zims=$EXTRA_ZIMS translate=$TRANSLATE medlineplus=$MEDLINEPLUS"
+  echo "Same as:$SAME"
+}
 # ---- --select: a fresh install from a selection file (#139) ----
 # The file names catalog.json ids and map regions. They are turned into the flags above
 # (--lite, --skip-*, --region, the opt-ins) and the normal install runs. Checked here,
@@ -140,42 +186,13 @@ if [ "$SELECT_SET" = 1 ]; then
   for p in $SEL_P; do
     case " $SELECT_PIECES " in *" $p "*) ;; *) sel_fail "unknown piece '$p' in $SELECT. Pieces: $SELECT_PIECES";; esac
   done
-  sel_has(){ case " $SEL_P " in *" $1 "*) return 0;; esac; return 1; }
   sel_has core || sel_fail "'core' is always installed; add \"core\" to the pieces."
   for p in $SEL_P; do for n in $(select_needs "$p"); do
     sel_has "$n" || sel_fail "'$p' needs '$n' in the same selection; add \"$n\" to the pieces."
   done; done
   [ -z "$SEL_R" ] || sel_has maps || sel_fail "the selection lists regions but not 'maps'; add \"maps\" or remove the regions."
-  sel_has gpt4all-repair || LITE=1
-  sel_has models || SKIP_MODELS=1
-  sel_has wikipedia || SKIP_WIKI=1
-  sel_has maps || SKIP_MAPS=1
-  if sel_has browser-maps; then BROWSER_MAPS=1; fi
-  if sel_has education; then EDU=1; fi
-  if sel_has kolibri; then KOLIBRI=1; fi
-  if sel_has extra-zims; then EXTRA_ZIMS=1; fi
-  if sel_has translate; then TRANSLATE=1; fi
-  if sel_has medlineplus; then MEDLINEPLUS=1; fi
-  [ -n "$SEL_R" ] && REGION="$SEL_R"
-  SEL_LIST=""; for p in $SELECT_PIECES; do sel_has "$p" && SEL_LIST="$SEL_LIST $p"; done
-  SAME=""
-  if [ "$LITE" = 1 ]; then SAME="$SAME --lite"; else
-    [ "$SKIP_MODELS" = 1 ] && SAME="$SAME --skip-models"
-    [ "$SKIP_WIKI" = 1 ] && SAME="$SAME --skip-wikipedia"
-  fi
-  if [ "$SKIP_MAPS" = 1 ]; then SAME="$SAME --skip-maps"; else SAME="$SAME --region $REGION"; fi
-  [ "$BROWSER_MAPS" = 1 ] && SAME="$SAME --browser-maps"
-  [ "$EDU" = 1 ] && SAME="$SAME --education"
-  [ "$KOLIBRI" = 1 ] && SAME="$SAME --kolibri"
-  [ "$EXTRA_ZIMS" = 1 ] && SAME="$SAME --extra-zims"
-  [ "$TRANSLATE" = 1 ] && SAME="$SAME --translate"
-  [ "$MEDLINEPLUS" = 1 ] && SAME="$SAME --medlineplus"
   echo "Selection file: $SELECT"
-  echo "Pieces:$SEL_LIST"
-  if [ "$SKIP_MAPS" = 1 ]; then echo "Regions: (no maps)"; else echo "Regions: $REGION"; fi
-  RREGION="$REGION"; [ "$SKIP_MAPS" = 1 ] && RREGION="-"   # no region is resolved when maps are skipped (#167)
-  echo "Resolved: lite=$LITE skip-models=$SKIP_MODELS skip-wikipedia=$SKIP_WIKI skip-maps=$SKIP_MAPS region=$RREGION browser-maps=$BROWSER_MAPS education=$EDU kolibri=$KOLIBRI extra-zims=$EXTRA_ZIMS translate=$TRANSLATE medlineplus=$MEDLINEPLUS"
-  echo "Same as:$SAME"
+  resolve_pieces "$SEL_P" "$SEL_R"
   [ "$CHECK_SEL" = 1 ] && { echo "Selection OK (--check-selection: nothing was created or downloaded)."; exit 0; }
 fi
 # ---- --only: add pieces to a finished drive (#74) ----
@@ -220,6 +237,103 @@ if [ "$LISTREGIONS" = 1 ]; then
   rm -f "$idx" 2>/dev/null; exit 0
 fi
 
+# ---- space estimate for the chosen flags (#68) ----
+# Sizes in GB (1024^3 bytes), measured on a full drive; keep them the same as in
+# Get-OfflineLibrary.ps1 so both installers agree.
+# space_estimate: EST (one "GB|what" line per piece) and EST_GB (the sum) for the flags set now
+# and MAP_MB. The install runs it once; the guided install (#80) also runs it per preset.
+est(){ EST="$EST$1|$2
+"; }
+space_estimate(){
+  EST=""
+  [ -z "$ONLY" ] && est 6.3 "core (AI engine, 3B model, medical, survival, manuals, Kiwix, phone apps)"
+  [ "$SKIP_MODELS" = 0 ] && est 8.9 "8B + 7B AI models"
+  [ "$LITE" = 0 ] && [ -z "$ONLY" ] && est 4.5 "GPT4All, iFixit, Appropedia"
+  [ "$SKIP_WIKI" = 0 ] && est 49.1 "Wikipedia"
+  [ "$SKIP_MAPS" = 0 ] && est "$(awk -v m="$MAP_MB" 'BEGIN{printf "%.1f", m/1024 + 0.5}')" "maps for '$REGION' + desktop viewer"
+  if [ "$BROWSER_MAPS" = 1 ] && { [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; }; then
+    # all of the US ~15.4 GB; states ~0.4 of their OsmAnd size (#102); always + the world map
+    bm=0
+    for tok in $(printf '%s' "$REGION" | tr ',;' '  '); do
+      tl="$(alias_region "$tok" | tr 'A-Z' 'a-z')"
+      case "$tl" in us|world|northamerica) bm=all ;; us_*) [ "$bm" = all ] || bm=state ;; esac
+    done
+    case "$bm" in all) bmgb=15.4 ;; state) bmgb="$(awk -v m="$MAP_MB" 'BEGIN{print 0.4*m/1024}')" ;; *) bmgb=0 ;; esac
+    est "$(awk -v b="$bmgb" 'BEGIN{printf "%.1f", b + 0.2}')" "browser maps"
+  fi
+  [ "$EDU" = 1 ] && est 168 "Khan Academy"
+  [ "$EXTRA_ZIMS" = 1 ] && est 5.8 "Wikivoyage + Wikibooks"
+  [ "$TRANSLATE" = 1 ] && est 2.3 "translator model"
+  [ "$MEDLINEPLUS" = 1 ] && est 0.1 "MedlinePlus health topics"
+  EST_GB="$(printf '%s' "$EST" | awk -F'|' '{s+=$1} END{printf "%.1f", s}')"
+}
+
+# ---- guided install (#80) ----
+# With no flags at all and someone at a terminal, ask how much to install (three size presets,
+# the biggest that fits is preselected), which maps, and one yes/no; then run exactly as if the
+# matching flags were given (resolve_pieces, as --select does) and print them as a command.
+# Any flag turns this off, and with no terminal nothing here runs.
+guided_questions(){
+  ask(){ printf '%s' "$1"; ans=""; read -r ans < /dev/tty || ans=""; }
+  # free space where the files will go (the folder may not exist yet: use its nearest parent)
+  d="$DEST"; while [ ! -d "$d" ] && [ "$d" != "$(dirname "$d")" ]; do d="$(dirname "$d")"; done
+  free="$(df -Pk "$d" 2>/dev/null | awk 'NR==2{printf "%.1f", $4/1048576}')"
+  MAP_MB="$(awk -v g="$GUIDE_US_GB" 'BEGIN{printf "%d", g*1024}')"
+  gsize(){ resolve_pieces "$1" "" > /dev/null; space_estimate; printf '%s' "$EST_GB"; }   # run in $( ): changes nothing here
+  s1="$(gsize "$PRESET_SMALL")"; s2="$(gsize "$PRESET_STANDARD")"; s3="$(gsize "$PRESET_EVERYTHING")"
+  fit(){ [ -n "$free" ] && awk -v n="$1" -v f="$free" 'BEGIN{exit !(n<=f)}'; }
+  pick=1; fit "$s2" && pick=2; fit "$s3" && pick=3
+  [ -n "$free" ] || pick=2
+  echo ""
+  if [ -n "$free" ]; then echo "  Free space there: $free GB."; else echo "  Free space there: unknown (the folder could not be measured)."; fi
+  echo "  How much do you want to install? Sizes include the US maps."
+  printf '    1) Small       about %5s GB  AI chat (small model), medical, survival, Army manuals, maps\n' "$s1"
+  printf '    2) Standard    about %5s GB  Small + Wikipedia, bigger AI models, repair and DIY guides\n' "$s2"
+  printf '    3) Everything  about %5s GB  Standard + Khan Academy (168 GB), browser maps, translator,\n' "$s3"
+  printf '                                   Wikivoyage, Wikibooks, MedlinePlus, Kolibri\n'
+  if [ -n "$free" ] && ! fit "$s1"; then echo "  None of these fits. Pick Small, then a small map area or 'none' below."; fi
+  while :; do
+    ask "  Choose 1, 2 or 3 [$pick]: "
+    case "$ans" in "") ans="$pick"; break;; 1|2|3) break;; *) echo "  Please type 1, 2 or 3.";; esac
+  done
+  preset="$ans"
+  case "$preset" in 1) P="$PRESET_SMALL";; 2) P="$PRESET_STANDARD";; *) P="$PRESET_EVERYTHING";; esac
+  echo ""
+  echo "  Maps: press Enter for the whole US. Or type a country, a US state or a continent"
+  echo "  (examples: UK, France, US_texas, Germany,Austria, Europe), or 'none' for no maps."
+  while :; do
+    ask "  Maps [US]: "
+    case "$ans" in *[!A-Za-z0-9_.,\;\ -]*) echo "  Please use letters, numbers, '_', '-' and commas only."; continue;; esac
+    R="$(printf '%s' "$ans" | tr ',;' '  ' | xargs | tr ' ' ',')"
+    break
+  done
+  case "$(printf '%s' "$R" | tr 'A-Z' 'a-z')" in
+    none|no|skip) P="$(for p in $P; do case "$p" in maps|browser-maps) ;; *) printf '%s ' "$p";; esac; done)"; R="" ;;
+    us) R="" ;;
+  esac
+  if [ "$preset" != 3 ]; then   # Everything has these already
+    with="$(gsize "$P $GUIDE_EXTRAS")"; less="$(gsize "$P")"
+    more="$(awk -v a="$with" -v b="$less" 'BEGIN{printf "%.1f", a-b}')"
+    def=N; fit "$with" && def=Y
+    echo ""
+    while :; do
+      ask "  Also add a translator, MedlinePlus health pages, Wikivoyage and Wikibooks (about $more GB)? [$def]: "
+      case "$ans" in "") ans="$def"; break;; y|Y|yes|YES|Yes|n|N|no|NO|No) break;; *) echo "  Please type y or n.";; esac
+    done
+    case "$ans" in y|Y|yes|YES|Yes) P="$P $GUIDE_EXTRAS";; esac
+  fi
+  # catalog order, so the Pieces line and the command are the same every time
+  sorted=""; for p in $SELECT_PIECES; do case " $P " in *" $p "*) sorted="$sorted $p";; esac; done
+  echo ""
+  resolve_pieces "${sorted# }" "$R"
+  GUIDED=1
+  GUIDED_CMD="bash get-offline-library.sh -d $(printf '%q' "$DEST")$SAME"
+  echo ""
+  echo "  The same install as one command (run it next time to skip these questions):"
+  echo "    $GUIDED_CMD"
+  echo ""
+}
+
 if [ "$LITE" = 1 ] && [ "$SKIP_MAPS" = 0 ] && [ "$SELECT_SET" = 0 ]; then
   echo "LITE MAP SIZE: maps for '$REGION' are still included. The default US maps alone are about 17 GB."
   echo "  Keep all US maps: use --lite with no --region (the default)."
@@ -242,6 +356,7 @@ if [ -z "$DEST" ]; then
     if [ "$ONLY_SET" = 1 ]; then printf "Where is the drive you want to add to (the folder that holds OfflineLibrary)? "
     else printf "Where would you like to save these files? "; fi
     read -r DEST < /dev/tty
+    if [ "$NARGS" = 0 ] && [ -n "$DEST" ]; then guided_questions; fi
   else
     echo "No destination given and no terminal to prompt."
     echo "Re-run with a path, e.g.:  bash get-offline-library.sh -d /path/to/drive"
@@ -320,7 +435,8 @@ fetch_sized(){ # url out bytes [soft]
 }
 if [ "$USE_ARIA" = 1 ]; then log "Downloader: aria2 (fast, multi-connection)"; else log "Downloader: curl (tip: install 'aria2' for much faster downloads)"; fi
 [ "$SELECT_SET" = 1 ] && log "Selection from $SELECT:$SEL_LIST (same as:$SAME)"
-if [ "$LITE" = 1 ] && [ "$SELECT_SET" = 0 ]; then log "Lite preset: 3B AI, medical/survival references and maps for '$REGION' (unless skipped). Size depends on region; use --region for a small area or --skip-maps. Re-run without --lite to add the full library."; fi
+[ "$GUIDED" = 1 ] && log "Guided install:$SEL_LIST (same as: $GUIDED_CMD)"
+if [ "$LITE" = 1 ] && [ "$SELECT_SET" = 0 ] && [ "$GUIDED" = 0 ]; then log "Lite preset: 3B AI, medical/survival references and maps for '$REGION' (unless skipped). Size depends on region; use --region for a small area or --skip-maps. Re-run without --lite to add the full library."; fi
 UA="Mozilla/5.0"
 # Repo files fetched later (guides, map viewer, helpers) come from the commit main is on now,
 # not from a main that moved during a run of several hours (#193). Falls back to main.
@@ -387,31 +503,8 @@ if [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; then   # --only browser-maps need
   fi
 fi
 
-# ---- space estimate for the chosen flags (#68) ----
-# Sizes in GB (1024^3 bytes), measured on a full drive; keep them the same as in
-# Get-OfflineLibrary.ps1 so both installers agree.
-EST=""; est(){ EST="$EST$1|$2
-"; }
-[ -z "$ONLY" ] && est 6.3 "core (AI engine, 3B model, medical, survival, manuals, Kiwix, phone apps)"
-[ "$SKIP_MODELS" = 0 ] && est 8.9 "8B + 7B AI models"
-[ "$LITE" = 0 ] && [ -z "$ONLY" ] && est 4.5 "GPT4All, iFixit, Appropedia"
-[ "$SKIP_WIKI" = 0 ] && est 49.1 "Wikipedia"
-[ "$SKIP_MAPS" = 0 ] && est "$(awk -v m="$MAP_MB" 'BEGIN{printf "%.1f", m/1024 + 0.5}')" "maps for '$REGION' + desktop viewer"
-if [ "$BROWSER_MAPS" = 1 ] && { [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; }; then
-  # all of the US ~15.4 GB; states ~0.4 of their OsmAnd size (#102); always + the world map
-  bm=0
-  for tok in $(printf '%s' "$REGION" | tr ',;' '  '); do
-    tl="$(alias_region "$tok" | tr 'A-Z' 'a-z')"
-    case "$tl" in us|world|northamerica) bm=all ;; us_*) [ "$bm" = all ] || bm=state ;; esac
-  done
-  case "$bm" in all) bmgb=15.4 ;; state) bmgb="$(awk -v m="$MAP_MB" 'BEGIN{print 0.4*m/1024}')" ;; *) bmgb=0 ;; esac
-  est "$(awk -v b="$bmgb" 'BEGIN{printf "%.1f", b + 0.2}')" "browser maps"
-fi
-[ "$EDU" = 1 ] && est 168 "Khan Academy"
-[ "$EXTRA_ZIMS" = 1 ] && est 5.8 "Wikivoyage + Wikibooks"
-[ "$TRANSLATE" = 1 ] && est 2.3 "translator model"
-[ "$MEDLINEPLUS" = 1 ] && est 0.1 "MedlinePlus health topics"
-EST_GB="$(printf '%s' "$EST" | awk -F'|' '{s+=$1} END{printf "%.1f", s}')"
+# ---- space estimate for the chosen flags (#68): space_estimate, defined above ----
+space_estimate
 FREE_GB="$(df -Pk "$ROOT" 2>/dev/null | awk 'NR==2{printf "%.1f", $4/1048576}')"
 # Folder bytes do not prove this selection's downloads are complete: they can be
 # unrelated files, old editions, unpacked maps or preallocated partial files (#102).
@@ -1439,6 +1532,7 @@ elif [ -d "$MVD" ]; then
   fi
 fi
 
+if [ "$GUIDED" = 1 ]; then echo ""; echo "  The same install as one command: $GUIDED_CMD"; fi
 if [ "$SC_FAIL" = 0 ]; then
   log "=== DONE. Open README.html (full index) or START-HERE.html ==="
   echo ""

@@ -3,11 +3,13 @@
 # keeps it and both installers the same:
 #   1. catalog.json is plain ASCII JSON; ids are unique and lower-case; every piece has a label
 #      and a gb (null when the size is found at install time).
-#   2. Both installers list the same ids, in the same order (SELECT_PIECES / $SelectPieces).
+#   2. Both installers list the same ids, in the same order (SELECT_PIECES / $SelectPieces), and
+#      the same pieces in each guided-install size preset (PRESET_* / $Preset*, #80).
 #   3. Every size in catalog.json is the number both installers' space estimate uses.
 #   4. Both installers accept every id with --select / -Selection (in --check-selection mode,
 #      which stops before anything is created or downloaded) and print the same result; each
 #      "needs" is enforced; bad files, an unknown id and mixed flags are refused with exit 1.
+#      Each size preset is a valid selection too.
 # Needs bash and pwsh. Used by CI (lint job). OEL_CATALOG=<file> checks another copy of the
 # catalog (to prove this check fails on a bad one). OEL_PS=powershell.exe runs the PowerShell
 # side with Windows PowerShell 5.1 (from Git Bash).
@@ -38,6 +40,9 @@ foreach($p in $pieces){
   $gb = if($null -eq $p.gb){ 'null' } else { ([double]$p.gb).ToString($inv) }
   $req = if($p.required){ 1 } else { 0 }
   "PIECE|$($p.id)|$gb|$($needs -join ' ')|$req|$($p.label)"
+  $pre = @($p.presets | Where-Object { $_ })
+  foreach($x in $pre){ if("$x" -cnotin 'small','standard','everything'){ throw "'$($p.id)' has unknown preset '$x'" } }
+  "PRESETS|$($p.id)|$($pre -join ' ')"
   foreach($pr in $p.PSObject.Properties){   # every other number is a size constant (text fields are not checked here)
     $v = $pr.Value; $isNum = ($v -is [int]) -or ($v -is [long]) -or ($v -is [double]) -or ($v -is [decimal])
     if($isNum -and $pr.Name -cnotin 'id','required','needs','gb','label'){ "NUM|$($p.id)|$($pr.Name)|$(([double]$v).ToString($inv))" }
@@ -55,6 +60,16 @@ sh_ids="$(sed -n 's/^SELECT_PIECES="\(.*\)"$/\1/p' get-offline-library.sh)"
 ps_ids="$(tr -d '\r' < Get-OfflineLibrary.ps1 | sed -n "s/^\$SelectPieces = \(.*\)$/\1/p" | tr -d "'" | tr ',' ' ')"
 [ "$sh_ids" = "$ids" ] || bad "get-offline-library.sh SELECT_PIECES is '$sh_ids', catalog has '$ids'"
 [ "$ps_ids" = "$ids" ] || bad "Get-OfflineLibrary.ps1 \$SelectPieces is '$ps_ids', catalog has '$ids'"
+preset_ids(){ awk -F'|' -v p="$1" '$1=="PRESETS"{n=split($3,a," "); for(i=1;i<=n;i++) if(a[i]==p) printf "%s ", $2}' "$T/cat.tsv" | sed 's/ $//'; }
+for pr in small:SMALL:Small standard:STANDARD:Standard everything:EVERYTHING:Everything; do
+  name="${pr%%:*}"; rest="${pr#*:}"; want="$(preset_ids "$name")"
+  sh_p="$(sed -n "s/^PRESET_${rest%%:*}=\"\(.*\)\"$/\1/p" get-offline-library.sh)"
+  ps_p="$(tr -d '\r' < Get-OfflineLibrary.ps1 | sed -n "s/^\$Preset${rest#*:} = \(.*\)$/\1/p" | tr -d "'" | tr ',' ' ')"
+  [ -n "$want" ] || bad "no piece in $CAT is in the '$name' preset"
+  [ "$sh_p" = "$want" ] || bad "get-offline-library.sh PRESET_${rest%%:*} is '$sh_p', catalog '$name' preset has '$want'"
+  [ "$ps_p" = "$want" ] || bad "Get-OfflineLibrary.ps1 \$Preset${rest#*:} is '$ps_p', catalog '$name' preset has '$want'"
+  [ "$sh_p" = "$want" ] && [ "$ps_p" = "$want" ] && echo "  ok: preset $name = $want"
+done
 
 # ---- 3. every catalog size is the one the space estimates use
 tr -d '\r' < Get-OfflineLibrary.ps1 > "$T/ps1.txt"
@@ -69,6 +84,7 @@ while IFS='|' read -r kind id a b c label; do
   elif [ "$kind" = NUM ]; then
     case "$id.$a" in
       maps.gb_viewer) has1 get-offline-library.sh "m/1024 + $b}" && has1 "$T/ps1.txt" "[math]::Round(\$mapGB + $b, 1)" ;;
+      maps.gb_default_us) has1 get-offline-library.sh "GUIDE_US_GB=$b " && has1 "$T/ps1.txt" "\$GuideUsGB = $b " ;;
       browser-maps.gb_world_map) has1 get-offline-library.sh "b + $b}" && has1 "$T/ps1.txt" "[math]::Round(\$bm + $b, 1)" ;;
       browser-maps.gb_all_us) has1 get-offline-library.sh "all) bmgb=$b ;;" && has1 "$T/ps1.txt" "){ $b } elseif" ;;
       browser-maps.state_share_of_osmand) has1 get-offline-library.sh "print $b*m/1024}" && has1 "$T/ps1.txt" "{ $b * \$mapGB }" ;;
@@ -127,6 +143,12 @@ for id in $ids; do
   set -- $(uniq_words core $(needs_of "$id") "$id")
   case " $* " in *" maps "*) r=',"regions":["US_delaware"]';; *) r="";; esac
   ok "id-$id" "{\"pieces\":[$(q "$@")]$r}"
+done
+echo "== each size preset (#80) is a valid selection"
+for name in small standard everything; do
+  # shellcheck disable=SC2046
+  set -- $(preset_ids "$name")
+  ok "preset-$name" "{\"pieces\":[$(q "$@")]}"
 done
 echo "== each 'needs' is enforced"
 for id in $ids; do

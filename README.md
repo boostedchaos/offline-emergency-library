@@ -417,6 +417,31 @@ None of them are needed for a normal install.
 
 Example: `./Get-OfflineLibrary.ps1 -Destination "F:\" -SkipWikipedia -SkipMaps`
 
+### Guided install (no flags)
+
+Run the installer with no flags at all (from a terminal, or by double-clicking `install.bat`,
+`install.command` or `install.sh`) and it asks at most four short questions:
+
+1. Where to save the files.
+2. How much: **Small** (the same as `-Lite` / `--lite`), **Standard** (the normal install) or
+   **Everything** (every piece in [`catalog.json`](catalog.json), with Khan Academy at about
+   168 GB). It shows the free space and preselects the biggest one that fits.
+3. Maps: press Enter for the US, or type a region (the same names as `-Region` / `--region`,
+   for example `UK`, `France` or `US_texas`), or `none`.
+4. Small and Standard only: one yes/no to add the translator, MedlinePlus, Wikivoyage and
+   Wikibooks (about 8.2 GB).
+
+It then prints the same install as one command, and prints it again when it finishes:
+
+```
+bash get-offline-library.sh -d /Volumes/USB --region US
+.\Get-OfflineLibrary.ps1 -Destination 'E:\' -Region US
+```
+
+Any flag turns the questions off: with `-Destination` / `-d` or any option above, the installer
+runs exactly as before. With no terminal (CI, `curl | bash` with no terminal, redirected input)
+it asks nothing new either.
+
 ### Add one piece to a finished drive
 
 To add something later without re-running the whole install, point the installer at the same

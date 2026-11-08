@@ -7,7 +7,7 @@
   documentation (Markdown + HTML).
 
   Usage:
-    .\Get-OfflineLibrary.ps1                      # will ask where to save
+    .\Get-OfflineLibrary.ps1                      # guided: asks where to save, how much, which maps (#80)
     .\Get-OfflineLibrary.ps1 -Destination E:\     # non-interactive
     .\Get-OfflineLibrary.ps1 -Destination E:\ -Selection selection.json   # fresh install of a selection (#139)
   Everything is RESUMABLE: re-run to continue after an interruption.
@@ -48,6 +48,46 @@ $ProgressPreference    = 'SilentlyContinue'
 # $SelectNeeds, get-offline-library.sh and catalog.json the same.
 $SelectPieces = 'core','gpt4all-repair','models','wikipedia','maps','browser-maps','education','kolibri','extra-zims','translate','medlineplus'
 $SelectNeeds = @{ 'models' = 'gpt4all-repair'; 'wikipedia' = 'gpt4all-repair'; 'browser-maps' = 'maps'; 'translate' = 'core' }
+# Size presets for the guided install (#80): the pieces in each one, in catalog order. They are
+# the "presets" in catalog.json; .github/scripts/check-catalog.sh keeps them the same.
+$PresetSmall = 'core','maps'
+$PresetStandard = 'core','gpt4all-repair','models','wikipedia','maps'
+$PresetEverything = 'core','gpt4all-repair','models','wikipedia','maps','browser-maps','education','kolibri','extra-zims','translate','medlineplus'
+$GuideExtras = 'extra-zims','translate','medlineplus'   # the one yes/no for Small and Standard
+$GuideUsGB = 16.6   # US OsmAnd maps in GB (catalog.json maps.gb_default_us): preset sizes assume US maps
+$Guided = $false; $GuidedCmd = ''
+function B($x){ [int][bool]$x }
+function Gb($x){ ([double]$x).ToString('0.0', [cultureinfo]::InvariantCulture) }   # same text on every locale
+# Resolve-Pieces pieces regions: catalog ids -> the install switches above, then print them.
+# Used by -Selection (#139) and the guided install (#80), so both turn pieces into switches the
+# same way. Sets $SelList and $SelSame (the switches as a command line).
+function Resolve-Pieces($selP, $selR, [switch]$Quiet){
+  $selP = @($selP); $selR = @($selR | Where-Object { $_ })
+  $script:Lite = $selP -cnotcontains 'gpt4all-repair'
+  $script:SkipModels = $selP -cnotcontains 'models'
+  $script:SkipWikipedia = $selP -cnotcontains 'wikipedia'
+  $script:SkipMaps = $selP -cnotcontains 'maps'
+  $script:BrowserMaps = $selP -ccontains 'browser-maps'
+  $script:Education = $selP -ccontains 'education'
+  $script:Kolibri = $selP -ccontains 'kolibri'
+  $script:ExtraZims = $selP -ccontains 'extra-zims'
+  $script:Translate = $selP -ccontains 'translate'
+  $script:MedlinePlus = $selP -ccontains 'medlineplus'
+  $script:Region = if($selR.Count){ $selR -join ',' } else { 'US' }
+  $script:SelList = (@($SelectPieces | Where-Object { $selP -ccontains $_ }) -join ' ')
+  $same = @()
+  if($Lite){ $same += '-Lite' } else { if($SkipModels){ $same += '-SkipModels' }; if($SkipWikipedia){ $same += '-SkipWikipedia' } }
+  if($SkipMaps){ $same += '-SkipMaps' } else { $same += "-Region $Region" }
+  if($BrowserMaps){ $same += '-BrowserMaps' }; if($Education){ $same += '-Education' }; if($Kolibri){ $same += '-Kolibri' }
+  if($ExtraZims){ $same += '-ExtraZims' }; if($Translate){ $same += '-Translate' }; if($MedlinePlus){ $same += '-MedlinePlus' }
+  $script:SelSame = $same -join ' '
+  if($Quiet){ return }
+  Write-Host "Pieces: $SelList"
+  Write-Host $(if($SkipMaps){ 'Regions: (no maps)' } else { "Regions: $Region" })
+  $rRegion = if($SkipMaps){ '-' } else { $Region }   # no region is resolved when maps are skipped (#167)
+  Write-Host "Resolved: lite=$(B $Lite) skip-models=$(B $SkipModels) skip-wikipedia=$(B $SkipWikipedia) skip-maps=$(B $SkipMaps) region=$rRegion browser-maps=$(B $BrowserMaps) education=$(B $Education) kolibri=$(B $Kolibri) extra-zims=$(B $ExtraZims) translate=$(B $Translate) medlineplus=$(B $MedlinePlus)"
+  Write-Host "Same as: $SelSame"
+}
 if($CheckSelection -and -not $PSBoundParameters.ContainsKey('Selection')){ Write-Host 'ERROR: -CheckSelection needs -Selection <file>.' -ForegroundColor Red; exit 1 }
 $SelList = ''
 if($PSBoundParameters.ContainsKey('Selection')){
@@ -78,31 +118,8 @@ if($PSBoundParameters.ContainsKey('Selection')){
   if($selP -cnotcontains 'core'){ SelFail '''core'' is always installed; add "core" to the pieces.' }
   foreach($p in $selP){ $n = $SelectNeeds[$p]; if($n -and $selP -cnotcontains $n){ SelFail "'$p' needs '$n' in the same selection; add ""$n"" to the pieces." } }
   if($selR.Count -and $selP -cnotcontains 'maps'){ SelFail 'the selection lists regions but not ''maps''; add "maps" or remove the regions.' }
-  if($selP -cnotcontains 'gpt4all-repair'){ $Lite = $true }
-  if($selP -cnotcontains 'models'){ $SkipModels = $true }
-  if($selP -cnotcontains 'wikipedia'){ $SkipWikipedia = $true }
-  if($selP -cnotcontains 'maps'){ $SkipMaps = $true }
-  if($selP -ccontains 'browser-maps'){ $BrowserMaps = $true }
-  if($selP -ccontains 'education'){ $Education = $true }
-  if($selP -ccontains 'kolibri'){ $Kolibri = $true }
-  if($selP -ccontains 'extra-zims'){ $ExtraZims = $true }
-  if($selP -ccontains 'translate'){ $Translate = $true }
-  if($selP -ccontains 'medlineplus'){ $MedlinePlus = $true }
-  if($selR.Count){ $Region = $selR -join ',' }
-  $SelList = (@($SelectPieces | Where-Object { $selP -ccontains $_ }) -join ' ')
-  $same = @()
-  if($Lite){ $same += '-Lite' } else { if($SkipModels){ $same += '-SkipModels' }; if($SkipWikipedia){ $same += '-SkipWikipedia' } }
-  if($SkipMaps){ $same += '-SkipMaps' } else { $same += "-Region $Region" }
-  if($BrowserMaps){ $same += '-BrowserMaps' }; if($Education){ $same += '-Education' }; if($Kolibri){ $same += '-Kolibri' }
-  if($ExtraZims){ $same += '-ExtraZims' }; if($Translate){ $same += '-Translate' }; if($MedlinePlus){ $same += '-MedlinePlus' }
-  $SelSame = $same -join ' '
-  function B($x){ [int][bool]$x }
   Write-Host "Selection file: $Selection"
-  Write-Host "Pieces: $SelList"
-  Write-Host $(if($SkipMaps){ 'Regions: (no maps)' } else { "Regions: $Region" })
-  $rRegion = if($SkipMaps){ '-' } else { $Region }   # no region is resolved when maps are skipped (#167)
-  Write-Host "Resolved: lite=$(B $Lite) skip-models=$(B $SkipModels) skip-wikipedia=$(B $SkipWikipedia) skip-maps=$(B $SkipMaps) region=$rRegion browser-maps=$(B $BrowserMaps) education=$(B $Education) kolibri=$(B $Kolibri) extra-zims=$(B $ExtraZims) translate=$(B $Translate) medlineplus=$(B $MedlinePlus)"
-  Write-Host "Same as: $SelSame"
+  Resolve-Pieces $selP $selR
   if($CheckSelection){ Write-Host 'Selection OK (-CheckSelection: nothing was created or downloaded).'; exit 0 }
 }
 if($Lite){ $SkipWikipedia = $true; $SkipModels = $true }
@@ -171,6 +188,97 @@ if($ListRegions){
   return
 }
 
+# Space estimate for the chosen flags (#68). Sizes in GB (1024^3 bytes), measured on a full
+# drive; keep them the same as in get-offline-library.sh so both installers agree.
+# Get-SpaceEstimate mapGB: one GB value per piece, for the switches set now. The install runs it
+# once; the guided install (#80) also runs it per preset.
+function Get-SpaceEstimate($mapGB){
+  $est = [ordered]@{}
+  if(-not $Only){ $est['core (AI engine, 3B model, medical, survival, manuals, Kiwix, phone apps)'] = 6.3 }
+  if(-not $SkipModels){ $est['8B + 7B AI models'] = 8.9 }
+  if((-not $Lite) -and (-not $Only)){ $est['GPT4All, iFixit, Appropedia'] = 4.5 }
+  if(-not $SkipWikipedia){ $est['Wikipedia'] = 49.1 }
+  if((-not $SkipMaps) -or $BmOnly){
+    if(-not $SkipMaps){ $est["maps for '$Region' + desktop viewer"] = [math]::Round($mapGB + 0.5, 1) }
+    if($BrowserMaps){
+      $rt = @(($Region -split '[,; ]') | Where-Object { $_ } | ForEach-Object { (Resolve-RegionToken $_.Trim()).ToLower() })
+      # all of the US ~15.4 GB; states ~0.4 of their OsmAnd size (#102); always + the world map
+      $bm = if(@($rt | Where-Object { $_ -in 'us','world','northamerica' }).Count){ 15.4 } elseif(@($rt | Where-Object { $_.StartsWith('us_') }).Count){ 0.4 * $mapGB } else { 0 }
+      $est['browser maps'] = [math]::Round($bm + 0.2, 1)
+    }
+  }
+  if($Education){ $est['Khan Academy'] = 168 }
+  if($ExtraZims){ $est['Wikivoyage + Wikibooks'] = 5.8 }
+  if($Translate){ $est['translator model'] = 2.3 }
+  if($MedlinePlus){ $est['MedlinePlus health topics'] = 0.1 }
+  $est
+}
+
+# ---------------------------------------------------------------- guided install (#80)
+# With no switches at all and someone at the console, ask how much to install (three size
+# presets, the biggest that fits is preselected), which maps, and one yes/no; then run exactly as
+# if the matching switches were given (Resolve-Pieces, as -Selection does) and print them as a
+# command. Any switch turns this off, and with redirected input nothing here runs.
+function Invoke-GuidedQuestions {
+  # free space where the files will go (the folder may not exist yet: use its nearest parent)
+  $free = $null
+  try {
+    $d = $Destination
+    while($d -and -not (Test-Path -LiteralPath $d -PathType Container)){ $d = Split-Path $d -Parent }
+    if($d){ $free = [math]::Round((Get-PSDrive (Get-Item -LiteralPath $d).PSDrive.Name).Free/1GB, 1) }
+  } catch { $free = $null }
+  function Size($p){ Resolve-Pieces $p @() -Quiet; [math]::Round(((Get-SpaceEstimate $GuideUsGB).Values | Measure-Object -Sum).Sum, 1) }
+  function Fits($n){ ($null -ne $free) -and ($n -le $free) }
+  $s1 = Size $PresetSmall; $s2 = Size $PresetStandard; $s3 = Size $PresetEverything
+  $pick = 1; if(Fits $s2){ $pick = 2 }; if(Fits $s3){ $pick = 3 }
+  if($null -eq $free){ $pick = 2 }
+  Write-Host ''
+  if($null -ne $free){ Write-Host "  Free space there: $(Gb $free) GB." } else { Write-Host '  Free space there: unknown (the folder could not be measured).' }
+  Write-Host '  How much do you want to install? Sizes include the US maps.'
+  Write-Host ('    1) Small       about {0,5} GB  AI chat (small model), medical, survival, Army manuals, maps' -f (Gb $s1))
+  Write-Host ('    2) Standard    about {0,5} GB  Small + Wikipedia, bigger AI models, repair and DIY guides' -f (Gb $s2))
+  Write-Host ('    3) Everything  about {0,5} GB  Standard + Khan Academy (168 GB), browser maps, translator,' -f (Gb $s3))
+  Write-Host '                                   Wikivoyage, Wikibooks, MedlinePlus, Kolibri'
+  if(($null -ne $free) -and -not (Fits $s1)){ Write-Host "  None of these fits. Pick Small, then a small map area or 'none' below." }
+  while($true){
+    $a = "$(Read-Host "  Choose 1, 2 or 3 [$pick]")".Trim()
+    if(-not $a){ $a = "$pick"; break }; if($a -in '1','2','3'){ break }; Write-Host '  Please type 1, 2 or 3.'
+  }
+  $preset = $a
+  $p = @(switch($preset){ '1' { $PresetSmall } '2' { $PresetStandard } default { $PresetEverything } })
+  Write-Host ''
+  Write-Host '  Maps: press Enter for the whole US. Or type a country, a US state or a continent'
+  Write-Host "  (examples: UK, France, US_texas, Germany,Austria, Europe), or 'none' for no maps."
+  while($true){
+    $a = "$(Read-Host '  Maps [US]')".Trim()
+    if($a -match '[^A-Za-z0-9_.,; -]'){ Write-Host "  Please use letters, numbers, '_', '-' and commas only."; continue }; break
+  }
+  $r = @($a -split '[,; ]' | Where-Object { $_ })
+  if(($r -join ',') -in 'none','no','skip'){ $p = @($p | Where-Object { $_ -notin 'maps','browser-maps' }); $r = @() }
+  elseif(($r -join ',') -eq 'us'){ $r = @() }
+  if($preset -ne '3'){   # Everything has these already
+    $with = Size ($p + $GuideExtras); $less = Size $p
+    $more = $with - $less
+    $def = if(Fits $with){ 'Y' } else { 'N' }
+    Write-Host ''
+    while($true){
+      $a = "$(Read-Host "  Also add a translator, MedlinePlus health pages, Wikivoyage and Wikibooks (about $(Gb $more) GB)? [$def]")".Trim()
+      if(-not $a){ $a = $def; break }; if($a -match '^(y|yes|n|no)$'){ break }; Write-Host '  Please type y or n.'
+    }
+    if($a -match '^(y|yes)$'){ $p += $GuideExtras }
+  }
+  # catalog order, so the Pieces line and the command are the same every time
+  $sorted = @($SelectPieces | Where-Object { $p -ccontains $_ })
+  Write-Host ''
+  Resolve-Pieces $sorted $r
+  $script:Guided = $true
+  $script:GuidedCmd = ".\Get-OfflineLibrary.ps1 -Destination '$($Destination -replace "'", "''")' $SelSame"
+  Write-Host ''
+  Write-Host '  The same install as one command (run it next time to skip these questions):'
+  Write-Host "    $GuidedCmd"
+  Write-Host ''
+}
+
 # ---------------------------------------------------------------- destination
 if($Lite -and -not $SkipMaps -and -not $PSBoundParameters.ContainsKey('Selection')){
   Write-Host "LITE MAP SIZE: maps for '$Region' are still included. The default US maps alone are about 17 GB." -ForegroundColor Yellow
@@ -185,6 +293,7 @@ if (-not $Destination) {
   Write-Host '  Offline Emergency Library installer' -ForegroundColor Cyan
   Write-Host '  -----------------------------------'
   $Destination = Read-Host $(if($Only){ 'Where is the drive you want to add to (the folder that holds OfflineLibrary)?' } else { 'Where would you like to save these files?' })
+  if($PSBoundParameters.Count -eq 0 -and $Destination -and -not [Console]::IsInputRedirected -and [Environment]::UserInteractive){ Invoke-GuidedQuestions }
 }
 if (-not $Destination) { Write-Host 'No destination given. Exiting.' -ForegroundColor Red; exit 1 }
 $Root = Join-Path $Destination 'OfflineLibrary'
@@ -271,8 +380,9 @@ function Fetch-Sized($url,$out,$bytes,[switch]$Soft){
   Move-Item -LiteralPath $part -Destination $out -Force
 }
 if($UseAria){ Log 'Downloader: aria2 (fast, multi-connection)' } else { Log "Downloader: curl (tip: install 'aria2' for much faster downloads)" }
-if($Lite -and -not $PSBoundParameters.ContainsKey('Selection')){ Log "Lite preset: 3B AI, medical/survival references and maps for '$Region' (unless skipped). Size depends on region; use -Region for a small area or -SkipMaps. Re-run without -Lite to add the full library." }
-if($SelList){ Log "Selection from ${Selection}: $SelList (same as: $SelSame)" }
+if($Lite -and -not $PSBoundParameters.ContainsKey('Selection') -and -not $Guided){ Log "Lite preset: 3B AI, medical/survival references and maps for '$Region' (unless skipped). Size depends on region; use -Region for a small area or -SkipMaps. Re-run without -Lite to add the full library." }
+if($SelList -and -not $Guided){ Log "Selection from ${Selection}: $SelList (same as: $SelSame)" }
+if($Guided){ Log "Guided install: $SelList (same as: $GuidedCmd)" }
 if($Only){ Log "Adding to the finished library: $($Only -join ', ') (nothing else is downloaded)" }
 # Repo files fetched later (guides, map viewer, helpers) come from the commit main is on now,
 # not from a main that moved during a run of several hours (#193). Falls back to main.
@@ -314,28 +424,10 @@ if((-not $SkipMaps) -or $BmOnly){   # -Only browser-maps needs the sizes for its
   }
 }
 
-# Space estimate for the chosen flags (#68). Sizes in GB (1024^3 bytes), measured on a full
-# drive; keep them the same as in get-offline-library.sh so both installers agree.
-$est = [ordered]@{}
-if(-not $Only){ $est['core (AI engine, 3B model, medical, survival, manuals, Kiwix, phone apps)'] = 6.3 }
-if(-not $SkipModels){ $est['8B + 7B AI models'] = 8.9 }
-if((-not $Lite) -and (-not $Only)){ $est['GPT4All, iFixit, Appropedia'] = 4.5 }
-if(-not $SkipWikipedia){ $est['Wikipedia'] = 49.1 }
+# Space estimate for the chosen flags (#68): Get-SpaceEstimate, defined above.
 $mapGB = 0
-if((-not $SkipMaps) -or $BmOnly){
-  $mapGB = [double](($sel | ForEach-Object { [double]$_.containerSize } | Measure-Object -Sum).Sum) / 1GB
-  if(-not $SkipMaps){ $est["maps for '$Region' + desktop viewer"] = [math]::Round($mapGB + 0.5, 1) }
-  if($BrowserMaps){
-    $rt = @(($Region -split '[,; ]') | Where-Object { $_ } | ForEach-Object { (Resolve-RegionToken $_.Trim()).ToLower() })
-    # all of the US ~15.4 GB; states ~0.4 of their OsmAnd size (#102); always + the world map
-    $bm = if(@($rt | Where-Object { $_ -in 'us','world','northamerica' }).Count){ 15.4 } elseif(@($rt | Where-Object { $_.StartsWith('us_') }).Count){ 0.4 * $mapGB } else { 0 }
-    $est['browser maps'] = [math]::Round($bm + 0.2, 1)
-  }
-}
-if($Education){ $est['Khan Academy'] = 168 }
-if($ExtraZims){ $est['Wikivoyage + Wikibooks'] = 5.8 }
-if($Translate){ $est['translator model'] = 2.3 }
-if($MedlinePlus){ $est['MedlinePlus health topics'] = 0.1 }
+if((-not $SkipMaps) -or $BmOnly){ $mapGB = [double](($sel | ForEach-Object { [double]$_.containerSize } | Measure-Object -Sum).Sum) / 1GB }
+$est = Get-SpaceEstimate $mapGB
 $estGB = [math]::Round(($est.Values | Measure-Object -Sum).Sum, 1)
 try {
   $drive = (Get-Item $Root).PSDrive
@@ -343,7 +435,6 @@ try {
   # Folder bytes do not prove this selection's downloads are complete: they can be
   # unrelated files, old editions, unpacked maps or preallocated partial files (#102).
   $needGB = $estGB
-  function Gb($x){ ([double]$x).ToString('0.0', [cultureinfo]::InvariantCulture) }   # same text on every locale
   Log "Destination: $Root   (free space: $(Gb $freeGB) GB)"
   Log "Space estimate for this selection: about $(Gb $estGB) GB"
   foreach($k in $est.Keys){ Log ("  {0,6} GB  {1}" -f (Gb $est[$k]), $k) }
@@ -1461,6 +1552,7 @@ if(-not $SkipMaps){
   }
 }
 
+if($Guided){ Write-Host ''; Write-Host "  The same install as one command: $GuidedCmd" }
 if($scFail -eq 0){
   Log '=== DONE. Open README.html (full index) or START-HERE.html ==='
   Write-Host ''
