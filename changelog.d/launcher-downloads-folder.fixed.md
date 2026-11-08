@@ -5,4 +5,4 @@
   it is installed; `install.command` keeps `~/Downloads`. When no `selection*.json` is found,
   all three let you drag the file in or paste its path (quotes and Terminal backslash escapes are
   stripped); an empty answer keeps the old "Install everything instead?" question. Fixes item 1
-  of #207. _[@boostedchaos](https://github.com/boostedchaos) - PR #TBD._
+  of #207. _[@boostedchaos](https://github.com/boostedchaos) - PR #220._
