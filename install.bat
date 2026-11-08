@@ -60,7 +60,7 @@ for /f "delims=" %%F in ('dir /b /a-d /o-d "%DL%\selection*.json" 2^>nul') do (
 if defined SEL goto :hassel
 rem Kept out of a parenthesised block on purpose: a profile path containing ')'
 rem (e.g. C:\Users\Jo (work)) would otherwise break the block.
-echo No selection*.json found in %DL%.
+echo No selection*.json found in "%DL%".
 rem The browser may save somewhere else: let the user drag the file in or paste its path.
 rem Drag-and-drop puts quotes around a path with spaces, so strip them. Empty = skip.
 echo If you saved it somewhere else, drag the file into this window (or paste its path) and press Enter.
@@ -78,7 +78,7 @@ echo Could not find that file: "%SEL%"
 goto :askfull
 :hassel
 echo.
-echo Using: %SEL%
+echo Using: "%SEL%"
 echo ----------------------------------------------------------------
 powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%" -Selection "%SEL%" -CheckSelection
 if errorlevel 9009 goto :notstarted
