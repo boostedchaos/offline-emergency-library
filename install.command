@@ -45,8 +45,19 @@ pick_and_install(){
   local sel
   sel="$(ls -t "$HOME/Downloads"/selection*.json 2>/dev/null | head -1)"
   if [ -z "$sel" ]; then
-    echo "No selection*.json found in $HOME/Downloads. Falling back to a full install."
-    return 2
+    echo "No selection*.json found in $HOME/Downloads."
+    # The browser may save somewhere else (#207): let the user drag the file in or paste its
+    # path. Plain read (no -r) undoes the backslash escapes Terminal adds on drag-and-drop and
+    # trims the trailing space; then drop one pair of surrounding quotes.
+    echo "If you saved it somewhere else, drag the file into this window (or paste its path) and press Return."
+    printf "Path to selection.json (Return to skip): "
+    read sel
+    case "$sel" in \"*\"|\'*\') sel="${sel:1:${#sel}-2}" ;; esac
+    [ -n "$sel" ] || return 2
+    if [ ! -f "$sel" ]; then
+      echo "Could not find that file: $sel"
+      return 2
+    fi
   fi
   echo ""
   echo "Using: $sel"

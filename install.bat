@@ -48,14 +48,33 @@ echo (it saves to your Downloads folder). When you have done that, come back her
 echo.
 pause
 rem Newest selection*.json in Downloads (dir /o-d sorts newest first).
+rem Ask Windows where Downloads really is (#207): it can be moved (Properties, Location tab,
+rem or Folder Redirection), so the default folder under the profile may be the wrong one.
+set "DL="
+for /f "usebackq delims=" %%D in (`powershell -NoProfile -Command "(New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path" 2^>nul`) do set "DL=%%D"
+if not defined DL set "DL=%USERPROFILE%\Downloads"
 set "SEL="
-for /f "delims=" %%F in ('dir /b /a-d /o-d "%USERPROFILE%\Downloads\selection*.json" 2^>nul') do (
-  if not defined SEL set "SEL=%USERPROFILE%\Downloads\%%F"
+for /f "delims=" %%F in ('dir /b /a-d /o-d "%DL%\selection*.json" 2^>nul') do (
+  if not defined SEL set "SEL=%DL%\%%F"
 )
 if defined SEL goto :hassel
 rem Kept out of a parenthesised block on purpose: a profile path containing ')'
 rem (e.g. C:\Users\Jo (work)) would otherwise break the block.
-echo No selection*.json found in %USERPROFILE%\Downloads.
+echo No selection*.json found in %DL%.
+rem The browser may save somewhere else: let the user drag the file in or paste its path.
+rem Drag-and-drop puts quotes around a path with spaces, so strip them. Empty = skip.
+echo If you saved it somewhere else, drag the file into this window (or paste its path) and press Enter.
+set "SEL="
+set /p "SEL=Path to selection.json (Enter to skip): "
+if not defined SEL goto :askfull
+set "SEL=%SEL:"=%"
+if not defined SEL goto :askfull
+if not exist "%SEL%" goto :nofile
+rem A folder is not a selection file.
+if exist "%SEL%\*" goto :nofile
+goto :hassel
+:nofile
+echo Could not find that file: "%SEL%"
 goto :askfull
 :hassel
 echo.

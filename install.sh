@@ -43,10 +43,26 @@ pick_and_install(){
   echo "(it saves to your Downloads folder). When you have done that, come back here."
   read -r -p "Press Return once selection.json is in your Downloads... " _
   local sel
-  sel="$(ls -t "$HOME/Downloads"/selection*.json 2>/dev/null | head -1)"
+  # A localized or moved Downloads folder (#207): ask xdg-user-dir when it is installed.
+  # It prints $HOME when no Downloads folder is set, so ignore that answer.
+  local dl="$HOME/Downloads" xdg
+  xdg="$(xdg-user-dir DOWNLOAD 2>/dev/null)" || xdg=""
+  if [ -n "$xdg" ] && [ "$xdg" != "$HOME" ] && [ -d "$xdg" ]; then dl="$xdg"; fi
+  sel="$(ls -t "$dl"/selection*.json 2>/dev/null | head -1)"
   if [ -z "$sel" ]; then
-    echo "No selection*.json found in $HOME/Downloads. Falling back to a full install."
-    return 2
+    echo "No selection*.json found in $dl."
+    # The browser may save somewhere else: let the user drag the file in or paste its path.
+    # Plain read (no -r) undoes the backslash escapes a terminal adds on drag-and-drop and
+    # trims the trailing space; then drop one pair of surrounding quotes.
+    echo "If you saved it somewhere else, drag the file into this window (or paste its path) and press Return."
+    printf "Path to selection.json (Return to skip): "
+    read sel
+    case "$sel" in \"*\"|\'*\') sel="${sel:1:${#sel}-2}" ;; esac
+    [ -n "$sel" ] || return 2
+    if [ ! -f "$sel" ]; then
+      echo "Could not find that file: $sel"
+      return 2
+    fi
   fi
   echo ""
   echo "Using: $sel"
