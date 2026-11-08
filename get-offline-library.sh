@@ -308,7 +308,8 @@ guided_questions(){
     break
   done
   case "$(printf '%s' "$R" | tr 'A-Z' 'a-z')" in
-    none|no|skip) P="$(for p in $P; do case "$p" in maps|browser-maps) ;; *) printf '%s ' "$p";; esac; done)"; R="" ;;
+    none|no|skip)   # no "case" inside $( ): bash 3.2 on macOS misreads it
+      keep=""; for p in $P; do case "$p" in maps|browser-maps) ;; *) keep="$keep $p";; esac; done; P="$keep"; R="" ;;
     us) R="" ;;
   esac
   if [ "$preset" != 3 ]; then   # Everything has these already
