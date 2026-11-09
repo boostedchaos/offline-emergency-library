@@ -3,4 +3,4 @@
   left out of the box; a later edit of the box no longer unticks it. The summary now says when a
   picked region is already inside another one (`US_texas` is inside `US`). The installers
   download each map once, so the selection file is unchanged. Fixes items 3 and 4 of #207.
-  _[@boostedchaos](https://github.com/boostedchaos) - PR #TBD._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #228._
