@@ -161,7 +161,10 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:14px;color:v
     ftin.style.cssText="width:100%;background:var(--code);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:14px";
     ftin.value = extraTokens().join(", ");
     ftin.onchange=function(){
-      extraList.forEach(function(t){ delete selectedRegions[t]; });
+      // Clear only the tokens this box shows (the ones not in the tree). A tree token typed
+      // here is ticked in the tree and left out of the box, so a later edit of the box must
+      // not untick it (#207 item 3).
+      extraTokens().forEach(function(t){ delete selectedRegions[t]; });
       extraList = ftin.value.split(",").map(function(s){return s.trim();}).filter(Boolean);
       extraList.forEach(function(t){ selectedRegions[t]=true; });
       render();
@@ -201,6 +204,24 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:14px;color:v
     var known={};
     REG.continents.forEach(function(c){ known[c.token]=1; (c.countries||[]).forEach(function(co){ known[co.token]=1; (co.subregions||[]).forEach(function(s){known[s.token]=1;}); }); });
     return regionList().filter(function(t){ return !known[t]; });
+  }
+
+  // A picked region inside another picked region adds nothing (#207 item 4). For a country
+  // or state, the installers take every map whose name starts with "<token>_" and download
+  // each file once, so US covers US_texas. Continents are left out on purpose: they match by
+  // OsmAnd's own continent name, which does not always follow this tree (Turkey's maps are
+  // all filed under europe). Returns [{t: token, by: the picked region that covers it}].
+  function coveredRegions(){
+    var cont={}; REG.continents.forEach(function(c){ cont[c.token.toLowerCase()]=1; });
+    var regs = regionList(), out=[];
+    regs.forEach(function(t){
+      var tl=t.toLowerCase();
+      for(var i=0;i<regs.length;i++){
+        var q=regs[i].toLowerCase();
+        if(q!==tl && !cont[q] && tl.indexOf(q+"_")===0){ out.push({t:t, by:regs[i]}); return; }
+      }
+    });
+    return out;
   }
 
   function regionNode(node, depth){
@@ -308,6 +329,8 @@ footer{margin-top:28px;border-top:1px solid var(--line);padding-top:14px;color:v
     var regs = regionList();
     if(regs.length) ul.appendChild(el("li",null, "<strong>Regions:</strong> "+regs.map(function(t){return "<code>"+esc(t)+"</code>";}).join(" ")));
     b.appendChild(ul);
+    var cov = coveredRegions();
+    if(cov.length) b.appendChild(el("p","note", "Already included: "+cov.map(function(c){ return "<code>"+esc(c.t)+"</code> is inside <code>"+esc(c.by)+"</code>"; }).join(", ")+". The installers download each map once, so these add nothing."));
 
     var kt = knownTotal();
     b.appendChild(el("p","total", "Running total: <b>~"+kt.sum.toFixed(1)+" GB</b>"+(kt.complete?"":" <span class='note'>+ maps (measured at install)</span>")));
