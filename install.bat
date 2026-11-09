@@ -40,6 +40,9 @@ if exist "%~dp0web\index.html" goto :haspage
 echo The picker page ^(web\index.html^) is not in this folder.
 goto :askfull
 :haspage
+rem Start time of this run, to flag an old selection file below (#207 item 2).
+set "T0="
+for /f "usebackq delims=" %%T in (`powershell -NoProfile -Command "[DateTime]::UtcNow.Ticks" 2^>nul`) do set "T0=%%T"
 echo Opening the picker page in your browser...
 start "" "%~dp0web\index.html"
 echo.
@@ -80,6 +83,10 @@ goto :askfull
 :hassel
 echo.
 echo Using: "%SEL%"
+rem Show when the file was saved, and flag one older than this run: the newest
+rem selection*.json can be an old pick if the new one was saved somewhere else.
+rem The path goes in through an environment variable, so special characters in it are safe.
+powershell -NoProfile -Command "$f = Get-Item -LiteralPath $env:SEL; 'Saved: ' + $f.LastWriteTime.ToString('yyyy-MM-dd HH:mm'); if ($env:T0 -and $f.LastWriteTimeUtc.Ticks -lt [long]$env:T0) { 'Note: this file is older than this run, so it may be an old pick. Check the list below before you answer.' }" 2>nul
 echo ----------------------------------------------------------------
 powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%" -Selection "%SEL%" -CheckSelection
 if errorlevel 9009 goto :notstarted

@@ -36,6 +36,7 @@ pick_and_install(){
     echo "Falling back to a full install."
     return 2
   fi
+  local t0; t0="$(date +%s)"
   echo "Opening the picker page in your browser..."
   open "$page" 2>/dev/null || echo "Could not open it automatically; open $page by hand."
   echo ""
@@ -61,6 +62,15 @@ pick_and_install(){
   fi
   echo ""
   echo "Using: $sel"
+  # Show when the file was saved, and flag one older than this run (#207 item 2): the
+  # newest selection*.json can be an old pick if the new one was saved somewhere else.
+  local mt; mt="$(date -r "$sel" +%s 2>/dev/null)" || mt=""
+  if [ -n "$mt" ]; then
+    echo "Saved: $(date -r "$sel" '+%Y-%m-%d %H:%M')"
+    if [ "$mt" -lt "$t0" ]; then
+      echo "Note: this file is older than this run, so it may be an old pick. Check the list below before you answer."
+    fi
+  fi
   echo "----------------------------------------------------------------"
   run_installer --select "$sel" --check-selection || { echo "That selection file is not valid. Fix it in the page and try again."; return 1; }
   echo "----------------------------------------------------------------"

@@ -63,8 +63,9 @@ and offer two choices:
   browser. Tick what you want, then use the button near the bottom of the page to save your
   selection. It saves a `selection.json` file to your Downloads folder. Go back to the launcher
   window and press a key (Return on Mac and Linux). The launcher takes the newest
-  `selection*.json` in Downloads, shows what it will install, and asks you to confirm before it
-  downloads anything. This is the same as
+  `selection*.json` in Downloads, shows when that file was saved and what it will install, and
+  asks you to confirm before it downloads anything. If the file is older than this run, it says
+  so: it may be an old pick. This is the same as
   [installing from a selection file](#install-from-a-selection-file).
 
 The picker page needs the kit's `web/` folder next to the launcher. The ZIP has it. If
