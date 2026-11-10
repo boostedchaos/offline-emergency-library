@@ -56,7 +56,7 @@ Windows CI also runs `.github/scripts/check-fetch.ps1` with Windows PowerShell 5
 to exercise the installer's real downloader against local executable fixtures, and
 `.github/scripts/check-doc-qa.ps1` for reader source pairing and relocation.
 `.github/scripts/check-doc-sources.sh` verifies that published manual text still matches
-`sources.tsv`; a changed publisher file must be reviewed, not silently re-hashed.
+`sources.tsv`; a changed publisher file must be reviewed, not silently re-hashed. Archive.org timeouts and 5xx are warnings; only a 4xx or changed text fails.
 Maintenance notes for the reader live in `doc-qa/README.md`.
 `.github/scripts/check-offroad-viewer.sh` verifies the OffRoad launcher links the
 prepared OBF folder without copying it, passes the Java 21 compatibility flag, starts
