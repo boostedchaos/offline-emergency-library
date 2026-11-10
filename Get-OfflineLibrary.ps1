@@ -161,6 +161,7 @@ $RegionAlias = @{
   'aut'='Austria';'bel'='Belgium';'prt'='Portugal';'irl'='Ireland';'swe'='Sweden';'nor'='Norway'
   'dnk'='Denmark';'fin'='Finland';'pol'='Poland';'cze'='Czech-republic';'czech'='Czech-republic';'czechia'='Czech-republic';'grc'='Greece'
   'can'='Canada';'mex'='Mexico';'bra'='Brazil';'arg'='Argentina';'nzl'='New-zealand';'new-zealand'='New-zealand'
+  'aus'='Australia-oceania';'australia'='Australia-oceania'   # OsmAnd splits it by state: Australia-oceania_<state>_*.obf.zip
   'jpn'='Japan';'kor'='South-korea';'korea'='South-korea';'chn'='China';'ind'='India';'idn'='Indonesia';'rus'='Russia'
   'zaf'='South-africa';'ken'='Kenya';'egy'='Egypt';'nga'='Nigeria';'tur'='Turkey';'turkiye'='Turkey'
   'sau'='Saudi-arabia';'saudi'='Saudi-arabia';'are'='United-arab-emirates';'uae'='United-arab-emirates'
@@ -412,10 +413,12 @@ if((-not $SkipMaps) -or $BmOnly){   # -Only browser-maps needs the sizes for its
     [xml]$idx = Get-Content $idxFile
     $allmaps = $idx.osmand_regions.region | Where-Object { $_.type -eq 'map' }
     # resolve the -Region tokens (comma/space separated) to a file set
-    $tokens = ($Region -split '[,; ]') | ForEach-Object { $_.Trim() } | Where-Object { $_ } | ForEach-Object { Resolve-RegionToken $_ }
-    foreach($t in $tokens){
+    $tokens = ($Region -split '[,; ]') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    # The typed word decides 'continent': the Australia alias is a map-name prefix, not the continent.
+    foreach($raw in $tokens){
+      $t = Resolve-RegionToken $raw
       if($t -ieq 'world'){ $sel = $allmaps; break }
-      elseif($Continents -contains $t.ToLower()){ $sel += $allmaps | Where-Object { $_.name -match ('_' + [regex]::Escape($t.ToLower()) + '_') } }
+      elseif($Continents -contains $raw.ToLower()){ $sel += $allmaps | Where-Object { $_.name -match ('_' + [regex]::Escape($t.ToLower()) + '_') } }
       else { $sel += $allmaps | Where-Object { $_.name -match ('^' + [regex]::Escape($t) + '_') } }
     }
     $sel = @($sel | Sort-Object name -Unique)

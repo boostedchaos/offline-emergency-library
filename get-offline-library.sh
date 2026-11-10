@@ -72,6 +72,7 @@ alias_region(){
     bra|brazil) echo "Brazil";;
     arg|argentina) echo "Argentina";;
     nzl|new-zealand) echo "New-zealand";;
+    aus|australia) echo "Australia-oceania";;   # OsmAnd splits it by state: Australia-oceania_<state>_*.obf.zip
     jpn|japan) echo "Japan";;
     kor|korea|south-korea) echo "South-korea";;
     chn|china) echo "China";;
@@ -481,10 +482,13 @@ if [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; then   # --only browser-maps need
   # '%s\n': without a final newline, read skips the last name (default "US" got 0 maps)
   printf '%s\n' "$REGION" | tr ',;' '  ' | tr ' ' '\n' | while IFS= read -r tok; do
     [ -z "$tok" ] && continue
+    raw="$(printf '%s' "$tok" | tr 'A-Z' 'a-z')"
     tok="$(alias_region "$tok")"
     tl="$(printf '%s' "$tok" | tr 'A-Z' 'a-z')"
     if [ "$tl" = world ]; then printf '%s\n' "$allnames" >> "$MAP_LOOKUP/_filelist.txt"
-    elif echo "$CONTINENTS" | grep -qw "$tl"; then printf '%s\n' "$allnames" | grep -iE "_${tl}_" >> "$MAP_LOOKUP/_filelist.txt"
+    # The typed word must be a whole continent name: grep -w also took "australia" or "oceania"
+    # (part of australia-oceania), and the Australia alias is a map-name prefix, not the continent.
+    elif case " $CONTINENTS " in *" $raw "*) true;; *) false;; esac; then printf '%s\n' "$allnames" | grep -iE "_${tl}_" >> "$MAP_LOOKUP/_filelist.txt"
     else printf '%s\n' "$allnames" | grep -iE "^${tok}_" >> "$MAP_LOOKUP/_filelist.txt"
     fi
   done
