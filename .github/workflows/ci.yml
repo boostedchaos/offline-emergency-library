@@ -38,6 +38,8 @@ jobs:
         run: bash .github/scripts/check-launchers.sh
       - name: Catalog ids and sizes match both installers (#139)
         run: bash .github/scripts/check-catalog.sh
+      - name: Region tokens pick the same maps in both installers
+        run: bash .github/scripts/check-regions.sh
       - name: Picker catalog.js matches catalog.json (#188)
         run: bash .github/scripts/build-catalog-js.sh --check
       - name: About page is up to date with CONTRIBUTORS (#189)
@@ -105,6 +107,12 @@ jobs:
         env:
           OEL_PS: powershell.exe
         run: bash .github/scripts/check-catalog.sh
+      - name: Region tokens with Windows PowerShell 5.1
+        if: runner.os == 'Windows'
+        shell: bash
+        env:
+          OEL_PS: powershell.exe
+        run: bash .github/scripts/check-regions.sh
       - name: Manual Q&A launcher execution (macOS and Linux)
         if: runner.os != 'Windows'
         run: bash .github/scripts/check-doc-launchers.sh

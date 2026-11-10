@@ -40,13 +40,14 @@ Look for issues labeled **`good first issue`** and **`help wanted`**.
 
 ## Before you open a PR
 - Run the offline checks from the CI lint job. Each takes seconds, so run them before you push
-  rather than waiting for CI (`check-catalog.sh` also needs PowerShell, `pwsh`):
+  rather than waiting for CI (`check-catalog.sh` and `check-regions.sh` also need PowerShell, `pwsh`):
 
   ```bash
   git ls-files '*.sh' '*.command' | while read -r f; do bash -n "$f"; done
   bash .github/scripts/check-consistency.sh   # manual downloads, link checks, guides agree
   bash .github/scripts/check-launchers.sh
   bash .github/scripts/check-catalog.sh
+  bash .github/scripts/check-regions.sh
   bash .github/scripts/compile-changelog.sh > /dev/null
   node --test doc-qa/retrieval.test.mjs
   ```
