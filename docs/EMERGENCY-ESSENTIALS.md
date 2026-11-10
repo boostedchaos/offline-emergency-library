@@ -69,7 +69,7 @@ a promise someone is listening. Transmit only as the law allows (emergencies are
 ### Sources on this drive (read them while you can)
 
 - **FM 4-25.11 / FM 21-11, First Aid** and **FM 21-76, Survival** — `Manuals/ArmyFieldManuals/`
-  (US Army, public domain): bleeding, CPR, choking, hypothermia, shelter, signalling, navigation.
+  (US Army, public domain; FM 21-11 contains American Heart Association copyrighted material): bleeding, CPR, choking, hypothermia, shelter, signalling, navigation.
 - **Where There Is No Doctor** (Hesperian) — `Medical/Manuals-PDF/`: bleeding, burns, water.
 - **Radio frequency reference** — `Manuals/Radio-Communications/RADIO-FREQUENCIES.html`:
   the frequencies above, with the rules and cautions.

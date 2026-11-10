@@ -63,7 +63,10 @@ manifest's text hashes. A successful exit alone does not prove extraction qualit
 
 ## Attribution and licenses
 
-The Army manuals are US government works (public domain). Archive OCR text is
+The Army manuals are US government works (public domain), except two: *FM 3-05.70*
+(2002) is distribution-restricted ("U.S. Government agencies and their contractors
+only"), and *FM 21-11 First Aid for Soldiers* contains American Heart Association
+copyrighted material. Archive OCR text is
 derived from the same identified originals and may contain OCR errors.
 
 Medical texts retain the attribution and terms of the original PDF:
