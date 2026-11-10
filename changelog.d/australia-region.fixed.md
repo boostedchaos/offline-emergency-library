@@ -4,4 +4,4 @@
   `aus` now mean those 11 state and territory maps in both installers. The bash installer
   also stops reading `australia` or `oceania` as a continent (part of `australia-oceania`), so
   `--region Oceania` gets the Oceania map, as it already did in PowerShell.
-  _[@boostedchaos](https://github.com/boostedchaos) - PR #TBD._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #230._
