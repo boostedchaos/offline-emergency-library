@@ -5,6 +5,7 @@
 #     Australia by state as Australia-oceania_<state>_*.obf.zip.
 #   - australia-oceania (any case) is still the whole continent.
 #   - Oceania is a name prefix, not part of the continent name (bash grep -w took it as one).
+#   - A <deleted_map> entry is not a map: OsmAnd answers 404 for it (#231).
 # Needs bash and pwsh. OEL_PS=powershell.exe runs the PowerShell side with Windows PowerShell 5.1.
 set -u
 cd "$(dirname "$0")/../.." || exit 1
@@ -21,6 +22,8 @@ cat > "$T/index.xml" <<'EOF'
 <region type="map" containerSize="1048576" name="New-zealand_australia-oceania_2.obf.zip"/>
 <region type="map" containerSize="1048576" name="Oceania_australia-oceania_2.obf.zip"/>
 <region type="map" containerSize="1048576" name="Papua-new-guinea_australia-oceania_2.obf.zip"/>
+<region type="map" containerSize="1048576" name="Belgium_flanders_europe_2.obf.zip"/>
+<deleted_map type="deleted_map" date="06.07.2026" size="" targetsize="" containerSize="0" contentSize="0" free="false" name="Belgium_europe_2.obf.zip" timestamp="1793919600000"/>
 <region type="map" containerSize="1048576" name="Us_delaware_northamerica_2.obf.zip"/>
 </osmand_regions>
 EOF
@@ -33,6 +36,7 @@ australia-oceania|$CONT
 Australia-Oceania|$CONT
 Oceania|Oceania_australia-oceania_2.obf.zip
 New-Zealand|New-zealand_australia-oceania_2.obf.zip
+Belgium|Belgium_flanders_europe_2.obf.zip
 US_delaware|Us_delaware_northamerica_2.obf.zip"
 
 # ---- bash: the installer's CONTINENTS, alias_region and map lookup section

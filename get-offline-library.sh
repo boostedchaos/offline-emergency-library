@@ -224,7 +224,7 @@ HAVE_TAR=1;   command -v tar   >/dev/null 2>&1 || HAVE_TAR=0
 if [ "$LISTREGIONS" = 1 ]; then
   idx="$(mktemp 2>/dev/null || echo /tmp/osmidx.xml)"
   curl -fsSL --retry 3 "https://download.osmand.net/get_indexes" -o "$idx" || { echo "Could not fetch the OsmAnd region index."; rm -f "$idx"; exit 1; }
-  names="$(grep -oE 'name="[^"]+\.obf\.zip"' "$idx" | sed -E 's/name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
+  names="$(grep -oE '<region [^>]*name="[^"]+\.obf\.zip"' "$idx" | sed -E 's/.* name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
   if [ -n "$FILTER" ]; then
     echo "Regions / sub-regions matching '$FILTER' (pass any of these to --region):"
     echo "$names" | grep -iE "$FILTER" | sed -E "s/_(africa|asia|australia-oceania|centralamerica|europe|northamerica|southamerica)_[0-9]+\.obf\.zip\$//" | sort -u | sed 's/^/  /'
@@ -477,7 +477,8 @@ if [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; then   # --only browser-maps need
     mkdir -p "$MAP_LOOKUP"
   fi
   curl -fsSL --retry 3 "https://download.osmand.net/get_indexes" -o "$MAP_LOOKUP/_index.xml" || : > "$MAP_LOOKUP/_index.xml"
-  allnames="$(grep -oE 'name="[^"]+\.obf\.zip"' "$MAP_LOOKUP/_index.xml" | sed -E 's/name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
+  # <region> lines only: the index also lists <deleted_map> names, which answer 404 (#231)
+  allnames="$(grep -oE '<region [^>]*name="[^"]+\.obf\.zip"' "$MAP_LOOKUP/_index.xml" | sed -E 's/.* name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
   : > "$MAP_LOOKUP/_filelist.txt"
   # '%s\n': without a final newline, read skips the last name (default "US" got 0 maps)
   printf '%s\n' "$REGION" | tr ',;' '  ' | tr ' ' '\n' | while IFS= read -r tok; do
