@@ -1063,10 +1063,13 @@ if { [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; } && [ "$BROWSER_MAPS" = 1 ]; t
     rm -rf "$MB/assets"; mv "$MB/assets-new/tozip" "$MB/assets"
   else log "  WARN: could not unpack the map style and fonts (base-assets.tar.gz)"; fi
   rm -rf "$MB/assets-new"
-  # map viewer libraries (pinned versions)
+  # map viewer libraries (pinned versions). unpkg often answers a resume request with the
+  # whole file (200, not 206), so 'curl -C -' on a copy already here fails (56) and the re-run
+  # stops (#101). The files are small: fetch a fresh copy each run, then swap it in.
   for u in maplibre-gl@4.7.1/dist/maplibre-gl.js maplibre-gl@4.7.1/dist/maplibre-gl.css pmtiles@4.4.0/dist/pmtiles.js; do
-    f="$MB/viewer/lib/$(basename "$u")"; fetch "https://unpkg.com/$u" "$f"
-    grep -q -i -E 'maplibregl|pmtiles' "$f" 2>/dev/null || { log "  WARN: $(basename "$u") did not download (removed)"; rm -f "$f"; }
+    f="$MB/viewer/lib/$(basename "$u")"; rm -f "$f.new" "$f.new.aria2"; fetch "https://unpkg.com/$u" "$f.new"
+    if grep -q -i -E 'maplibregl|pmtiles' "$f.new" 2>/dev/null; then mv -f "$f.new" "$f"
+    else log "  WARN: $(basename "$u") did not download (old copy kept, if any)"; rm -f "$f.new"; fi
   done
   # Caddy web server for every platform (one release); folder = <os>-<arch>
   crel="$(curl -sL -H "User-Agent: oel" "https://api.github.com/repos/caddyserver/caddy/releases/latest")"

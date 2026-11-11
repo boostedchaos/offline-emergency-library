@@ -1063,10 +1063,14 @@ if(((-not $SkipMaps) -or $BmOnly) -and $BrowserMaps){
       Move-Item (Join-Path $new 'tozip') $old
     } else { Log '  WARN: could not unpack the map style and fonts (base-assets.tar.gz)' }
     Remove-Item $new -Recurse -Force -ErrorAction SilentlyContinue
-    # map viewer libraries (pinned versions)
+    # map viewer libraries (pinned versions). unpkg often answers a resume request with the
+    # whole file (200, not 206), so 'curl -C -' on a copy already here fails (56) and the re-run
+    # stops (#101). The files are small: fetch a fresh copy each run, then swap it in.
     foreach($u in 'maplibre-gl@4.7.1/dist/maplibre-gl.js','maplibre-gl@4.7.1/dist/maplibre-gl.css','pmtiles@4.4.0/dist/pmtiles.js'){
-      $f = Join-Path $mb ('viewer\lib\' + (Split-Path $u -Leaf)); Fetch "https://unpkg.com/$u" $f
-      if(-not ((Test-Path $f) -and (Select-String -Path $f -Pattern 'maplibregl|pmtiles' -Quiet))){ Log "  WARN: $(Split-Path $u -Leaf) did not download (removed)"; Remove-Item $f -Force -ErrorAction SilentlyContinue }
+      $f = Join-Path $mb ('viewer\lib\' + (Split-Path $u -Leaf)); $n = "$f.new"
+      Remove-Item -LiteralPath $n, "$n.aria2" -Force -ErrorAction SilentlyContinue; Fetch "https://unpkg.com/$u" $n
+      if((Test-Path -LiteralPath $n) -and (Select-String -LiteralPath $n -Pattern 'maplibregl|pmtiles' -Quiet)){ Move-Item -LiteralPath $n -Destination $f -Force }
+      else { Log "  WARN: $(Split-Path $u -Leaf) did not download (old copy kept, if any)"; Remove-Item -LiteralPath $n -Force -ErrorAction SilentlyContinue }
     }
     # Caddy web server for every platform (one release); folder = <os>-<arch>
     $crel = Invoke-RestMethod 'https://api.github.com/repos/caddyserver/caddy/releases/latest' -Headers @{'User-Agent'='ps'}
