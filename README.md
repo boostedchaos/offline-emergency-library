@@ -53,6 +53,22 @@ Leave the window open until it says **Finished**, then open
 **`START-HERE.html`** in the `OfflineLibrary` folder it made there. If the download stops, run it again the same
 way: it carries on where it left off.
 
+**Phone (no computer or drive needed)**
+
+Want just the manuals on your phone for a grab-and-go kit? Get the **phone docs pack** — one
+zip (about **250 MB**, so use Wi-Fi) with the medical, first-aid, survival, repair and
+food-growing manuals plus short emergency guides. No computer, no drive and no special app:
+the PDFs open in any reader. (It does not include Wikipedia, maps or the offline AI — for
+those, install to a computer and see [`USE-ON-PHONE`](docs/USE-ON-PHONE.md).)
+
+<img src="web/phone-pack-qr.svg" alt="QR code to download the phone docs pack" width="150" align="right">
+
+1. **Scan the QR code** with your phone camera — or tap [this download link](https://github.com/elhajahmadj/offline-emergency-library/releases/download/phone-pack/Offline-Emergency-Phone-Pack.zip) — while you still have internet.
+2. **Unzip it.** iPhone/iPad: tap the zip in the **Files** app. Android: open it in your file manager and choose **Extract**.
+3. **Open the PDFs** in any reader, or import the PDFs and `.md` guides into an on-device document-AI app (for example **NomadAI**, iOS/Android) to ask questions about them offline.
+
+The [release page](https://github.com/elhajahmadj/offline-emergency-library/releases/tag/phone-pack) lists the current size, files and licenses.
+
 ### Pick what to install
 
 `install.bat`, `install.command` and `install.sh` first ask **How would you like to install?**
@@ -171,7 +187,7 @@ Downloading ~85 GB can take several hours.
 | **GPT4All doc-Q&A** | 64-bit PC, ~8 GB RAM recommended. CPU only. Self-contained (no Python/CUDA). |
 | **Maps on a computer** | **No phone needed.** Run `MapViewer-Desktop\VIEW-MAPS-OFFLINE`: the bundled OffRoad viewer draws your region's OsmAnd maps with no internet on Windows, macOS and Linux, including non-US regions (Offline rendering tested on Windows 11; macOS and Linux are bundled but not runtime-tested). Browser maps (US, `-BrowserMaps`) remain an option for US street detail. First use unzips the maps (~30 GB). |
 | **Maps on a phone** | Android: bundled **OsmAnd~ APK** (sideload offline). iPhone/iPad: install **OsmAnd** from the App Store while online. |
-| **Manuals on a phone, no drive** | The [phone docs pack](https://github.com/elhajahmadj/offline-emergency-library/releases/tag/phone-pack): manual PDFs and short guides in one zip for any PDF reader or on-device document-AI app. See `USE-ON-PHONE`. |
+| **Manuals on a phone, no drive** | The [phone docs pack](https://github.com/elhajahmadj/offline-emergency-library/releases/tag/phone-pack) (~250 MB): manual PDFs and short guides in one zip for any PDF reader or on-device document-AI app. See [Start here](#start-here) or `USE-ON-PHONE`. |
 
 **Key points:**
 - **No GPU is required** for the AI — it runs on an ordinary CPU (just slower). A 6 GB GPU
@@ -295,7 +311,8 @@ runs 100% offline afterward:
 | Health topics (optional) | medlineplus.gov/xml.html (MedlinePlus health topic XML, US National Library of Medicine; public domain) |
 
 **Every download URL, grouped by category with licenses, is in [`DATA-SOURCES.md`](DATA-SOURCES.md)**
-(and on the website's [Sources page](web/sources.html)). CI re-checks them weekly via
+(and on the website's [Sources page](web/sources.html)); [`SOURCES.md`](SOURCES.md) is a compact,
+machine-generated table of every component and its license link. CI re-checks the links weekly via
 `.github/scripts/check-links.sh`.
 
 **Verify the installer before running it.** Each script's SHA-256 is published in
