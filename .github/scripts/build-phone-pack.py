@@ -124,13 +124,29 @@ def get(url, retries=6, delay=20):
 
 
 def resolve(kind, src):
+    """Download URLs for one file, best first."""
     if kind == "url":
-        return src
+        return [src]
     # Same pick as the installer's ia_pdf: first .pdf that is not the OCR "_text.pdf".
     meta = json.loads(get(f"https://archive.org/metadata/{src}"))
     name = next(f["name"] for f in meta["files"]
                 if f["name"].endswith(".pdf") and not f["name"].endswith("_text.pdf"))
-    return f"https://archive.org/download/{src}/{urllib.parse.quote(name)}"
+    q = urllib.parse.quote(name)
+    # From GitHub runners, archive.org/download/ often redirects to an eu.archive.org node
+    # that never accepts the connection (curl exit 28 on every try), while the item's own
+    # data nodes (d1/d2 in its metadata) answer. So try those first and the redirect last.
+    nodes = [f"https://{meta[k]}{meta['dir']}/{q}" for k in ("d1", "d2") if meta.get(k) and meta.get("dir")]
+    return nodes + [f"https://archive.org/download/{src}/{q}"]
+
+
+def get_first(urls):
+    for i, url in enumerate(urls):
+        try:
+            return get(url, retries=3)
+        except OSError as e:
+            if i == len(urls) - 1:
+                raise
+            print(f"  {e}; trying the next source", flush=True)
 
 
 def main():
@@ -162,7 +178,7 @@ def build(tmp, drive):
                 if name not in urls:
                     sys.exit(f"{name}: in sources.tsv but not downloaded by get-offline-library.sh")
                 print(f"fetch: {name}", flush=True)
-                data = get(resolve(*urls[name]))
+                data = get_first(resolve(*urls[name]))
             got = hashlib.new(algo.lower(), data).hexdigest()
             if got != digest:
                 sys.exit(f"{name}: {algo} {got} does not match sources.tsv {digest}")
