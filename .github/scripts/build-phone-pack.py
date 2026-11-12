@@ -123,20 +123,38 @@ def get(url, retries=6, delay=20):
         time.sleep(delay)
 
 
+ARCHIVE_DOWNLOAD = re.compile(r"https://archive\.org/download/([^/]+)/([^/?#]+)$")
+
+
+def data_nodes(meta, name):
+    # From GitHub runners, archive.org/download/ often redirects to an eu.archive.org node
+    # that never accepts the connection (curl exit 28 on every try), while the item's own
+    # data nodes (d1/d2 in its metadata) answer. So try those first and the redirect last.
+    q = urllib.parse.quote(name)
+    return [f"https://{meta[k]}{meta['dir']}/{q}" for k in ("d1", "d2") if meta.get(k) and meta.get("dir")]
+
+
 def resolve(kind, src):
     """Download URLs for one file, best first."""
     if kind == "url":
-        return [src]
+        m = ARCHIVE_DOWNLOAD.match(src)
+        if not m:
+            return [src]
+        # An archive.org link given as a plain URL (get_pdf_url) gets the same data-node
+        # routing, with the given link last. If the lookup fails, use the link alone.
+        try:
+            meta = json.loads(get(f"https://archive.org/metadata/{m[1]}"))
+        except (OSError, ValueError):
+            return [src]
+        name = urllib.parse.unquote(m[2])
+        if not any(f.get("name") == name for f in meta.get("files", [])):
+            return [src]
+        return data_nodes(meta, name) + [src]
     # Same pick as the installer's ia_pdf: first .pdf that is not the OCR "_text.pdf".
     meta = json.loads(get(f"https://archive.org/metadata/{src}"))
     name = next(f["name"] for f in meta["files"]
                 if f["name"].endswith(".pdf") and not f["name"].endswith("_text.pdf"))
-    q = urllib.parse.quote(name)
-    # From GitHub runners, archive.org/download/ often redirects to an eu.archive.org node
-    # that never accepts the connection (curl exit 28 on every try), while the item's own
-    # data nodes (d1/d2 in its metadata) answer. So try those first and the redirect last.
-    nodes = [f"https://{meta[k]}{meta['dir']}/{q}" for k in ("d1", "d2") if meta.get(k) and meta.get("dir")]
-    return nodes + [f"https://archive.org/download/{src}/{q}"]
+    return data_nodes(meta, name) + [f"https://archive.org/download/{src}/{urllib.parse.quote(name)}"]
 
 
 def get_first(urls):
