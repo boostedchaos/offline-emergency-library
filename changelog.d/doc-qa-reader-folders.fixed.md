@@ -3,4 +3,4 @@
   stopped the page at load with "Cannot load the manuals: Invalid PDF source path". The page now
   allows the same 5 folders as the installers, and `check-doc-allowlist.sh` also checks the
   reader's list. Found in #159.
-  _[@boostedchaos](https://github.com/boostedchaos) - PR #000._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #268._
