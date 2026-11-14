@@ -106,8 +106,8 @@ region's maps — only the selection changes.</li>
 <code>tile.osmand.net</code>, not the maps on the drive. With no internet the map area stays <strong>blank</strong>
 (<a href="https://github.com/elhajahmadj/offline-emergency-library/issues/15">#15</a>). For offline use on a
 computer, use <strong>OffRoad</strong> above instead. On <strong>Linux x64</strong> the bundled build has the offline
-renderer, so it may work offline, but that is untested. Everything you need to launch it is
-bundled - <strong>no separate install, no Java to set up.</strong></p>
+renderer, so it can draw the maps on the drive with no internet (see <strong>Offline on Linux x64</strong>
+below). Everything you need to launch it is bundled - <strong>no separate install, no Java to set up.</strong></p>
 <ol>
 <li>Open <code>OsmAnd\MapViewer-Desktop\</code>.</li>
 <li><strong>Windows:</strong> double-click <strong><code>VIEW-MAPS-ON-PC.bat</code></strong>.
@@ -121,6 +121,16 @@ minutes and uses extra space — see note below), then opens the viewer.</li>
 <li>The <strong>OsmAndMapCreator</strong> window opens. Your maps are the <code>.obf</code> files in <code>OsmAnd\obf\</code>.
 Use the app's menus to open/browse a map, zoom, and search.</li>
 </ol>
+<p><strong>Offline on Linux x64</strong> (tested on Debian 13 x86_64 with no network,
+<a href="https://github.com/elhajahmadj/offline-emergency-library/issues/108">#108</a>):</p>
+<ol>
+<li>Make the window wider, or maximize it. At its first size (800×600) the <strong>Offline Rendering</strong>
+button is hidden past the right end of the top toolbar.</li>
+<li>Click <strong>Offline Rendering</strong>.</li>
+<li>In the dialog, set <strong>Directory with binary files</strong> to the drive's <code>OsmAnd/obf</code> folder (the
+launcher prints the full path; the default is <code>~/osmand</code>), then click <strong>OK</strong>.</li>
+</ol>
+<p>The map then draws from the drive. Use the <strong>+</strong> and <strong>-</strong> buttons to zoom.</p>
 <p><strong>Dependencies: fully handled.</strong> This folder includes a <strong>portable Java runtime</strong> (<code>jre\</code>)
 and the <strong>OsmAndMapCreator</strong> app (<code>app\</code>). Nothing else is required to launch it on a 64-bit PC.</p>
 <blockquote>

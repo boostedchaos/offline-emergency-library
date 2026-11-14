@@ -1032,8 +1032,13 @@ JAVA="$(find "$DIR/jre" -name java -type f 2>/dev/null | head -n1)"
 [ -n "$JAVA" ] && export PATH="$(dirname "$JAVA"):$PATH"
 bash "$DIR/prepare-maps.sh" || exit 1
 echo "If the map area stays BLANK: on macOS this viewer draws online map tiles, not the"
-echo "drive's maps, so it is blank with no internet (issue 15; Linux may work offline, untested)."
+echo "drive's maps, so it is blank with no internet (issue 15)."
+echo "Linux x64 offline: widen the window, click 'Offline Rendering', set 'Directory with"
+echo "binary files' to $(cd "$DIR/.." && pwd)/obf and click OK (HOW-TO-VIEW-MAPS)."
 echo "For offline maps on Windows, macOS or Linux, use VIEW-MAPS-OFFLINE instead."
+# The viewer loads its map fonts from ./fonts, so start it in app/: from any other folder
+# the offline map draws with no street or town names (#108).
+cd "$DIR/app" || exit 1
 # one launch only (bash runs both sh and bash scripts); the old "sh || bash" started a 2nd viewer when the 1st exited non-zero
 bash "$DIR/app/OsmAndMapCreator.sh"
 EOS
