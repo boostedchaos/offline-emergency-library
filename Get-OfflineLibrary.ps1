@@ -201,7 +201,7 @@ function Get-SpaceEstimate($mapGB){
   if((-not $Lite) -and (-not $Only)){ $est['GPT4All, iFixit, Appropedia'] = 4.5 }
   if(-not $SkipWikipedia){ $est['Wikipedia'] = 49.1 }
   if((-not $SkipMaps) -or $BmOnly){
-    if(-not $SkipMaps){ $est["maps for '$Region' + desktop viewer"] = [math]::Round($mapGB + 0.5, 1) }
+    if(-not $SkipMaps){ $est["maps for '$Region' + desktop viewer"] = [math]::Round($mapGB + 0.7, 1) }
     if($BrowserMaps){
       $rt = @(($Region -split '[,; ]') | Where-Object { $_ } | ForEach-Object { (Resolve-RegionToken $_.Trim()).ToLower() })
       # all of the US ~15.4 GB; states ~0.4 of their OsmAnd size (#102); always + the world map

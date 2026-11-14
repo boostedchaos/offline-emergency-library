@@ -251,7 +251,7 @@ space_estimate(){
   [ "$SKIP_MODELS" = 0 ] && est 8.9 "8B + 7B AI models"
   [ "$LITE" = 0 ] && [ -z "$ONLY" ] && est 4.5 "GPT4All, iFixit, Appropedia"
   [ "$SKIP_WIKI" = 0 ] && est 49.1 "Wikipedia"
-  [ "$SKIP_MAPS" = 0 ] && est "$(LC_ALL=C awk -v m="$MAP_MB" 'BEGIN{printf "%.1f", m/1024 + 0.5}')" "maps for '$REGION' + desktop viewer"
+  [ "$SKIP_MAPS" = 0 ] && est "$(LC_ALL=C awk -v m="$MAP_MB" 'BEGIN{printf "%.1f", m/1024 + 0.7}')" "maps for '$REGION' + desktop viewer"
   if [ "$BROWSER_MAPS" = 1 ] && { [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; }; then
     # all of the US ~15.4 GB; states ~0.4 of their OsmAnd size (#102); always + the world map
     bm=0

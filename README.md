@@ -102,7 +102,7 @@ Smaller drive, another country's maps, or extra content? See
 | **Offline doc-Q&A** | GPT4All — ask an AI questions about your PDFs, with citations | ~0.7 GB | CPU, one-time install |
 | **Wikipedia** | Full English Wikipedia (all articles, no images) — Kiwix-readable | ~49 GB | Kiwix |
 | **Browser maps** *(opt-in)* | US street maps that open in **any web browser** (Project NOMAD / Protomaps + MapLibre viewer + Caddy), `-BrowserMaps` / `--browser-maps` | US ≈16.5 GB (one state: less) | **Any computer** with a browser |
-| **Offline maps** | Maps for the region you pick (**default US**; any country/region/continent - see below) + **bundled OffRoad desktop viewer** (reads the maps offline on Windows, macOS and Linux) + **bundled Android app (APK)** | US ≈17 GB; varies by region (+~0.5 GB tools) | **PC (no phone) or phone** |
+| **Offline maps** | Maps for the region you pick (**default US**; any country/region/continent - see below) + **bundled OffRoad desktop viewer** (reads the maps offline on Windows, macOS and Linux) + **bundled Android app (APK)** | US ≈17 GB; varies by region (+~0.7 GB tools) | **PC (no phone) or phone** |
 | **Repair archive** | iFixit — cars, appliances, electronics, phones | ~3.4 GB | Kiwix |
 | **DIY archive** | Appropedia — plumbing, electrical, construction, energy, water, food | ~0.6 GB | Kiwix |
 | **Medical** | Offline medical Wikipedia (WikiMed) | ~1.8 GB | Kiwix |
