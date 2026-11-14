@@ -132,8 +132,8 @@ below). Everything you need to launch it is bundled - **no separate install, no 
 **Offline on Linux x64** (tested on Debian 13 x86_64 with no network,
 [#108](https://github.com/elhajahmadj/offline-emergency-library/issues/108)):
 
-1. Make the window wider, or maximize it. At its first size (800×600) the **Offline Rendering**
-   button is hidden past the right end of the top toolbar.
+1. If you do not see the **Offline Rendering** button at the right end of the top toolbar,
+   make the window wider or maximize it. The window first opens at 800×600, which can hide it.
 2. Click **Offline Rendering**.
 3. In the dialog, set **Directory with binary files** to the drive's `OsmAnd/obf` folder (the
    launcher prints the full path; the default is `~/osmand`), then click **OK**.
