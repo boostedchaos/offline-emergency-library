@@ -117,8 +117,8 @@ Notes:
 `tile.osmand.net`, not the maps on the drive. With no internet the map area stays **blank**
 ([#15](https://github.com/elhajahmadj/offline-emergency-library/issues/15)). For offline use on a
 computer, use **OffRoad** above instead. On **Linux x64** the bundled build has the offline
-renderer, so it may work offline, but that is untested. Everything you need to launch it is
-bundled - **no separate install, no Java to set up.**
+renderer, so it can draw the maps on the drive with no internet (see **Offline on Linux x64**
+below). Everything you need to launch it is bundled - **no separate install, no Java to set up.**
 
 1. Open `OsmAnd\MapViewer-Desktop\`.
 2. **Windows:** double-click **`VIEW-MAPS-ON-PC.bat`**.
@@ -128,6 +128,17 @@ bundled - **no separate install, no Java to set up.**
    - Later runs skip straight to the viewer.
 3. The **OsmAndMapCreator** window opens. Your maps are the `.obf` files in `OsmAnd\obf\`.
    Use the app's menus to open/browse a map, zoom, and search.
+
+**Offline on Linux x64** (tested on Debian 13 x86_64 with no network,
+[#108](https://github.com/elhajahmadj/offline-emergency-library/issues/108)):
+
+1. If you do not see the **Offline Rendering** button at the right end of the top toolbar,
+   make the window wider or maximize it. The window first opens at 800×600, which can hide it.
+2. Click **Offline Rendering**.
+3. In the dialog, set **Directory with binary files** to the drive's `OsmAnd/obf` folder (the
+   launcher prints the full path; the default is `~/osmand`), then click **OK**.
+
+The map then draws from the drive. Use the **+** and **-** buttons to zoom.
 
 **Dependencies: fully handled.** This folder includes a **portable Java runtime** (`jre\`)
 and the **OsmAndMapCreator** app (`app\`). Nothing else is required to launch it on a 64-bit PC.
