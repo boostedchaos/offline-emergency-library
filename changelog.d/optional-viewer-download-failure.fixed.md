@@ -1,2 +1,2 @@
 - **A failed optional download no longer stops the install.** When the OsmAndMapCreator nightly, the portable Java download or (on Windows) the world basemap fails with a 404 or an outage, the installer now skips it and goes on to write the launchers, guides, README.html and CHECKSUMS-SHA256.txt. Before, both installers stopped at step 8b, and every re-run stopped there until the server came back. The self-check still reports a missing viewer. Resolves #272.
-  _[@boostedchaos](https://github.com/boostedchaos) - PR #TBD._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #280._
