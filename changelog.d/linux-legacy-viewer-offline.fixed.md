@@ -1,2 +1,2 @@
 - **Legacy map viewer on Linux: street names offline, and the steps to get there.** `VIEW-MAPS-ON-PC.sh` now starts OsmAndMapCreator in its `app/` folder, where it finds its map fonts. Before, the offline map on Linux x64 drew with no street or town names. The map guide and the launcher now give the 3 steps for offline use on Linux x64 (widen the window, Offline Rendering, map folder). Resolves #108.
-  _[@boostedchaos](https://github.com/boostedchaos) - PR #000._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #269._
