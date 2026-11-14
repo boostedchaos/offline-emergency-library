@@ -16,7 +16,7 @@ async function localText(path) {
 
 // A source path is a library-relative PDF, never a URL or a filesystem command.
 function pdfLink(path, page) {
-  if (!/^(Medical\/Manuals-PDF|Manuals\/ArmyFieldManuals)\/[^/\\\t\r\n]+\.pdf$/.test(path) || path.includes("..")) {
+  if (!/^(Medical\/Manuals-PDF|Manuals\/ArmyFieldManuals|Manuals\/Food-Growing|Manuals\/Metalworking|Manuals\/Survival-Preparedness)\/[^/\\\t\r\n]+\.pdf$/.test(path) || path.includes("..")) {
     throw new Error("Invalid PDF source path");
   }
   return "/" + path.split("/").map(encodeURIComponent).join("/") + (page ? `#page=${page}` : "");
