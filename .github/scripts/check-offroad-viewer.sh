@@ -83,6 +83,28 @@ grep -Fq 'ClassTailor.noOptimize' Get-OfflineLibrary.ps1 && ok "Windows launcher
 grep -Fq 'offroad/OffRoad.jar' get-offline-library.sh && grep -Fq 'offroad\OffRoad.jar' Get-OfflineLibrary.ps1 && ok "both launchers point at the extracted OffRoad jar" || bad "a launcher points at the wrong OffRoad path"
 grep -Fq 'World_basemap_mini_2.obf.zip' get-offline-library.sh && grep -Fq 'World_basemap_mini_2.obf.zip' Get-OfflineLibrary.ps1 && ok "both installers include OffRoad's world basemap" || bad "world basemap download is missing from an installer"
 
+# Legacy OsmAndMapCreator launcher (#108): the viewer loads its map fonts from ./fonts, so the
+# launcher must start it in app/ whatever folder the user runs it from. A fake
+# OsmAndMapCreator.sh records the folder it was started in. prepare-maps.sh also prints the
+# obf path, so the folder check matches the launcher's own Offline Rendering line.
+extract 'cat > "$MVD/VIEW-MAPS-ON-PC.sh"' < get-offline-library.sh > "$viewer/VIEW-MAPS-ON-PC.sh"
+mkdir -p "$viewer/app/fonts"
+cat > "$viewer/app/OsmAndMapCreator.sh" <<'EOF'
+#!/usr/bin/env bash
+pwd -P > "$CAPTURE"
+if [ -d fonts ]; then echo fonts-visible >> "$CAPTURE"; fi
+EOF
+chmod +x "$viewer/VIEW-MAPS-ON-PC.sh" "$viewer/app/OsmAndMapCreator.sh"
+rm -f "$tmp/mc-start"
+if (cd "$tmp" && CAPTURE="$tmp/mc-start" bash "$viewer/VIEW-MAPS-ON-PC.sh" > "$tmp/mc.log" 2>&1); then
+  ok "legacy viewer launcher exits successfully"
+else
+  bad "legacy viewer launcher failed: $(tail -n 3 "$tmp/mc.log" | tr '\n' ' ')"
+fi
+[ "$(head -n 1 "$tmp/mc-start" 2>/dev/null)" = "$(cd "$viewer/app" && pwd -P)" ] && grep -Fxq fonts-visible "$tmp/mc-start" \
+  && ok "legacy viewer starts in app/, where its fonts are" || bad "legacy viewer does not start in app/ (offline map has no street names, #108)"
+grep -Fq "files' to $(cd "$maps" && pwd)/obf and click OK" "$tmp/mc.log" && ok "legacy viewer launcher prints the map folder for Offline Rendering" || bad "legacy viewer launcher does not print the obf folder"
+
 if [ "$fail" -ne 0 ]; then
   echo "OffRoad viewer checks failed."
   exit 1
