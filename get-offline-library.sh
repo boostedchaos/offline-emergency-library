@@ -400,6 +400,9 @@ fetch(){ # url out
     # .aria2 control file on the next run.
     if [ "$arc" = 7 ] || [ -e "$2.aria2" ]; then
       log "ERROR: download stopped: $1 -> $2. Re-run the installer to resume."
+      # aria2 catches Ctrl+C and exits 7, so bash never sees the signal: re-raise it on this
+      # shell, or a fetch inside ( ... ) (optional downloads) ends only the subshell (#272).
+      if [ "$arc" = 7 ]; then trap - INT; kill -INT "${BASHPID:-$(exec sh -c 'echo "$PPID"')}"; fi
       exit 1
     fi
     echo "  (aria2 failed, falling back to curl)"
@@ -419,7 +422,8 @@ remote_size(){ curl -sIL -A "${UA:-Mozilla/5.0}" "$1" 2>/dev/null | tr -d '\r' |
 # one edition into another, and it replaces the old file only once it is complete.
 # With no size known, this is a plain fetch. With a 4th arg (soft), a size mismatch from
 # the source changing mid-download is not fatal: it returns 1 so an optional download (the
-# desktop viewer) can be skipped and the run continues (#99).
+# desktop viewer) can be skipped and the run continues (#99). A failed download still exits
+# (fetch), so run a soft call in ( ... ): the exit then ends only the subshell (#272).
 fetch_sized(){ # url out bytes [soft]
   [ -n "$3" ] || { fetch "$1" "$2"; return; }
   if [ -f "$2" ] && [ ! -e "$2.aria2" ] && [ "$(wc -c < "$2" | tr -d ' ')" = "$3" ]; then return 0; fi
@@ -934,7 +938,7 @@ if [ "$SKIP_MAPS" = 0 ]; then
   if [ "$HAVE_UNZIP" = 1 ]; then
     # "latest" URLs keep their file name across new editions: fetch by remote size (#57)
     mcu="https://download.osmand.net/latest-night-build/OsmAndMapCreator-main.zip"
-    if fetch_sized "$mcu" "$MVD/OsmAndMapCreator.zip" "$(remote_size "$mcu")" soft; then
+    if ( fetch_sized "$mcu" "$MVD/OsmAndMapCreator.zip" "$(remote_size "$mcu")" soft ); then
       # unpack to a new folder; replace the working viewer only if the unpack worked
       rm -rf "$MVD/app.new"
       if unzip -o -q "$MVD/OsmAndMapCreator.zip" -d "$MVD/app.new" && [ -f "$MVD/app.new/OsmAndMapCreator.sh" ]; then
@@ -945,7 +949,7 @@ if [ "$SKIP_MAPS" = 0 ]; then
     fi
     jreurl="https://api.adoptium.net/v3/binary/latest/21/ga/${PLAT}/${JARCH}/jre/hotspot/normal/eclipse"
     [ "$PLAT" = mac ] && jreurl="https://api.adoptium.net/v3/binary/latest/21/ga/mac/${JARCH}/jre/hotspot/normal/eclipse"
-    if fetch_sized "$jreurl" "$MVD/jre.tar.gz" "$(remote_size "$jreurl")" soft; then
+    if ( fetch_sized "$jreurl" "$MVD/jre.tar.gz" "$(remote_size "$jreurl")" soft ); then
       rm -rf "$MVD/_jre"; mkdir -p "$MVD/_jre"; tar -xf "$MVD/jre.tar.gz" -C "$MVD/_jre" 2>/dev/null
       if [ -n "$(find "$MVD/_jre" -name java -type f 2>/dev/null | head -n1)" ]; then
         rm -rf "$MVD/jre"; mv "$MVD/_jre"/*/ "$MVD/jre" 2>/dev/null

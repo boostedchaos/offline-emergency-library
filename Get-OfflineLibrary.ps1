@@ -327,7 +327,9 @@ $UseAria = (-not $NoAria) -and [bool](Get-Command aria2c -ErrorAction SilentlyCo
 # Show a live progress meter (percent/size/speed/ETA) only when attached to a real
 # console; stay quiet when output is redirected (CI/logging) so it doesn't fill with bars.
 $DlTty = -not [Console]::IsOutputRedirected
-function Fetch($url,$out){
+# Fetch url out [-Soft]: with -Soft (an optional download) a failed download throws instead of
+# ending the run, so the caller's try/catch can skip it (#272). Ctrl+C (aria2 exit 7) still stops.
+function Fetch($url,$out,[switch]$Soft){
   if($UseAria){
     $ariaProg = if($DlTty){ '--summary-interval=1' } else { '--summary-interval=0' }
     # A native program that cannot start leaves LASTEXITCODE unchanged (#132).
@@ -338,6 +340,7 @@ function Fetch($url,$out){
     # part-done file: it is preallocated with gaps, so 'curl -C -' would keep a corrupt
     # copy. aria2 resumes it from its .aria2 control file on the next run.
     if($LASTEXITCODE -eq 7 -or (Test-Path "$out.aria2")){
+      if($Soft -and $LASTEXITCODE -ne 7){ throw "download stopped: $url -> $out (optional, skipped; re-run to resume)" }
       Log "ERROR: download stopped: $url -> $out. Re-run the installer to resume."
       exit 1
     }
@@ -347,6 +350,7 @@ function Fetch($url,$out){
   $global:LASTEXITCODE = $null
   curl.exe -fL -C - --retry 10 --retry-delay 5 --retry-all-errors $curlProg -o $out $url
   if($LASTEXITCODE -ne 0 -or -not (Test-Path $out -PathType Leaf) -or (Get-Item $out).Length -eq 0){
+    if($Soft){ throw "download failed: $url -> $out (optional, skipped; re-run to try again)" }
     Log "ERROR: download failed: $url -> $out. Re-run the installer to resume."
     exit 1
   }
@@ -364,16 +368,16 @@ function Remote-Size($url){
 # one edition into another, and it replaces the old file only once it is complete.
 # With no size known, this is a plain Fetch. With -Soft, a size mismatch from the source
 # changing mid-download is not fatal: it throws (caught by the optional viewer's try) so
-# the run continues (#99).
+# the run continues (#99). -Soft also reaches Fetch, so a failed download throws too (#272).
 function Fetch-Sized($url,$out,$bytes,[switch]$Soft){
-  if(-not $bytes){ Fetch $url $out; return }
+  if(-not $bytes){ Fetch $url $out -Soft:$Soft; return }
   if((Test-Path $out -PathType Leaf) -and -not (Test-Path "$out.aria2") -and (Get-Item $out).Length -eq [int64]$bytes){ return }
   $part = "$out.$bytes.part"
   Get-ChildItem -Path (Split-Path $out -Parent) -Filter ((Split-Path $out -Leaf) + '.*.part') -ErrorAction SilentlyContinue |
     Where-Object { $_.FullName -ne $part } |
     ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue; Remove-Item -LiteralPath ($_.FullName + '.aria2') -Force -ErrorAction SilentlyContinue }
   if(Test-Path $out -PathType Leaf){ Log "  re-download: $(Split-Path $out -Leaf) (size on disk is not the source's $bytes bytes)" }
-  Fetch $url $part
+  Fetch $url $part -Soft:$Soft
   $got = (Get-Item $part).Length
   if($got -ne [int64]$bytes){
     Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue; Remove-Item -LiteralPath "$part.aria2" -Force -ErrorAction SilentlyContinue
@@ -871,7 +875,8 @@ if(-not $SkipMaps){
     $worldRow = $idx.osmand_regions.region | Where-Object { $_.name -eq $world } | Select-Object -First 1
     if((-not $BmOnly) -and -not (Test-Path $worldPath) -and $worldRow){
       Log "osmand: $world (world basemap for the desktop viewer)"
-      Fetch-Sized "https://download.osmand.net/download.php?standard=yes&file=$world" $worldPath $worldRow.containerSize -Soft
+      # optional: a failed download skips it and the run goes on, like bash's ( ... ) || true (#272)
+      try{ Fetch-Sized "https://download.osmand.net/download.php?standard=yes&file=$world" $worldPath $worldRow.containerSize -Soft }catch{ Log "  note: $($_.Exception.Message)" }
     } elseif((-not $BmOnly) -and -not (Test-Path $worldPath)) {
       Log "osmand note: $world is not in the current index; skipping the optional basemap."
     }

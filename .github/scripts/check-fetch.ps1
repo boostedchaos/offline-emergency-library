@@ -8,6 +8,8 @@ $ast = [System.Management.Automation.Language.Parser]::ParseInput($src, [ref]$to
 if($errors){ throw $errors }
 $fetch = $ast.Find({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq 'Fetch' }, $true)
 if(-not $fetch){ throw 'Fetch function not found' }
+$fsized = $ast.Find({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq 'Fetch-Sized' }, $true)
+if(-not $fsized){ throw 'Fetch-Sized function not found' }
 $tmp = Join-Path ([IO.Path]::GetTempPath()) ('oel-fetch-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory $tmp | Out-Null
 try {
@@ -36,6 +38,7 @@ public class AriaFixture {
     }
     if (mode == "missing") return 0;
     if (mode == "failure") return 1;
+    if (mode == "curlfail") return 22;
     File.Copy(new Uri(args[args.Length - 1]).LocalPath, output, true);
     return 0;
   }
@@ -52,7 +55,14 @@ public class AriaFixture {
     @{ Name='aria-nonzero'; Mode='failure'; Stale=0; Exit=0; Bytes=$true; Fallback=$true },
     @{ Name='aria-cancel'; Mode='cancel'; Stale=0; Exit=1; Bytes=$false; Fallback=$false },
     @{ Name='aria-partial'; Mode='partial'; Stale=0; Exit=1; Bytes=$false; Fallback=$false },
-    @{ Name='blocked-curl-existing-file'; Mode='curl'; Stale=0; Exit=1; Bytes=$false; Fallback=$false }
+    @{ Name='blocked-curl-existing-file'; Mode='curl'; Stale=0; Exit=1; Bytes=$false; Fallback=$false },
+    # -Soft (optional downloads, #272): a failure throws so the caller skips it; Ctrl+C still stops.
+    # Fetch-Sized must pass -Soft on, with no size known and with a size (part file).
+    @{ Name='soft-curl-failure'; Mode='curlfail'; Stale=0; Exit=0; Bytes=$false; Fallback=$false; Soft='Fetch' },
+    @{ Name='soft-aria-partial'; Mode='partial'; Stale=0; Exit=0; Bytes=$false; Fallback=$false; Soft='Fetch' },
+    @{ Name='soft-aria-cancel'; Mode='cancel'; Stale=0; Exit=1; Bytes=$false; Fallback=$false; Soft='Fetch' },
+    @{ Name='soft-sized-no-size'; Mode='curlfail'; Stale=0; Exit=0; Bytes=$false; Fallback=$false; Soft='SizedNone' },
+    @{ Name='soft-sized-part'; Mode='curlfail'; Stale=0; Exit=0; Bytes=$false; Fallback=$false; Soft='SizedPart' }
   )
   foreach($case in $cases){
     $dir = Join-Path $tmp $case.Name
@@ -61,6 +71,8 @@ public class AriaFixture {
     $aria = Join-Path $dir 'aria2c.exe'
     if($case.Mode -eq 'blocked'){ [IO.File]::WriteAllText($aria, 'MZ invalid executable') }
     else { Copy-Item $stub $aria }
+    # curlfail: a curl that starts and exits 22 (HTTP error), so the soft path, not a launch error, is tested
+    if($case.Mode -eq 'curlfail'){ Copy-Item $stub (Join-Path $dir 'curl.exe') }
     if($case.Mode -eq 'curl'){
       [IO.File]::WriteAllText((Join-Path $dir 'curl.exe'), 'MZ invalid executable')
       [IO.File]::WriteAllText($out, 'old file must not imply success')
@@ -68,16 +80,26 @@ public class AriaFixture {
     # Use curl from its installed PATH location; copying only the exe can separate
     # a runner's curl from the DLLs it needs. Only the blocked-curl case shadows it.
     $runner = Join-Path $dir 'run.ps1'
+    $q = "'$($url.Replace("'", "''"))' '$($out.Replace("'", "''"))'"
+    $call = switch($case.Soft){
+      'Fetch'     { "Fetch $q -Soft" }
+      'SizedNone' { "Fetch-Sized $q '' -Soft" }
+      'SizedPart' { "Fetch-Sized $q 999 -Soft" }
+      default     { "Fetch $q" }
+    }
+    if($case.Soft){ $call = "try { $call; Write-Host 'SOFT-NO-THROW' } catch { Write-Host ('SOFT-THROW: ' + `$_.Exception.Message) }" }
     $body = @"
 `$ErrorActionPreference = 'Continue'
 `$env:PATH = '$($dir.Replace("'", "''"));' + `$env:PATH
 `$env:OEL_FETCH_MODE = '$($case.Mode)'
-`$UseAria = `$$($case.Mode -ne 'curl')
+`$UseAria = `$$($case.Mode -notin 'curl','curlfail')
 `$DlTty = `$false
 function Log(`$m){ Write-Host `$m }
 $($fetch.Extent.Text)
+$($fsized.Extent.Text)
 `$global:LASTEXITCODE = $($case.Stale)
-Fetch '$($url.Replace("'", "''"))' '$($out.Replace("'", "''"))'
+$call
+Write-Host 'RUN-WENT-ON'
 exit 0
 "@
     [IO.File]::WriteAllText($runner, $body)
@@ -92,6 +114,7 @@ exit 0
       throw "$($case.Name): payload missing or incorrect"
     }
     if(($text -match 'falling back to curl') -ne $case.Fallback){ throw "$($case.Name): wrong fallback behavior" }
+    if($case.Soft -and $case.Exit -eq 0 -and ($text -notmatch 'SOFT-THROW: ' -or $text -notmatch 'RUN-WENT-ON')){ throw "$($case.Name): a soft download failure did not throw to the caller" }
     if($case.Mode -eq 'partial' -and ([IO.File]::ReadAllText($out) -cne 'unfinished' -or -not (Test-Path "$out.aria2"))){
       throw 'partial file or resume control was changed'
     }

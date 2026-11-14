@@ -105,6 +105,54 @@ fi
   && ok "legacy viewer starts in app/, where its fonts are" || bad "legacy viewer does not start in app/ (offline map has no street names, #108)"
 grep -Fq "files' to $(cd "$maps" && pwd)/obf and click OK" "$tmp/mc.log" && ok "legacy viewer launcher prints the map folder for Offline Rendering" || bad "legacy viewer launcher does not print the obf folder"
 
+# Optional viewer downloads (#272): fetch exits on a failed download, so every soft call must
+# run in ( ... ), or a 404 / outage of an optional viewer stops the whole install at step 8b.
+# Static: no soft call outside a subshell. Behavior: the installer's real fetch + fetch_sized
+# with a curl that always fails; the run must go on after the soft call.
+unsub="$(grep -n 'fetch_sized .* soft' get-offline-library.sh | grep -v '( fetch_sized ' || true)"
+[ -z "$unsub" ] && ok "every soft fetch_sized call runs in a subshell" || bad "soft fetch_sized call outside ( ... ) stops the install on a failed download: $unsub"
+fx="$tmp/fetchfx"; mkdir -p "$fx/bin"
+printf '#!/bin/sh\nexit 22\n' > "$fx/bin/curl"; chmod +x "$fx/bin/curl"
+{ echo 'log(){ printf "%s\n" "$*"; }'; echo 'USE_ARIA=0; DL_TTY=0'
+  awk '/^fetch\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
+  awk '/^remote_size\(\)\{/{print; exit}' get-offline-library.sh
+  awk '/^fetch_sized\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
+  echo 'if ( fetch_sized "https://example.invalid/x.zip" "$1/x.zip" "$(remote_size https://example.invalid/x.zip)" soft ); then echo GOT; else echo SKIPPED; fi'
+  echo 'echo AFTER'
+} > "$fx/run.sh"
+PATH="$fx/bin:$PATH" bash "$fx/run.sh" "$fx" > "$fx/out.txt" 2>&1 || true
+grep -Fxq SKIPPED "$fx/out.txt" && grep -Fxq AFTER "$fx/out.txt" && [ ! -e "$fx/x.zip" ] \
+  && ok "a failed optional download is skipped and the run goes on" || bad "a failed optional download did not leave the run going: $(tr '\n' ' ' < "$fx/out.txt")"
+# control: the same call without ( ... ) must end the run, or the check above proves nothing
+sed 's/^if ( fetch_sized \(.*\) soft ); then/if fetch_sized \1 soft; then/' "$fx/run.sh" > "$fx/run-bare.sh"
+grep -q '^if fetch_sized ' "$fx/run-bare.sh" || bad "control script was not made"
+PATH="$fx/bin:$PATH" bash "$fx/run-bare.sh" "$fx" > "$fx/out-bare.txt" 2>&1 || true
+grep -Fxq AFTER "$fx/out-bare.txt" && bad "control: a bare soft call did not stop the run, so the subshell check is not testing fetch's exit" || ok "control: a bare soft call stops the run (why the subshell is needed)"
+
+# Ctrl+C during an aria2 download (#272): aria2 catches SIGINT and exits 7, so bash does not
+# see the signal. fetch must re-raise it, or Ctrl+C in an optional ( ... ) download only skips
+# that file and the install goes on. A fake aria2c that exits 7 on SIGINT; SIGINT goes to the
+# whole process group, as a terminal Ctrl+C does.
+if command -v perl > /dev/null 2>&1; then
+  ax="$tmp/ariafx"; mkdir -p "$ax/bin"
+  printf '#!/usr/bin/env bash\ntrap "exit 7" INT\necho started > "$FLAG"\nfor i in $(seq 1 100); do sleep 0.1; done\nexit 0\n' > "$ax/bin/aria2c"
+  printf '#!/bin/sh\nexit 22\n' > "$ax/bin/curl"; chmod +x "$ax/bin/aria2c" "$ax/bin/curl"
+  sed 's/^USE_ARIA=0; DL_TTY=0$/USE_ARIA=1; DL_TTY=0/' "$fx/run.sh" > "$ax/run.sh"
+  grep -q '^USE_ARIA=1; DL_TTY=0$' "$ax/run.sh" || bad "aria2 Ctrl+C test script was not made"
+  FLAG="$ax/flag" PATH="$ax/bin:$PATH" perl -e '$SIG{INT}="DEFAULT"; setpgrp(0,0); exec @ARGV' bash "$ax/run.sh" "$ax" > "$ax/out.txt" 2>&1 &
+  apid=$!
+  for i in $(seq 1 50); do [ -f "$ax/flag" ] && break; sleep 0.1; done
+  if [ -f "$ax/flag" ]; then
+    kill -INT -- "-$apid" 2>/dev/null; arc=0; wait "$apid" || arc=$?
+    if grep -Fxq AFTER "$ax/out.txt"; then bad "Ctrl+C during an aria2 download in ( ... ) did not stop the run (exit $arc)"
+    else ok "Ctrl+C during an aria2 download stops the run, also inside ( ... ) (exit $arc)"; fi
+  else
+    kill -- "-$apid" 2>/dev/null; wait "$apid" 2>/dev/null; bad "fake aria2c did not start"
+  fi
+else
+  echo "SKIP: aria2 Ctrl+C test (no perl to start a process group)"
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo "OffRoad viewer checks failed."
   exit 1
