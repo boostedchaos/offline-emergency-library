@@ -490,16 +490,20 @@ Log '=== [1/8] Offline AI engine (llama.cpp) for Windows, macOS and Linux ==='
 $LlamaAssets = [ordered]@{ 'win-cpu-x64.zip'='x64'; 'win-cpu-arm64.zip'='arm64'; 'win-vulkan-x64.zip'='vulkan-x64'
   'macos-arm64.tar.gz'='macos-arm64'; 'macos-x64.tar.gz'='macos-x64'
   'ubuntu-x64.tar.gz'='linux-x64'; 'ubuntu-arm64.tar.gz'='linux-arm64'; 'ubuntu-vulkan-x64.tar.gz'='linux-vulkan-x64' }
+# Windows' own tar.exe (bsdtar) by full path, for the .tar.gz files. From Git Bash, plain
+# 'tar.exe' finds Git's GNU tar, which reads 'C:\...' as a remote host and fails (#273).
+$WinTar = if($env:SystemRoot -and (Test-Path -LiteralPath (Join-Path $env:SystemRoot 'System32\tar.exe'))){ Join-Path $env:SystemRoot 'System32\tar.exe' } else { 'tar' }
 # Expand-Tgz: unpack a .tar.gz with its symlinks turned into real files. exFAT has no symlinks
 # and Windows tar often cannot create them, so unpack to a temp folder, replace each link
 # with a copy of its target, then copy the result onto the drive.
 function Expand-Tgz($file,$dest){
-  $tarExe = if (Get-Command tar.exe -ErrorAction SilentlyContinue) { 'tar.exe' } else { 'tar' }
   $t = Join-Path ([System.IO.Path]::GetTempPath()) ('oel-untar-' + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Force $t, $dest | Out-Null
   try {
-    & $tarExe -xzf $file -C $t 2>$null
-    $links = @(& $tarExe -tvzf $file | Where-Object { $_ -match '^l' -and $_ -match ' -> ' })
+    $names = @(& $WinTar -tzf $file 2>$null)
+    if($LASTEXITCODE -ne 0 -or $names.Count -eq 0){ throw "$(Split-Path -Leaf $file) cannot be read (tar exit $LASTEXITCODE)" }
+    & $WinTar -xzf $file -C $t 2>$null
+    $links = @(& $WinTar -tvzf $file | Where-Object { $_ -match '^l' -and $_ -match ' -> ' })
     for ($pass = 0; $pass -lt 5; $pass++) {          # a link can point at another link: repeat
       foreach ($l in $links) {
         $m = [regex]::Match($l, '\s(\S+) -> (\S+)$'); if (-not $m.Success) { continue }
@@ -510,6 +514,10 @@ function Expand-Tgz($file,$dest){
         if (-not $item -and (Test-Path -LiteralPath $tp -PathType Leaf)) { Copy-Item -LiteralPath $tp $lp }
       }
     }
+    # Not the exit code: without admin rights, Windows tar exits 1 because it cannot make the
+    # symlinks, and the loop above fills them in. Check every entry is on disk instead.
+    $miss = @($names | Where-Object { $_ -and -not $_.EndsWith('/') -and -not (Test-Path -LiteralPath (Join-Path $t $_)) })
+    if($miss.Count){ throw "$($miss.Count) of $($names.Count) entries in $(Split-Path -Leaf $file) did not unpack (first: $($miss[0]))" }
     Copy-Item (Join-Path $t '*') $dest -Recurse -Force
   } finally { Remove-Item $t -Recurse -Force -ErrorAction SilentlyContinue }
 }
@@ -1097,8 +1105,7 @@ if(((-not $SkipMaps) -or $BmOnly) -and $BrowserMaps){
     # map style, fonts and symbols (one archive, no symlinks inside)
     $ba = Join-Path $mb 'base-assets.tar.gz'; Fetch-Sized "$nm/base-assets.tar.gz" $ba (Remote-Size "$nm/base-assets.tar.gz")   # same name on every update (#57)
     $new = Join-Path $mb 'assets-new'; if(Test-Path $new){ Remove-Item $new -Recurse -Force }; New-Item -ItemType Directory -Force $new | Out-Null
-    $tarExe = if(Get-Command tar.exe -ErrorAction SilentlyContinue){ 'tar.exe' } else { 'tar' }
-    & $tarExe -xzf $ba -C $new 2>$null
+    & $WinTar -xzf $ba -C $new 2>$null
     if(Test-Path (Join-Path $new 'tozip\nomad-base-styles.json')){
       $old = Join-Path $mb 'assets'; if(Test-Path $old){ Remove-Item $old -Recurse -Force }
       Move-Item (Join-Path $new 'tozip') $old
@@ -1122,7 +1129,8 @@ if(((-not $SkipMaps) -or $BmOnly) -and $BrowserMaps){
       $out = Join-Path $mb "server\$($a.name)"; $dest = Join-Path $mb "server\$dir"
       Log "caddy: $($a.name)"; Fetch $a.browser_download_url $out
       if(Test-Path $dest){ Remove-Item $dest -Recurse -Force }; New-Item -ItemType Directory -Force $dest | Out-Null   # keeps Caddy's LICENSE (Apache-2.0)
-      try{ if($ck -like '*.zip'){ Expand-Zip $out $dest } else { & $tarExe -xzf $out -C $dest } }catch{ Log "  WARN: could not unpack ${ck}: $($_.Exception.Message)" }
+      # Caddy archives have no symlinks, so tar's exit code is the check (#273)
+      try{ if($ck -like '*.zip'){ Expand-Zip $out $dest } else { $err = @(& $WinTar -xzf $out -C $dest 2>&1); if($LASTEXITCODE -ne 0){ throw "tar exit ${LASTEXITCODE}: $($err | Select-Object -First 1)" } } }catch{ Log "  WARN: could not unpack ${ck}: $($_.Exception.Message)" }
     }
     # viewer page + OPEN-MAPS launchers: from the repo (local clone, else GitHub). The .bat gets
     # Windows line ends and the .sh Unix line ends, whatever the source had.
