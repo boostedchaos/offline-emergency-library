@@ -113,7 +113,7 @@ unsub="$(grep -n 'fetch_sized .* soft' get-offline-library.sh | grep -v '( fetch
 [ -z "$unsub" ] && ok "every soft fetch_sized call runs in a subshell" || bad "soft fetch_sized call outside ( ... ) stops the install on a failed download: $unsub"
 fx="$tmp/fetchfx"; mkdir -p "$fx/bin"
 printf '#!/bin/sh\nexit 22\n' > "$fx/bin/curl"; chmod +x "$fx/bin/curl"
-{ echo 'log(){ printf "%s\n" "$*"; }'; echo 'USE_ARIA=0; DL_TTY=0'
+{ echo 'log(){ printf "%s\n" "$*"; }'; echo 'USE_ARIA=0; DL_TTY=0'; echo 'sleep(){ :; }'  # no pause between fetch's tries
   awk '/^fetch\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
   awk '/^remote_size\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
   awk '/^fetch_sized\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
