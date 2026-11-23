@@ -1,0 +1,215 @@
+{
+ "source": "survival-llm (MIT, Copyright (c) 2026 Ronny Fernandez), github.com/anonnerdfrenzy/survival-llm at 7d1fe29cddfbdf8ab39bd70f6ce1f7d6209c7e1c: QUESTIONS from evals/retrieval_eval.py, GOLD from evals/make_judging_batches.py, copied unchanged.",
+ "questions": [
+  {
+   "q": "The power just went out. How long will the food in my fridge and freezer stay safe?",
+   "must": [
+    "\\b4\\s*hours?",
+    "\\b48\\s*hours?",
+    "\\b24\\s*hours?"
+   ],
+   "about": "food|outage|refrigerat|freez",
+   "gold": "USDA: a closed fridge keeps food safe about 4 hours; a full freezer about 48 hours, half-full about 24. Discard perishables above 40\u00b0F (4\u00b0C) for 2+ hours. Never taste to check."
+  },
+  {
+   "q": "Can I run my gas generator in the garage if I leave the big door open?",
+   "must": [
+    "\\b(no|never|don'?t|do not)\\b",
+    "\\b20\\s*(feet|ft|foot)"
+   ],
+   "about": "generator|carbon monoxide",
+   "gold": "Never run a generator in a garage, even with the door open (CO). Outdoors only, at least 20 feet from the house, away from windows, doors and vents. Have battery CO alarms."
+  },
+  {
+   "q": "The tap water might be contaminated. How many drops of household bleach per gallon make it safe?",
+   "must": [
+    "\\b(6|8|16|six|eight|sixteen)\\s*drops",
+    "\\b30\\s*min"
+   ],
+   "about": "water|bleach|disinfect|purif",
+   "gold": "EPA: plain unscented bleach, 6%: 8 drops (about 1/8 tsp) per gallon; 8.25%: 6 drops. Double for cloudy water (filter first). Stir, wait 30 minutes; a slight chlorine smell means it worked. Older FEMA guidance says 16 drops; both are acceptable if consistent."
+  },
+  {
+   "q": "How long do I need to boil water to make it safe to drink?",
+   "must": [
+    "\\b(1|one)\\s*(full\\s*)?minute"
+   ],
+   "about": "water|boil|purif",
+   "gold": "CDC: a rolling boil for 1 minute; 3 minutes above 6,500 feet (2,000 m)."
+  },
+  {
+   "q": "What are the signs of carbon monoxide poisoning and what should I do?",
+   "must": [
+    "headache",
+    "dizz|nause|vomit|confus",
+    "fresh air|outside|get out|leave",
+    "911|emergency"
+   ],
+   "about": "carbon monoxide",
+   "gold": "CO poisoning: headache, dizziness, weakness, nausea/vomiting, chest pain, confusion. Get everyone into fresh air at once, call 911, don't go back in."
+  },
+  {
+   "q": "Someone is shivering hard and acting confused after being out in the cold. What do I do?",
+   "must": [
+    "hypotherm",
+    "wet",
+    "warm|blanket",
+    "911|emergency|medical"
+   ],
+   "about": "hypotherm|cold",
+   "gold": "Likely hypothermia: call 911; move somewhere warm; remove wet clothing; warm the core first (chest, neck, head, groin) with dry blankets or skin-to-skin; warm sweet non-alcoholic drinks only if alert; don't rub limbs; handle gently; CPR if not breathing."
+  },
+  {
+   "q": "Someone cut their arm badly and it is bleeding a lot. What do I do?",
+   "must": [
+    "pressure",
+    "911|emergency"
+   ],
+   "about": "bleed|wound|first aid|hemorrh",
+   "gold": "Severe bleeding: call 911; firm direct pressure with a clean cloth; if blood soaks through, add more on top without removing; tourniquet above the wound for life-threatening limb bleeding if pressure fails."
+  },
+  {
+   "q": "I burned my hand on the stove. How should I treat it?",
+   "must": [
+    "cool|cold",
+    "running water|under (cool|cold)? ?water|tap water",
+    "\\b(10|15|20|ten|fifteen|twenty)(\\s*-\\s*\\d+)?\\s*min"
+   ],
+   "about": "burn",
+   "gold": "Burn: cool under cool running water for 20 minutes (10+ acceptable); remove rings and tight items; cover loosely with cling film or a clean non-fluffy dressing; no ice, butter or creams; get care for large, deep or blistering burns, and burns to hands, face or genitals."
+  },
+  {
+   "q": "The power is out. How long can my insulin stay unrefrigerated?",
+   "must": [
+    "\\b28\\s*days|\\b(4|four)\\s*weeks|\\bmonth"
+   ],
+   "about": "insulin|diabet",
+   "gold": "Insulin: opened vials/pens are usually fine at room temperature (below about 86\u00b0F/30\u00b0C) for 28 days (some types 42-56); unopened can also be kept at room temperature up to the same limit. Keep out of heat and don't freeze. Check the label."
+  },
+  {
+   "q": "Is it safe to use candles for light during a blackout?",
+   "must": [
+    "flashlight|battery|lantern",
+    "unattended|never leave|don'?t leave"
+   ],
+   "about": "candle|outage|fire",
+   "gold": "Ready.gov: use flashlights or battery lanterns, not candles. If candles are used: never unattended, away from flammables, on a stable holder."
+  },
+  {
+   "q": "My phone is at 15% and the power is out. How do I make the battery last?",
+   "must": [
+    "low power|battery saver|power sav",
+    "airplane|flight mode",
+    "bright"
+   ],
+   "about": "phone|battery|outage",
+   "gold": "Phone: Low Power Mode / battery saver; lower brightness; close apps; turn off radios or use airplane mode when not needed; text rather than call; charge from a power bank or a car running outdoors."
+  },
+  {
+   "q": "Can I charge my phone in my car with the engine running inside the garage?",
+   "must": [
+    "\\b(no|never|don'?t|do not|not)\\b",
+    "carbon monoxide|\\bco\\b"
+   ],
+   "about": "carbon monoxide|car|garage",
+   "gold": "Never run a car in a garage, even with the door open (CO). Charge in the car only outdoors with the exhaust clear, or use a power bank."
+  },
+  {
+   "q": "A power line is down in my front yard. What should I do?",
+   "must": [
+    "\\b(30|33|35|thirty|thirty-five)\\s*(feet|ft)|\\b10\\s*m",
+    "911|utility|power company"
+   ],
+   "about": "power line|downed|electric",
+   "gold": "Downed power line: stay at least 35 feet (10 m) away; assume it is live; don't touch anything it touches; call 911 and the utility; if in a vehicle touching it, stay inside unless there is a fire."
+  },
+  {
+   "q": "The water is off and the toilet won't flush. What can I do for a toilet?",
+   "must": [
+    "bucket",
+    "bag|liner",
+    "bleach|disinfect|lime|sawdust|litter|lid"
+   ],
+   "about": "toilet|sanitation|waste",
+   "gold": "No-flush toilet: line a bucket or the bowl with heavy plastic bags, add disinfectant (diluted bleach) or absorbent (sawdust, kitty litter), seal and store bags; or pour a bucket of water into the bowl to flush if water is available; wash hands."
+  },
+  {
+   "q": "How do I keep warm in my house in winter if the power and heat are out?",
+   "must": [
+    "(one|single|small|same) room",
+    "layer",
+    "carbon monoxide|\\boven\\b|\\bstove\\b|\\bgrill"
+   ],
+   "about": "cold|winter|warm|heat",
+   "gold": "Keep warm: gather in one room and close it off, layer clothing, blankets, hats; never use an oven, stove, grill or generator for heat (CO); keep CO alarms working."
+  },
+  {
+   "q": "There has been a nuclear explosion nearby. What should I do?",
+   "must": [
+    "get inside|go inside|shelter|indoors",
+    "basement|middle|center|interior",
+    "\\b24\\s*hours|stay inside|stay tuned"
+   ],
+   "about": "nuclear|radiation|fallout",
+   "gold": "Ready.gov: get inside the nearest building, go to the basement or middle, stay inside for 24 hours unless told otherwise, stay tuned to official information; remove outer clothing and wash if exposed."
+  },
+  {
+   "q": "Is canned food still safe to eat after it sat in floodwater?",
+   "must": [
+    "label",
+    "sanitiz|bleach|boil|disinfect",
+    "home[- ]canned|home canned|discard"
+   ],
+   "about": "flood|canned|food",
+   "gold": "Floodwater: discard home-canned food and damaged commercial cans; undamaged commercial cans can be saved: remove labels, wash, sanitize (boil 2 minutes or bleach solution), relabel."
+  },
+  {
+   "q": "Is it safe to take ibuprofen that expired two years ago?",
+   "must": [
+    "less effective|potency|effective|weaker|strength"
+   ],
+   "about": "expir|ibuprofen|medic",
+   "gold": "Expired ibuprofen: usually safe but may be less effective; the FDA recommends not using expired medicine; ask a pharmacist when possible."
+  },
+  {
+   "q": "How do I make oral rehydration solution at home?",
+   "must": [
+    "\\b(6|six) (level )?(tea)?spoons?|\\b(6|six) teaspoons",
+    "half|1/2|\u00bd",
+    "\\b(1|one) (liter|litre|l\\b|quart)"
+   ],
+   "about": "rehydrat|diarrh|dehydrat",
+   "gold": "WHO: 1 liter of clean water + 6 level teaspoons of sugar + half a level teaspoon of salt."
+  },
+  {
+   "q": "Someone working in the heat is confused, very hot and has stopped sweating. What do I do?",
+   "must": [
+    "heat ?stroke",
+    "911|emergency",
+    "cool|ice|cold water|wet"
+   ],
+   "about": "heat",
+   "gold": "Heat stroke is an emergency: call 911; move to a cool place; cool fast (cold water immersion, ice packs, wet cloths and fanning); don't give fluids if confused."
+  },
+  {
+   "q": "How can I tell if home-canned food might have botulism?",
+   "must": [
+    "bulg|swoll|leak|spurt|cloudy|odor|smell|foam",
+    "(do not|don'?t|never) taste",
+    "throw|discard"
+   ],
+   "about": "botul|canning|canned",
+   "gold": "Possible botulism: bulging, leaking or swollen containers, spurting liquid, foam, cloudy liquid, off smell. Never taste; discard safely (sealed bags), clean spills with bleach; get medical care for symptoms."
+  },
+  {
+   "q": "How much water should I store per person for an emergency?",
+   "must": [
+    "\\b(1|one) gallon",
+    "per (person|day)",
+    "\\b(3|three)[- ]day|\\b(2|two)[- ]weeks?"
+   ],
+   "about": "water|emergency|supply|kit",
+   "gold": "Ready.gov: 1 gallon of water per person per day; at least a 3-day supply for evacuation, 2 weeks at home."
+  }
+ ]
+}

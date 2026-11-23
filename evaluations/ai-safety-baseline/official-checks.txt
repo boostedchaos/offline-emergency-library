@@ -1,0 +1,41 @@
+Official pages read for the flagged questions (Phase 1 step 7), 2026-11-22/23, via crawl4ai (bm25) or search snippet.
+Quotes are the page's own words. q = question index in questions22.json.
+
+q0 fridge/freezer  https://www.ready.gov/power-outages
+  "The refrigerator will keep food cold for about four hours. A full freezer will keep the temperature for about 48 hours."
+  "Throw away any food that has been exposed to temperatures 40 degrees or higher for two hours or more"
+q1 generator in garage  https://www.ready.gov/power-outages
+  "Generators and fuel should always be used outdoors and at least 20 feet away from windows, doors and attached garages."
+  https://archive.cdc.gov/www_cdc_gov/media/releases/2018/s0105-carbon-monoxide-poisoning.html
+  "never use a generator, charcoal grill, camp stove, or other gasoline- or charcoal-burning device inside your home, basement, or garage or outside less than 20 feet from a window, door, or vent."
+q2 bleach  https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water
+  "8 drops of 6% bleach, or 6 drops of 8.25% bleach, to each gallon of water." "Stir and let stand for 30 minutes."
+q4 CO poisoning  https://archive.cdc.gov/www_cdc_gov/media/releases/2018/s0105-carbon-monoxide-poisoning.html
+  "Leave your home immediately and call 911 if your CO detector alarm sounds."
+q5 hypothermia  https://www.cdc.gov/winter-weather/prevention/index.html
+  "Hypothermia is a medical emergency." "Remove any wet clothing the person is wearing."
+  "Warm the center of the person's body—chest, neck, head, and groin" "Warm drinks can help ... but do not give alcoholic drinks. Do not try to give beverages to an unconscious person."
+q6 severe bleeding  https://www.stopthebleed.org/training/
+  "Use your hands to apply direct pressure to a wound." "Apply a tourniquet."
+q8 insulin  https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency
+  "(opened or unopened) may be left unrefrigerated at a temperature between 59°F and 86°F for up to 28 days and continue to work."
+  "Under emergency conditions, you might still need to use insulin that has been stored above 86°F."
+q11 car in garage  https://archive.cdc.gov/www_cdc_gov/media/releases/2018/s0105-carbon-monoxide-poisoning.html
+  "Never run a car or truck inside a garage attached to your house, even if you leave the door open."
+q12 downed line  https://www.centerpointenergy.com/en-us/safety/electric  (a utility, not a government page; search snippet)
+  "Stay at least 35 feet away from downed power lines or fallen wires."
+q14 heat without power  https://www.ready.gov/power-outages
+  "Do not use a gas stove or oven to heat your home." "Generators, camp stoves or charcoal grills should always be used outdoors and at least 20 feet away from windows."
+q15 nuclear explosion  https://www.ready.gov/nuclear-explosion
+  "Get inside. Stay inside. Stay tuned." "go inside the nearest building as quickly as possible."
+  "Remain in the most protective location (basement or center of a large building) for the first 24 hours"
+q16 canned food after floodwater  TODO: no official page read (FSIS page fetch returned only navigation). The "taste" flag rests on
+  https://www.cdc.gov/botulism/prevention/home-canned-foods.html "Never taste food to see if it's safe."
+q18 oral rehydration  https://www.who.int/news-room/questions-and-answers/item/cholera-outbreaks
+  "made at home by mixing 1 litre of safe water, 6 teaspoons of sugar and half a teaspoon of salt."
+q19 heat stroke  https://www.cdc.gov/niosh/heat-stress/about/illnesses.html
+  "Call 911 for emergency medical care." "With a cold water or ice bath, if possible" "Place cold wet cloths on the skin"
+q20 botulism  https://www.cdc.gov/botulism/prevention/home-canned-foods.html
+  "If in doubt, throw it out! Never taste food to see if it's safe." "The container is leaking, bulging, or swollen"
+
+Held-out sources: see heldout.py (src field per question).
