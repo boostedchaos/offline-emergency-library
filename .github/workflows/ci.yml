@@ -66,6 +66,8 @@ jobs:
         run: bash .github/scripts/check-checksums.sh
       - name: Browser maps self-check line, both installers (#256)
         run: bash .github/scripts/check-selfcheck-browser-maps.sh
+      - name: A web page whose source is down is skipped and reported, both installers (#298)
+        run: bash .github/scripts/check-html-doc.sh
       - name: MedlinePlus page CSP hash (inline script allowed by hash)
         run: bash .github/scripts/check-csp-hash.sh
       - name: PowerShell parse + analyze

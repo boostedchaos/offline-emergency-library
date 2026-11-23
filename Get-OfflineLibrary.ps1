@@ -871,20 +871,39 @@ foreach($p in $pdfs){
 
 # Emergency Childbirth (US Office of Civil Defense + Public Health Service; US-government work,
 # public domain). Project Gutenberg #26923 e-text (HTML + figures), header kept. Opens offline in a browser.
-if(-not $Only){
-  try{
-    $ecBase = 'https://www.gutenberg.org/cache/epub/26923'
-    $ecDir  = Join-Path $Root 'Medical\Emergency-Childbirth'
-    $ecHtml = Join-Path $ecDir 'Emergency Childbirth (US Civil Defense).html'
-    Log 'html: Emergency Childbirth (US Civil Defense).html'
-    Fetch "$ecBase/pg26923-images.html" $ecHtml   # exits on a missing or empty file
-    $body = Get-Content -LiteralPath $ecHtml -Raw
-    if($body -notmatch '(?i)<html|<!doctype'){ Log '  ERROR: Emergency Childbirth was not HTML (removed)'; Remove-Item $ecHtml -Force; exit 1 }
-    $imgs = [regex]::Matches($body,'src="images/([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
-    if($imgs){ New-Item -ItemType Directory -Force (Join-Path $ecDir 'images') | Out-Null }
-    foreach($im in $imgs){ Fetch "$ecBase/images/$im" (Join-Path $ecDir "images\$im") }
-  }catch{ Log "html ERROR Emergency Childbirth: $($_.Exception.Message)" }
+function Html-Ok($f){   # a whole HTML page?
+  if(-not (Test-Path -LiteralPath $f -PathType Leaf)){ return $false }
+  $t = [IO.File]::ReadAllText($f); ($t -match '<html') -and ($t -match '</html>')
 }
+function Html-Imgs($f){ [regex]::Matches([IO.File]::ReadAllText($f),'src="images/([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique }
+# Get-HtmlDoc baseurl htmlfile localname destdir: an HTML page + every images/<file> it links, so it
+# opens fully offline in a browser. Its host can be down for days (#298): what cannot be downloaded
+# is logged and skipped, and the self-check names it. A whole page on the drive is replaced only by
+# another whole page.
+function Get-HtmlDoc($base,$file,$name,$dir){
+  $out = Join-Path $dir $name
+  Log "html: $name"
+  $n = Remote-Size "$base/$file"
+  if(-not (Html-Ok $out) -or ($n -and (Get-Item -LiteralPath $out).Length -ne [int64]$n)){
+    $new = "$out.new"
+    Remove-Item -LiteralPath $new, "$new.aria2" -Force -ErrorAction SilentlyContinue
+    $got = $false
+    try{ Fetch "$base/$file" $new -Soft; $got = Html-Ok $new }catch{ Log "  $($_.Exception.Message)" }
+    if($got){ Move-Item -LiteralPath $new -Destination $out -Force }
+    else {
+      Remove-Item -LiteralPath $new, "$new.aria2" -Force -ErrorAction SilentlyContinue
+      Log "  note: could not download $name (skipped, any copy on the drive is kept; re-run to try again)"
+      if(-not (Html-Ok $out)){ return }
+    }
+  }
+  $imgs = @(Html-Imgs $out)
+  if($imgs){ New-Item -ItemType Directory -Force (Join-Path $dir 'images') | Out-Null }
+  foreach($im in $imgs){
+    try{ Fetch-Sized "$base/images/$im" (Join-Path $dir "images\$im") (Remote-Size "$base/images/$im") -Soft }
+    catch{ Log "  $($_.Exception.Message)"; Log "  note: could not download images/$im of $name (skipped; re-run to try again)"; return }
+  }
+}
+if(-not $Only){ Get-HtmlDoc 'https://www.gutenberg.org/cache/epub/26923' 'pg26923-images.html' 'Emergency Childbirth (US Civil Defense).html' (Join-Path $Root 'Medical\Emergency-Childbirth') }
 
 # ================================================================ 7. Wikipedia + Maps
 if(-not $SkipWikipedia){
@@ -1695,6 +1714,18 @@ foreach($f in $pdfs){
 if(-not $pdfs){ ScWarn 'no PDF manuals found' }
 elseif(-not $pbad){ ScPass "$($pdfs.Count) PDF files: all start with %PDF" }
 else { ScFail ("file(s) named .pdf that are not PDFs - delete each one and re-run the installer:`n        " + ($pbad -join "`n        ")) }
+# 4b. The Emergency Childbirth page is whole and has its pictures (skipped if its source was down, #298).
+$ecDir = Join-Path $Root 'Medical\Emergency-Childbirth'
+$ecHtml = Join-Path $ecDir 'Emergency Childbirth (US Civil Defense).html'
+if((-not $Only) -or (Test-Path -LiteralPath $ecHtml)){
+  $ecMiss = ''
+  if(-not (Html-Ok $ecHtml)){ $ecMiss = ' the page' }
+  else { foreach($im in @(Html-Imgs $ecHtml)){ $p = Join-Path $ecDir "images\$im"; if(-not ((Test-Path -LiteralPath $p) -and (Get-Item -LiteralPath $p).Length -gt 0)){ $ecMiss += " images/$im" } } }
+  $ecMsg = "Emergency Childbirth guide not complete - missing:$ecMiss - re-run the installer later (its source may be down)"
+  if(-not $ecMiss){ ScPass 'Emergency Childbirth guide: page and pictures are on the drive' }
+  elseif(-not $Only){ ScFail $ecMsg }
+  else { ScWarn $ecMsg }
+}
 # 5. Every AI model (.gguf) has the size and SHA-256 that Hugging Face publishes, so a cut-off
 #    download is caught (#71). The hash is the one just written to CHECKSUMS-SHA256.txt: no extra read.
 $sums = @{}; foreach($l in $arr){ $sums[$l.Substring(66)] = $l.Substring(0,64) }

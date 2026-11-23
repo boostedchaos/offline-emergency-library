@@ -820,17 +820,30 @@ get_pdf_url(){ # url  localname  destdir   (direct link)
   # validate it's really a PDF; drop error pages (fetch already exits on a missing or empty file)
   if [ "$(head -c 4 "$out" 2>/dev/null)" != "%PDF" ]; then log "  ERROR: $2 was not a valid PDF (removed)"; rm -f "$out"; exit 1; fi
 }
+html_ok(){ grep -qi '<html' "$1" 2>/dev/null && grep -qi '</html>' "$1"; }   # a whole HTML page?
+html_imgs(){ grep -oE 'src="images/[^"]+"' "$1" | sed -E 's/.*images\/([^"]+)".*/\1/' | LC_ALL=C sort -u; }
 get_html_doc(){ # baseurl  htmlfile  localname  destdir   (an HTML page + the images/ it references)
   # Grabs the page and every images/<file> it links, so it opens fully offline in a browser.
+  # Its host can be down for days (#298): what cannot be downloaded is logged and skipped, and the
+  # self-check names it. A whole page on the drive is replaced only by another whole page.
+  # ( ... ) because fetch exits on a failed download (#272).
   out="$4/$3"
   log "html: $3"
-  fetch "$1/$2" "$out"
-  if ! head -c 400 "$out" 2>/dev/null | grep -qi '<html\|<!doctype'; then
-    log "  ERROR: $3 was not HTML (removed)"; rm -f "$out"; exit 1
+  n="$(remote_size "$1/$2")"
+  if ! html_ok "$out" || { [ -n "$n" ] && [ "$(wc -c < "$out" | tr -d ' ')" != "$n" ]; }; then
+    rm -f "$out.new" "$out.new.aria2"
+    if ( fetch "$1/$2" "$out.new" ) && html_ok "$out.new"; then mv -f "$out.new" "$out"
+    else
+      rm -f "$out.new" "$out.new.aria2"
+      log "  note: could not download $3 (skipped, any copy on the drive is kept; re-run to try again)"
+      html_ok "$out" || return 0
+    fi
   fi
-  imgs="$(grep -oE 'src="images/[^"]+"' "$out" | sed -E 's/.*images\/([^"]+)".*/\1/' | sort -u)"
+  imgs="$(html_imgs "$out")"
   [ -n "$imgs" ] && mkdir -p "$4/images"
-  for im in $imgs; do fetch "$1/images/$im" "$4/images/$im"; done
+  for im in $imgs; do
+    ( fetch_sized "$1/images/$im" "$4/images/$im" "$(remote_size "$1/images/$im")" soft ) || { log "  note: could not download images/$im of $3 (skipped; re-run to try again)"; return 0; }
+  done
 }
 AFM="$ROOT/Manuals/ArmyFieldManuals"; MPDF="$ROOT/Medical/Manuals-PDF"
 if [ -n "$ONLY" ]; then log "pdf: manuals not touched (--only)"; else
@@ -1653,6 +1666,17 @@ PEOF
 if [ "$pt" = 0 ]; then sc_warn "no PDF manuals found"
 elif [ -z "$pbad" ]; then sc_pass "$pt PDF files: all start with %PDF"
 else sc_fail "file(s) named .pdf that are not PDFs - delete each one and re-run the installer:$pbad"; fi
+# 4b. The Emergency Childbirth page is whole and has its pictures (skipped if its source was down, #298).
+ECH="$ROOT/Medical/Emergency-Childbirth/Emergency Childbirth (US Civil Defense).html"
+if [ -z "$ONLY" ] || [ -e "$ECH" ]; then
+  ec_miss=""
+  if ! html_ok "$ECH"; then ec_miss=" the page"
+  else for im in $(html_imgs "$ECH"); do [ -s "$ROOT/Medical/Emergency-Childbirth/images/$im" ] || ec_miss="$ec_miss images/$im"; done; fi
+  ec_msg="Emergency Childbirth guide not complete - missing:$ec_miss - re-run the installer later (its source may be down)"
+  if [ -z "$ec_miss" ]; then sc_pass "Emergency Childbirth guide: page and pictures are on the drive"
+  elif [ -z "$ONLY" ]; then sc_fail "$ec_msg"
+  else sc_warn "$ec_msg"; fi
+fi
 # 5. Every AI model (.gguf) has the size and SHA-256 that Hugging Face publishes, so a cut-off
 #    download is caught (#71). The hash is the one just written to CHECKSUMS-SHA256.txt: no extra read.
 gt=0; gbad=""; gwarn=""
