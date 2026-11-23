@@ -352,7 +352,7 @@ function Fetch($url,$out,[switch]$Soft){
   $curlProg = if($DlTty){ '-#' } else { '-sS' }
   # Retry here, not with curl's --retry (#298): that one sleeps as long as the server's
   # Retry-After asks (gutenberg.org: 6 hours) and restarts a dropped download from where this
-  # run began. --retry-max-time is no way out: curl 8.14.0 to 8.23.0 then exits 0 on the failed
+  # run began. --retry-max-time is no way out: curl 8.14.1 and 8.23.0 then exit 0 on the failed
   # download (curl/curl#23838). Each try here resumes; one with no data for 2 minutes is cut off.
   $fresh = -not ((Test-Path $out -PathType Leaf) -and (Get-Item $out).Length -gt 0)
   for($try = 2; ; $try++){

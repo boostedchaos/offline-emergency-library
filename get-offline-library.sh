@@ -413,7 +413,7 @@ fetch(){ # url out
   if [ "$DL_TTY" = 1 ]; then curl_prog="-#"; else curl_prog="-sS"; fi
   # Retry here, not with curl's --retry (#298): that one sleeps as long as the server's
   # Retry-After asks (gutenberg.org: 6 hours) and restarts a dropped download from where this
-  # run began. --retry-max-time is no way out: curl 8.14.0 to 8.23.0 then exits 0 on the failed
+  # run began. --retry-max-time is no way out: curl 8.14.1 and 8.23.0 then exit 0 on the failed
   # download (curl/curl#23838). Each try here resumes; one with no data for 2 minutes is cut off.
   local fresh=1 try=1 had code pause
   if [ -s "$2" ]; then fresh=0; fi

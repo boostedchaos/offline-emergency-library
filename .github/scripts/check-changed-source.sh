@@ -166,7 +166,7 @@ EOF
     fresh; URL="$P/dropnorange/manual.pdf"; check "cut off half way, Range ignored"
     want_gets "Range ignored" dropnorange "GET dropnorange -,GET dropnorange bytes=$h-,GET dropnorange -,"
     # ... and a source that stays down is a failure after 11 tries, also with a half-done part file
-    # on the drive (curl 8.14.0 to 8.23.0 can exit 0 there, curl/curl#23838).
+    # on the drive (with --retry-max-time, curl 8.14.1 and 8.23.0 exit 0 there, curl/curl#23838).
     fresh; URL="$P/down/manual.pdf"; sz="$(wc -c < "$T/src/manual.pdf" | tr -d ' ')"
     for d in sh ps; do head -c "$h" "$T/src/manual.pdf" > "$T/$d/manual.pdf.$sz.part"; done
     down(){ # shell-name folder runner
