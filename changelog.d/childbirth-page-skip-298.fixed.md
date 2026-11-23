@@ -3,4 +3,4 @@
   maps and the checksum list. They now log it, skip it and go on; the self-check at the end says
   FAIL and names the page or picture that is missing, and a re-run picks it up. A whole page on
   the drive is replaced only by another whole page. Refs #298.
-  _[@boostedchaos](https://github.com/boostedchaos)._
+  _[@boostedchaos](https://github.com/boostedchaos) - PR #301._
