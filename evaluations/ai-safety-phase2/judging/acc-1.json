@@ -1,0 +1,650 @@
+{
+ "batch": 1,
+ "lens": "accuracy",
+ "scores": [
+  {
+   "question": 4,
+   "label": "A",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Full signs; leave, 911, medical care right. Lacks don't go back in; opening windows could delay exit; long."
+  },
+  {
+   "question": 4,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Fresh air right, but 911 only if unconscious or unresponsive; shut off source, check detector; no chest pain or no-re-entry warning."
+  },
+  {
+   "question": 4,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Evacuate and 911 right, but then identify and turn off source and open windows, against don't go back in; chest pain missing."
+  },
+  {
+   "question": 4,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Fresh air right; 911 only if severe; turn off source; \"loss of smell\" wrong; chest pain missing."
+  },
+  {
+   "question": 4,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Signs, fresh air and 911 right. Lacks vomiting and don't go back in; detector battery clutter."
+  },
+  {
+   "question": 4,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Signs and 911 right, but turn off source first and leave only if you can't; no fresh air."
+  },
+  {
+   "question": 4,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and evacuate right, but ventilates first; confusion, chest pain, vomiting and no-re-entry missing."
+  },
+  {
+   "question": 4,
+   "label": "H",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Good signs, 911, fresh air. Moves only the person, after the call; no everyone-out or don't-go-back warning."
+  },
+  {
+   "question": 4,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Get out and 911 first; good signs. Turning off appliances and opening windows is ambiguous; no don't-go-back warning."
+  },
+  {
+   "question": 4,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Full signs; get out and 911 right. Odd electrical and alcohol tips; opening windows; no don't-go-back warning."
+  },
+  {
+   "question": 4,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Leave and 911 right, but opens windows first and tests with a detector; chest pain and no-re-entry missing."
+  },
+  {
+   "question": 4,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and evacuate right, but ventilates first; confusion, chest pain, vomiting and no-re-entry missing."
+  },
+  {
+   "question": 4,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Evacuate, 911 and never re-enter right. Ventilating listed before leaving; chest pain and vomiting missing."
+  },
+  {
+   "question": 4,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Evacuate, 911 and stay outside right. Chest pain and vomiting missing; \"do not treat others\" slightly off."
+  },
+  {
+   "question": 4,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Leave, fresh air, 911 right. Last paragraph muddled; chest pain, vomiting and no-re-entry missing."
+  },
+  {
+   "question": 4,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Evacuate at once, 911, medical care right. Opening doors and checking levels suggest re-entry; chest pain missing."
+  },
+  {
+   "question": 4,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Full signs and 911, but unconscious victims are turned over, not moved out; no everyone-out or don't-go-back."
+  },
+  {
+   "question": 4,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Good signs, but says ventilated area not evacuate; turn off source before 911; no no-re-entry warning."
+  },
+  {
+   "question": 6,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 right, but \"gentle\" pressure is wrong; no add-on-top without removing, no tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, direct sustained pressure right. Lacks firm, layering over soaked cloth, and tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Call and firm pressure right; no layering or tourniquet; urgent care and soap-washing a severe wound wrong."
+  },
+  {
+   "question": 6,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "\"Firm but gentle\", calls only if not stopping, China number; cleans wound; no layering or tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and firm pressure right; discourages tourniquet, keeps jewelry on wrongly; no layering."
+  },
+  {
+   "question": 6,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, firm pressure, leave debris right; \"not too tight\" weakens it; no layering or tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "G",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "All key points: 911, firm pressure, add on top, tourniquet above wound, time noted, shock care."
+  },
+  {
+   "question": 6,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and firm pressure right; forbids tourniquet except medical professionals; no layering."
+  },
+  {
+   "question": 6,
+   "label": "I",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Gentle pressure, \"do not apply direct pressure or use a tourniquet\": core treatment wrong."
+  },
+  {
+   "question": 6,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and firm pressure right, but wrongly forbids tourniquet on an arm and packing; soaked-cloth advice unclear."
+  },
+  {
+   "question": 6,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 and firm pressure right; lacks layering over soaked cloth and tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Call, firm pressure, add layer without lifting right; no tourniquet; China number; pressure comes fourth."
+  },
+  {
+   "question": 6,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 and direct pressure right; 5-minute floor, not \"firm\"; no layering or tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "\"Firm, gentle\" pressure, wrong pressure points, wash with soap, 911 late at step 7; no tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Firm pressure and tourniquet mention right, but call third; removing objects and soap wash wrong."
+  },
+  {
+   "question": 6,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Direct pressure right; emergency call conditional and contradictory; soap cleaning; no layering or tourniquet; cluttered."
+  },
+  {
+   "question": 6,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Call, firm pressure, add cloth on top right; China number, cleans wound afterward, no tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Calls first, but \"gentle pressure, don't press too hard\" is wrong; soap wash; no layering or tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "S",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 and firm pressure right; lacks layering and tourniquet."
+  },
+  {
+   "question": 6,
+   "label": "T",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Gentle pressure, \"don't press too hard\" wrong; emergency call late; tourniquet mentioned only if trained."
+  },
+  {
+   "question": 7,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Cool, cover, no ice or butter right; \"several minutes\" too short/vague; rings and hand referral missing."
+  },
+  {
+   "question": 7,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "10-15 min cooling, jewelry, cover, hand/blister care right; ointment and burn creams against guidance."
+  },
+  {
+   "question": 7,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Cool, remove accessories, cover, care for blisters right; \"several minutes\" vague; no hand referral or butter/cream warning."
+  },
+  {
+   "question": 7,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Cool, cover, no ice/butter, blister care right; \"several minutes\" vague; rings missing."
+  },
+  {
+   "question": 7,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10-15 min cooling and no ice right; needless 911, ointment, no cover, no rings, no care criteria."
+  },
+  {
+   "question": 7,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "10-15 min, non-stick cover, no ice or creams right; rings missing; care threshold only third-degree or large."
+  },
+  {
+   "question": 7,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10-15 min, jewelry, cover right; aloe/ointment wrong; \"1/4 inch deep\" care threshold wrong; no hand referral."
+  },
+  {
+   "question": 7,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10-15 min, jewelry, cover right; ointment, hydrocortisone, soap wrong; 10% body threshold; no hand or blister care."
+  },
+  {
+   "question": 7,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10+ min cooling and cover right; burn cream/aloe against guidance; rings and ice warning missing."
+  },
+  {
+   "question": 7,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10 min cooling and jewelry right; needless 911; no cover, no ice/butter warning, no care criteria."
+  },
+  {
+   "question": 7,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "10-15 min, jewelry, cover, hand care right; soap and antibiotic ointment against guidance."
+  },
+  {
+   "question": 7,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "10-15 min, cover, no ice/butter, blister care right; rings missing; dry cloth may be fluffy."
+  },
+  {
+   "question": 7,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "10-15 min, non-stick cover, blister care right; ointment against guidance; rings and ice warning missing."
+  },
+  {
+   "question": 7,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Cooling, rings, cover right; soap, ointment, aloe against guidance; treats second-degree as minor; no hand/blister care."
+  },
+  {
+   "question": 7,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "10-15 min, jewelry, no ice, deep/large care right; covering and cream warning missing."
+  },
+  {
+   "question": 7,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10-15 min, jewelry, cover right; ointment, benzocaine, soap against guidance; no blister referral."
+  },
+  {
+   "question": 7,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "10+ min, no ice/butter, cover, hand referral right; aloe/burn gel against guidance; rings not named."
+  },
+  {
+   "question": 7,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10-15 min, jewelry, cover right; needless 911, ointment against guidance; no ice warning or care criteria."
+  },
+  {
+   "question": 9,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Precautions good, but endorses candles, names no flashlights; pouring water into candle is wrong."
+  },
+  {
+   "question": 9,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Precautions and flashlights/lanterns right; opens with candles can be safe; power-line and wax tips off."
+  },
+  {
+   "question": 9,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Right no and fire risk; no flashlight alternative or precautions."
+  },
+  {
+   "question": 9,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Flashlights not candles right; carbon monoxide reason overstated."
+  },
+  {
+   "question": 9,
+   "label": "E",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No, flashlights or lanterns, never unattended: matches guidance."
+  },
+  {
+   "question": 9,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Not recommended, flashlights/lanterns right; some odd reasons; no unattended or stable-holder precautions."
+  },
+  {
+   "question": 9,
+   "label": "G",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No, fire and burn risk, use flashlights or lanterns: main point complete."
+  },
+  {
+   "question": 9,
+   "label": "H",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Stable surface, flammables, flashlights safer right; never unattended missing; no clear answer; oxygen claim odd."
+  },
+  {
+   "question": 9,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Discourages candles but for soot/CO; misses fire risk and flashlight alternative."
+  },
+  {
+   "question": 9,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "All precautions and flashlights included; leads with can be safe, alternative last."
+  },
+  {
+   "question": 9,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Unattended and flammables right; irrelevant emergency preface; never answers; no flashlights or stable holder."
+  },
+  {
+   "question": 9,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Precautions and flashlights included; frames candles as cozy; fan/open windows draft advice poor."
+  },
+  {
+   "question": 9,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Precautions and flashlights included; leads with can be safe; wick and wax-pool details odd."
+  },
+  {
+   "question": 9,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Not recommended, flashlights/lanterns right; \"no heat\" reason wrong/irrelevant; no precautions if used."
+  },
+  {
+   "question": 9,
+   "label": "O",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Clear no, use battery-powered lights; no reason or precautions but main point right."
+  },
+  {
+   "question": 9,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Right no, but soot is the only reason; fire risk and flashlights missing."
+  },
+  {
+   "question": 9,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Endorses candles; unattended and stable right; bigger wick, \"tunnel vision\" wrong; flashlights only later."
+  },
+  {
+   "question": 9,
+   "label": "R",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No, fire risk, flashlights or lanterns: main point right."
+  },
+  {
+   "question": 23,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Right no to tree; suggests cave, ditch, open crouch; contradicts itself on low areas; no vehicle or 30 minutes."
+  },
+  {
+   "question": 23,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Right no to tree; sends to valley crouch; no building, vehicle or 30 minutes."
+  },
+  {
+   "question": 23,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Building/vehicle right, but hedged \"might not be safest\"; lie flat wrong; no 30 minutes."
+  },
+  {
+   "question": 23,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No, building or vehicle right; crouch only as fallback; 30-minute wait missing."
+  },
+  {
+   "question": 23,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "No, building or car right; contradictory \"avoid contact with the ground\"; 30-minute wait missing."
+  },
+  {
+   "question": 23,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Right no to tree; ditch crouch instead of building or vehicle; no 30 minutes; vague preface."
+  },
+  {
+   "question": 23,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No, leave for building or hard-topped vehicle windows closed; 30-minute wait missing."
+  },
+  {
+   "question": 23,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Right no, then recommends a group of trees or low area; contradictory; no building, vehicle or 30 minutes."
+  },
+  {
+   "question": 23,
+   "label": "I",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No, vehicle or building, 30 minutes after last thunder; low area only as fallback."
+  },
+  {
+   "question": 23,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "No, building or vehicle right; 30-minute wait missing; higher ground near streams questionable."
+  },
+  {
+   "question": 23,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Right no; offers low-lying area equal to building; no vehicle or 30 minutes."
+  },
+  {
+   "question": 23,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "No tree and 30 minutes right; lie flat in ditch and stay together wrong; no building or vehicle."
+  },
+  {
+   "question": 23,
+   "label": "M",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "No, building or vehicle immediately, 30 minutes after thunder; fallback reasonable; wordy."
+  },
+  {
+   "question": 23,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Building/vehicle mentioned, but tent, open area, low area also called safe; hedged on tree; no 30 minutes."
+  },
+  {
+   "question": 23,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Right no; low area before building; 30/30 implies distant thunder can wait; no 30-minute wait."
+  },
+  {
+   "question": 23,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "No, building or hard-topped vehicle, head back right; 30-minute wait missing; wordy, odd mechanism."
+  },
+  {
+   "question": 23,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "No tree and 30 minutes right; low ground instead of building or vehicle; nonsense reasons, contradictory lie down."
+  },
+  {
+   "question": 23,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Right no; low area instead of building or vehicle; avoid open areas contradicts; no 30 minutes."
+  }
+ ]
+}

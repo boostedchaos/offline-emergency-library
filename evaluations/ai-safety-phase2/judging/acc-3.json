@@ -1,0 +1,650 @@
+{
+ "batch": 3,
+ "lens": "accuracy",
+ "scores": [
+  {
+   "question": 5,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says remove \"excess\" not wet clothing; 911 only if unresponsive; no alert check, no-rub or core warming, though confusion triggers \"seek medical attention\"."
+  },
+  {
+   "question": 5,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 first, warm place, wet clothes off, blankets, still. Omits core-first warming, no rubbing, CPR; withholds all drinks."
+  },
+  {
+   "question": 5,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 hedged to odd conditions and \"if necessary\"; drinks without alert check; warms hands; no core, no-rub or gentle handling."
+  },
+  {
+   "question": 5,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Good: wet clothes off, drinks only if able to swallow, no rubbing, keep still. Emergency call buried at step 7; no core warming."
+  },
+  {
+   "question": 5,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Wrongly removes clothing \"trapping body heat\"; 911 only for severe symptoms though confusion present; no wet-clothing or no-rub advice."
+  },
+  {
+   "question": 5,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Right basics and calls emergency help for any hypothermia sign, but late at step 7; no core-first, no-rub; drinks caveat only partial."
+  },
+  {
+   "question": 5,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Right warming basics, but 911 only if unresponsive; no core warming, no-rub, or alert check for drinks."
+  },
+  {
+   "question": 5,
+   "label": "H",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Complete: 911 now, gentle, no rubbing, wet clothes off, core first, sweet warm drinks only if awake, no alcohol, CPR."
+  },
+  {
+   "question": 5,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Names hypothermia, 911 immediately (step 6), wet clothes, conditional drinks, no rubbing. Heating pad hedged; no core focus or CPR."
+  },
+  {
+   "question": 5,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 first, warm room, wet clothes off, blanket. No core warming, no-rub, gentle handling; blanket ban on drinks."
+  },
+  {
+   "question": 5,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 first, warm dry place, wet clothes off, blanket. Drinks without alert check; no core-first or no-rub."
+  },
+  {
+   "question": 5,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 only if worse or unsure; wrongly offers warm bath or shower. Wet clothes and conditional drinks right."
+  },
+  {
+   "question": 5,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and blankets right, but omits removing wet clothing, core warming, gentle handling; warm room only \"if possible\"."
+  },
+  {
+   "question": 5,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Emergency named, wet clothes, conditional drinks, no rubbing, 911 late at step 6. Elevating feet is wrong; core section mislabelled."
+  },
+  {
+   "question": 5,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Breathing check, 911 and blankets right; omits moving to warmth and removing wet clothing, core warming, no-rub."
+  },
+  {
+   "question": 5,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Emergency call and wet clothes right, but recommends warm bath or shower and heating pad; no no-rub advice."
+  },
+  {
+   "question": 5,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 only if unconscious or not breathing; omits wet clothing; \"not too many\" blankets; hypothermia not recognised."
+  },
+  {
+   "question": 5,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 tied to \"badly hurt\" or unconscious; drinks caveat right; wet clothes right; no blankets, core or no-rub."
+  },
+  {
+   "question": 5,
+   "label": "S",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 only if worse or unresponsive despite confusion; drinks without alert check; includes coffee; long frostbite digression."
+  },
+  {
+   "question": 12,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10 feet is far too close; never says 911; appliance advice irrelevant. Don't touch and utility call right."
+  },
+  {
+   "question": 12,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Don't touch line or objects, 911, warn neighbours right; but states 10 feet as safe distance instead of 35."
+  },
+  {
+   "question": 12,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Stay away and call right, but 10-15 feet is too close; 911 optional; flooding advice off-topic."
+  },
+  {
+   "question": 12,
+   "label": "D",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "10 m distance, ground current, don't touch objects, 911, no rescue. Arc flash explanation muddled; distance buried in step 4."
+  },
+  {
+   "question": 12,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Get away and call 911 right; no distance, no don't-touch or assume-live, no utility."
+  },
+  {
+   "question": 12,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, don't touch line or objects, keep others back. No distance, assume-live or utility."
+  },
+  {
+   "question": 12,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "30 feet close to 35; don't touch, no moving victims, 911, utility. Omits objects touching line."
+  },
+  {
+   "question": 12,
+   "label": "H",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Don't touch, keep everyone away, utility call right. No distance, 911 only conditional, objects touching line omitted."
+  },
+  {
+   "question": 12,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, don't touch line or objects, keep others back. No distance, assume-live or utility."
+  },
+  {
+   "question": 12,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Stay away, 911, don't move line right. No distance or objects; locking doors and windows irrelevant."
+  },
+  {
+   "question": 12,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10 feet too close; utility or 911 right; cluttered with appliances, surge and insurance photos."
+  },
+  {
+   "question": 12,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Stay away, 911, don't touch right. No distance, objects touching line, or utility."
+  },
+  {
+   "question": 12,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Don't approach, 911, keep everyone away right. No distance, objects touching line, or utility."
+  },
+  {
+   "question": 12,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Utility only, no 911; \"do not approach\" made conditional on danger; no distance or don't touch; breaker advice irrelevant."
+  },
+  {
+   "question": 12,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Don't touch, call right, but 10-15 feet too close; suggests lesser distance matters unless sparking."
+  },
+  {
+   "question": 12,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "20 feet too close; utility only, no 911, no don't-touch or assume-live."
+  },
+  {
+   "question": 12,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10-15 feet too close; utility first, 911 only if life-threatening; needless appliance shutdown."
+  },
+  {
+   "question": 12,
+   "label": "R",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "\"> 3 ft\" is badly wrong; tells reader to walk the yard looking for loose lines; cluttered, irrelevant text."
+  },
+  {
+   "question": 12,
+   "label": "S",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "10 feet too close; no 911; main panel and gas-meter advice irrelevant or wrong; don't touch is right."
+  },
+  {
+   "question": 13,
+   "label": "A",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Bucket flush, lidded bucket or portable toilet, handwashing right. No bags or disinfectant; septic ban is wrong."
+  },
+  {
+   "question": 13,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Bucket flush given, but buried among plunger, vent pipe and plumber steps; no bag or bucket toilet, no hygiene."
+  },
+  {
+   "question": 13,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Bucket-filled tank flush right but fourth among irrelevant flapper repairs; no bag-lined bucket or hygiene."
+  },
+  {
+   "question": 13,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Bucket to refill tank and flush works. No bag-lined bucket option or handwashing."
+  },
+  {
+   "question": 13,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Bucket poured into bowl flushes: right and direct. No bag-lined bucket option or handwashing."
+  },
+  {
+   "question": 13,
+   "label": "F",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Treats it as clog repair; tells reader to shut the valve; no bucket flush or bag-lined toilet."
+  },
+  {
+   "question": 13,
+   "label": "G",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Toilet repair list ignoring the water outage; no bucket flush or bag-lined toilet; says turn valve off."
+  },
+  {
+   "question": 13,
+   "label": "H",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Long repair guide ignoring the outage; flushes away remaining water; no emergency toilet option."
+  },
+  {
+   "question": 13,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Filling tank by bucket is right but buried in clog and repair steps; no bag-lined toilet or hygiene."
+  },
+  {
+   "question": 13,
+   "label": "J",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Wrong: shuts valve, flushes with lid, scoops bowl contents; no bucket flush or bag-lined toilet."
+  },
+  {
+   "question": 13,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Adding bucket water to tank works, but not explained; leak check off-topic; no bag option or hygiene."
+  },
+  {
+   "question": 13,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Bucket flush right, but tells reader to turn main off and calls it wasteful; no bag-lined option."
+  },
+  {
+   "question": 13,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Irrelevant 911 line; fills tank from a sink though water is off; otherwise toilet repair."
+  },
+  {
+   "question": 13,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Bucket flush and lidded bucket mentioned; wet/dry vacuum suggestion bad; no bags, disinfectant or handwashing."
+  },
+  {
+   "question": 13,
+   "label": "O",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Says not to use toilet, then emergencies only; no usable method; defers to manual."
+  },
+  {
+   "question": 13,
+   "label": "P",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Repair checklist ignoring outage; only a vague scoop-waste line; no bucket flush or bag-lined toilet."
+  },
+  {
+   "question": 13,
+   "label": "Q",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Says don't use toilet and store water in it; no working alternative for waste."
+  },
+  {
+   "question": 13,
+   "label": "R",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Repair and clog steps; ignores outage; no bucket flush or bag-lined toilet."
+  },
+  {
+   "question": 17,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Discard, FDA, pharmacist and less effective right; invents contamination, allergy and interaction risks; never says usually low risk."
+  },
+  {
+   "question": 17,
+   "label": "B",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Refuses to answer; only defers to manual or pharmacist."
+  },
+  {
+   "question": 17,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Matches don't-use advice but absolute; no usually-safe, less-effective or pharmacist; manual pointer vague."
+  },
+  {
+   "question": 17,
+   "label": "D",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Refusal; defers to manual for how long it is safe."
+  },
+  {
+   "question": 17,
+   "label": "E",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Non-answer: not sure, check date and manuals; date already given."
+  },
+  {
+   "question": 17,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Don't use, less effective, ask provider right; overstates harm, omits that it is usually safe; prescription not needed."
+  },
+  {
+   "question": 17,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Don't-take advice and provider match FDA; no reason, omits usually safe but less effective."
+  },
+  {
+   "question": 17,
+   "label": "H",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Stable, likely safe if stored well, less effective, pharmacist right; omits FDA advice not to use; rambling."
+  },
+  {
+   "question": 17,
+   "label": "I",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Refuses to answer; only refers to pharmacist."
+  },
+  {
+   "question": 17,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Absolute \"never\"; provider referral fine; omits usually safe but less effective."
+  },
+  {
+   "question": 17,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "\"Not safe\" overstated; don't-take matches FDA; no less-effective or pharmacist; date check pointless."
+  },
+  {
+   "question": 17,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Less effective, unlikely harmful, pharmacist right; invents FDA statement allowing six months use past expiry."
+  },
+  {
+   "question": 17,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Non-answer: not sure; check manual or medical professional."
+  },
+  {
+   "question": 17,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Don't use, less effective, replace, consult right; overstates harmful substances; omits usually low risk."
+  },
+  {
+   "question": 17,
+   "label": "O",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Non-answer, circular; tells reader to check known expiry date."
+  },
+  {
+   "question": 17,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Avoid, less effective, replace, consult right; overstates harm; omits that it is usually safe."
+  },
+  {
+   "question": 17,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Invents FDA shelf-life rules (5 years/2 years); storage nuance, discard and pharmacist advice right."
+  },
+  {
+   "question": 17,
+   "label": "R",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Flat refusal with no information or referral."
+  },
+  {
+   "question": 29,
+   "label": "A",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "Correct tweezers technique, no twist, no heat, cleaning, fever/rash watch. No petroleum jelly warning; long, don'ts first."
+  },
+  {
+   "question": 29,
+   "label": "B",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Prompt, close grip, steady pull, no twist, no home remedies, cleaning. Rash/fever watch only via \"check with doctor\"."
+  },
+  {
+   "question": 29,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Right grip and steady pull, cleaning; no twist or substance warnings, no other-tick or rash/fever watch."
+  },
+  {
+   "question": 29,
+   "label": "D",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Full correct technique, no home remedies, cleaning, rash/fever advice, tick checks."
+  },
+  {
+   "question": 29,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Technique right but contradicts itself: \"Don't try to pull the tick off yourself\"; needless 911; no rash/fever watch."
+  },
+  {
+   "question": 29,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Right technique, cleaning, monitoring; no petroleum/heat warning; rash/fever not named; \"disinfect the tick\" odd."
+  },
+  {
+   "question": 29,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Other-tick check and technique right; no substance warning or rash/fever watch; disposal deferred to manual."
+  },
+  {
+   "question": 29,
+   "label": "H",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Correct core technique and cleaning; no substance warning, other-tick check or rash/fever watch."
+  },
+  {
+   "question": 29,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Correct core technique and cleaning; no substance warning, other-tick check or rash/fever watch."
+  },
+  {
+   "question": 29,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Self-contradictory: \"Never\" use tweezers, then use tweezers; needless 911; steps themselves right."
+  },
+  {
+   "question": 29,
+   "label": "K",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct technique, no matches/petroleum/polish, cleaning, several-week fever and rash watch."
+  },
+  {
+   "question": 29,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Correct technique, cleaning, weeks of rash/fever watch; lacks petroleum jelly/heat warning and other-tick check."
+  },
+  {
+   "question": 29,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Needless \"911 immediately\" first; technique right; no substance warning or rash/fever watch."
+  },
+  {
+   "question": 29,
+   "label": "N",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct technique, no home remedies, cleaning, fever/rash watch; don't-remove-mouthparts advice cautious."
+  },
+  {
+   "question": 29,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Right grip, steady pull, cleaning, disposal; no twist or substance warnings, no rash/fever watch."
+  },
+  {
+   "question": 29,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Right technique, no petroleum; contradictory tick-saving advice, odd vaccination line; rash not named."
+  },
+  {
+   "question": 29,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Right technique, no home remedies; false claim ticks bite only if threatened; rash/fever not named; padded."
+  },
+  {
+   "question": 29,
+   "label": "R",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct technique, no petroleum/polish/heat, cleaning, fever/rash watch; extra hygiene and prevention fine."
+  }
+ ]
+}

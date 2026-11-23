@@ -1,0 +1,650 @@
+{
+ "batch": 0,
+ "lens": "accuracy",
+ "scores": [
+  {
+   "question": 0,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Freezer 24-48 h right; fridge 4-6 h and 6-8 h if well stocked is too long; no keep-doors-closed."
+  },
+  {
+   "question": 0,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Fridge 4-6 h too long; freezer only 24 h, no full/half-full; relies on spoilage check."
+  },
+  {
+   "question": 0,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Fridge times (1-2 h) wrong; freezer 48 h max fits a full one; leans on visible spoilage; no doors closed."
+  },
+  {
+   "question": 0,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "4 h fridge only if full, invented 2 h otherwise; freezer 24 h only; relies on smell and texture; no doors closed."
+  },
+  {
+   "question": 0,
+   "label": "E",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "No closed-fridge time; gives room-temperature times, freezer 12-24 h wrong; irrelevant 911 line; admits unsure."
+  },
+  {
+   "question": 0,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Doors closed and freezer 24-48 h right; fridge 4-6 h too long; discarding all freezer food above 0F is wrong."
+  },
+  {
+   "question": 0,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "4 h fridge, 48 h freezer, doors closed right; missing 24 h for half-full and the 2-hour 40F discard rule."
+  },
+  {
+   "question": 0,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Conflicting times; fridge 4-6 h; discard after 4 h above 40F is wrong (2 h); freezer 24 h only."
+  },
+  {
+   "question": 0,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "4 h, 48 h, never taste, 2 h rule present; fridge logic says 'above 40F' before outage; contradictory discard advice."
+  },
+  {
+   "question": 0,
+   "label": "J",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Gives only a 2-hour condition; no closed-fridge 4 h and no freezer time."
+  },
+  {
+   "question": 0,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Fridge 4 h and doors closed right; freezer gets no time, says indefinitely for a short outage."
+  },
+  {
+   "question": 0,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "2 h discard rule right; fridge 2-4 h imprecise; freezer 4-6 h badly wrong (24-48 h); no doors closed."
+  },
+  {
+   "question": 0,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Per-food times mostly wrong: fridge 1-3 h, freezer 8-12 h for many items; doors closed is right."
+  },
+  {
+   "question": 0,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Fridge 4 h closed and 2 h rule right; no freezer hours; says eat perishables once warm, freezer unsafe above 0F."
+  },
+  {
+   "question": 0,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Closed freezer 24-48 h roughly right; fridge times by temperature are nonsense (4 h at 40-140F)."
+  },
+  {
+   "question": 0,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "4 h, 48 h full, doors closed right; missing half-full 24 h and discard rule."
+  },
+  {
+   "question": 0,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "4 h fridge right, then discard after 8-12 h contradicts; no doors closed; freezer 24-48 h vague."
+  },
+  {
+   "question": 0,
+   "label": "R",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "48 h if full, 4 h fridge right; missing half-full 24 h and discard rule; check the freezer invites opening."
+  },
+  {
+   "question": 2,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1/8-1/4 tsp and 30 min fit; says non-chlorine bleach works, wrong; demands strong odor; no drop count."
+  },
+  {
+   "question": 2,
+   "label": "B",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Nonsense math gives 0.48 drops per gallon; far too little; no wait time."
+  },
+  {
+   "question": 2,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Opens with refusal; 2-4 drops per quart (8-16 per gallon) right; no 30-minute wait."
+  },
+  {
+   "question": 2,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "1/4 tsp is acceptable (about 16 drops); no drop count, no 30-minute wait, no strength."
+  },
+  {
+   "question": 2,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "16 drops acceptable but says not sure; no wait, no unscented, no strength."
+  },
+  {
+   "question": 2,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "16 drops and 30 min acceptable, but '8 drops for 5 gallons' contradicts; not-sure opening."
+  },
+  {
+   "question": 2,
+   "label": "G",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "8 drops, unscented, mix, 30 min, odor check, filter cloudy right; misses doubling for cloudy; wordy."
+  },
+  {
+   "question": 2,
+   "label": "H",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No dose; only sends reader to the manuals."
+  },
+  {
+   "question": 2,
+   "label": "I",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No dose; only manuals or water utility."
+  },
+  {
+   "question": 2,
+   "label": "J",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "2 drops per gallon is a quarter of the right dose; falsely says it kills everything."
+  },
+  {
+   "question": 2,
+   "label": "K",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Refusal; no dose."
+  },
+  {
+   "question": 2,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Calls bleach not safe or recommended, then gives 2-4 drops per quart and 30 min; contradictory."
+  },
+  {
+   "question": 2,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "1/4 tsp acceptable; no drop count, no 30-minute wait."
+  },
+  {
+   "question": 2,
+   "label": "N",
+   "accuracy": 0,
+   "clarity": 2,
+   "note": "Wrongly says do not add bleach; boiling 1 minute is right but the dose is unanswered."
+  },
+  {
+   "question": 2,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "16 drops, 30 min, unscented, odor check right; 16 drops is not 1/8 tsp; odd boil-first steps."
+  },
+  {
+   "question": 2,
+   "label": "P",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No dose; only manuals."
+  },
+  {
+   "question": 2,
+   "label": "Q",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No dose; only manuals."
+  },
+  {
+   "question": 2,
+   "label": "R",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Refusal; no dose."
+  },
+  {
+   "question": 2,
+   "label": "S",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "8 drops and 30 min right; missing unscented, strength, cloudy doubling, odor check."
+  },
+  {
+   "question": 3,
+   "label": "A",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "1 minute rolling boil, 3 minutes above 6,562 ft; chemical caveat right."
+  },
+  {
+   "question": 3,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute right; no altitude rule, no rolling boil."
+  },
+  {
+   "question": 3,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "1 and 3 minutes right; adds a conflicting 2-minute tier for 2,000-6,500 ft."
+  },
+  {
+   "question": 3,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 minute right; altitude formula wrong (2 min at 8,000 ft, should be 3); invented Giardia times."
+  },
+  {
+   "question": 3,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "1-3 minutes rolling boil covers it; no altitude rule; odd 'until bubbles become larger'."
+  },
+  {
+   "question": 3,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute vigorous boil right; no altitude rule."
+  },
+  {
+   "question": 3,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 minute at sea level right; 3-5 and 5-7 minute tiers wrong; says filters or tablets may be better."
+  },
+  {
+   "question": 3,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1-3 minutes low; invented tiers up to 9-12 minutes are wrong."
+  },
+  {
+   "question": 3,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute rolling boil right; no altitude rule."
+  },
+  {
+   "question": 3,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute rolling boil right; no altitude rule."
+  },
+  {
+   "question": 3,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute right; no altitude rule, no rolling boil."
+  },
+  {
+   "question": 3,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "1 minute right; opens 'Not sure'; no altitude rule, no rolling boil."
+  },
+  {
+   "question": 3,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Invented tiers by germ and altitude; protozoa 3-10 minutes wrong; no rolling boil."
+  },
+  {
+   "question": 3,
+   "label": "N",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Rolling boil 1 minute, 3 minutes above 2,000 m; chemical caveat right."
+  },
+  {
+   "question": 3,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 and 3 minutes right; false claim that salt replaces electrolytes lost in boiling."
+  },
+  {
+   "question": 3,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute rolling boil right; no altitude rule."
+  },
+  {
+   "question": 3,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 minute rolling boil right; no altitude rule."
+  },
+  {
+   "question": 3,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Splits times by germ wrongly (3 minutes for bacteria at sea level, 5 at altitude); confusing."
+  },
+  {
+   "question": 3,
+   "label": "S",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Rolling boil 1 minute, 3 above 6,500 ft, prefilter cloudy; all right."
+  },
+  {
+   "question": 21,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 gallon per day right; then says it covers 1.5 gallons of use; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "B",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "1 gallon per day, 3 days, 2 weeks, rotation all right; long."
+  },
+  {
+   "question": 21,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "1 gallon per day right with a good breakdown; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 gallon and 3 days right; family of four 4-8 gallons for 72 h wrong (12); CDC 2 liters wrong."
+  },
+  {
+   "question": 21,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per person per day right; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day for 3-5 days right; no 2-week home supply."
+  },
+  {
+   "question": 21,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day right; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "H",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day right; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 gallon and 3 days right; tiers wrong, including 3-4 gallons per person per week."
+  },
+  {
+   "question": 21,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day, 3-7 days right; no 2-week home supply."
+  },
+  {
+   "question": 21,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "1 gallon per day, right 3-day and 1-week totals; no 2-week supply."
+  },
+  {
+   "question": 21,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day, at least 3 days right; no 2-week supply."
+  },
+  {
+   "question": 21,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "1 gallon per day, 3 gallons for 3 days right; 3 gallons per day for longer is wrong; no 2 weeks."
+  },
+  {
+   "question": 21,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 gallon per day and 3 days right; breakdown exceeds it and total of 6 gallons contradicts."
+  },
+  {
+   "question": 21,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day right; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "1 gallon per day right; no days of supply."
+  },
+  {
+   "question": 21,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Quotes 1 gallon and 3 days, then says 4-6 and 6-8 gallons per person per day; contradictory."
+  },
+  {
+   "question": 21,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "1 gallon only for under 3 days; invented 2 and 3 gallon tiers; includes garden water; totals inconsistent."
+  },
+  {
+   "question": 24,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Drop, cover, hold on and no running out right; wrongly calls doorway a good option."
+  },
+  {
+   "question": 24,
+   "label": "B",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Drop, cover, hold on; no doorway; no running outside; interior wall fallback right."
+  },
+  {
+   "question": 24,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Stay inside and doorway myth right; tells reader to move away from tables; no drop, head cover or hold on."
+  },
+  {
+   "question": 24,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Stay inside, drop, cover, hold on right; doorway hedged, odd 'side of the doorway' advice."
+  },
+  {
+   "question": 24,
+   "label": "E",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Drop, cover, hold on; no running out; no doorway; all right."
+  },
+  {
+   "question": 24,
+   "label": "F",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "Drop, cover, hold on; no running out; no doorway; right but long, odd doorway reasoning."
+  },
+  {
+   "question": 24,
+   "label": "G",
+   "accuracy": 0,
+   "clarity": 2,
+   "note": "Sends reader to a doorway first; no drop, cover, hold on; inside wall only as an alternative."
+  },
+  {
+   "question": 24,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Table and no running out right; doorway fallback with closed door is wrong and unworkable."
+  },
+  {
+   "question": 24,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Interior room right; no drop, cover, hold on; avoids furniture; doorway fallback wrong."
+  },
+  {
+   "question": 24,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Stay inside, interior wall, protect head right; doorway advice wrong; no drop or table."
+  },
+  {
+   "question": 24,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "No running out and table right; lists doorway first as good; contradicts itself on walls."
+  },
+  {
+   "question": 24,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Stay inside and table right; wrongly says standing mid-doorway protects."
+  },
+  {
+   "question": 24,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Table, cover head, no running out right; doorway not answered; no hold on."
+  },
+  {
+   "question": 24,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Table and hold on right; doorway fallback wrong; running outside not answered."
+  },
+  {
+   "question": 24,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Drop, cover, hold on and no running out right; doorway hedged as usable if strong; no table named."
+  },
+  {
+   "question": 24,
+   "label": "P",
+   "accuracy": 0,
+   "clarity": 2,
+   "note": "Tells reader to stand in a doorway or by a wall; no drop, cover, hold on; running outside not answered."
+  },
+  {
+   "question": 24,
+   "label": "Q",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No doorway, stay inside, table, hold on, protect head; right."
+  },
+  {
+   "question": 24,
+   "label": "R",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Drop, cover, hold on and outdoor advice right; doorway in older buildings called a good idea; long."
+  }
+ ]
+}

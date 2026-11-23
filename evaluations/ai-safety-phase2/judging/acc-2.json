@@ -1,0 +1,650 @@
+{
+ "batch": 2,
+ "lens": "accuracy",
+ "scores": [
+  {
+   "question": 1,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says no and outdoors, but then says a separate-entrance garage with the door closed is acceptable; false explosive byproducts; no 20 ft."
+  },
+  {
+   "question": 1,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Names CO and recommends outdoors at the end, but no clear no; suggests fans and propane as less harmful; no 20 ft."
+  },
+  {
+   "question": 1,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Clear no, even with door open, names CO; does not say outdoors, 20 feet or alarms."
+  },
+  {
+   "question": 1,
+   "label": "D",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never, even with door open; CO; outdoors at least 20 feet from openings."
+  },
+  {
+   "question": 1,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Advises against it, but says only 3-4 feet from windows and offers a garage ventilation system as an option."
+  },
+  {
+   "question": 1,
+   "label": "F",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Gives steps to use it in a garage, with windows open, or in a shed or detached garage; contradicts guidance."
+  },
+  {
+   "question": 1,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Correct never, even with doors open, CO; missing outdoors, 20 feet and alarms."
+  },
+  {
+   "question": 1,
+   "label": "H",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never, even with door open; CO deadly; outdoors at least 20 feet away."
+  },
+  {
+   "question": 1,
+   "label": "I",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Complete: never, CO, outdoors 20 feet, alarms, symptoms and refuelling advice."
+  },
+  {
+   "question": 1,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Never, even with door open, and 20 feet; does not name CO or say outdoors explicitly."
+  },
+  {
+   "question": 1,
+   "label": "K",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Clear no, even with door open, deadly CO, outdoors 20 feet."
+  },
+  {
+   "question": 1,
+   "label": "L",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Gives advice for running it in the garage, placed far from the entrance; no clear no, no 20 feet."
+  },
+  {
+   "question": 1,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Correct no for garages; does not address the open door, CO, or outdoors 20 feet."
+  },
+  {
+   "question": 1,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Never in garage, outdoors 20 feet; does not mention CO or the open door."
+  },
+  {
+   "question": 1,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Strongly advises against, names CO, outdoors away from openings; no 20 feet; vague generator enclosure advice; wordy."
+  },
+  {
+   "question": 1,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Concludes avoid garages, but gives ventilation, fan and short-duration tips for garage use; no outdoors 20 feet."
+  },
+  {
+   "question": 1,
+   "label": "Q",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Treats garage use with open door and windows as acceptable with precautions; running outside only an option."
+  },
+  {
+   "question": 1,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Says not entirely safe and outdoors preferred, but gives if-you-must garage steps with ventilation; no 20 feet."
+  },
+  {
+   "question": 1,
+   "label": "S",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never, even with door open; CO; outdoors at least 20 feet."
+  },
+  {
+   "question": 8,
+   "label": "A",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Gives no time; says not sure and points to the drive manual."
+  },
+  {
+   "question": 8,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Unopened 28 days right; opened 10 days wrong, and says opened must be refrigerated; check label."
+  },
+  {
+   "question": 8,
+   "label": "C",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: 4-6 hours at room temperature, tells reader to discard; real limit about 28 days."
+  },
+  {
+   "question": 8,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Lantus 28 days and 86F right; Humalog 24 hours and Fiasp/Apidra 14 days wrong; garbled product names."
+  },
+  {
+   "question": 8,
+   "label": "E",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: 24-hour limit; suggests a refrigerator in a power outage."
+  },
+  {
+   "question": 8,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "About 30 days, away from heat: near right; no 86F limit, 28-day figure or label check."
+  },
+  {
+   "question": 8,
+   "label": "G",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Wrong and contradictory hour/day tables; short-acting 4-6 hours; suggests dry ice."
+  },
+  {
+   "question": 8,
+   "label": "H",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No answer, only points to the drive."
+  },
+  {
+   "question": 8,
+   "label": "I",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: 4-6 hours, attributed to ADA/FDA; dry ice could freeze insulin."
+  },
+  {
+   "question": 8,
+   "label": "J",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: 3-7 days instead of about 28; Lantus listed in two groups; check label is right."
+  },
+  {
+   "question": 8,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Mostly right by type (28, 42 days); regular/NPH 10 days too short, Lantus 30; no 86F limit."
+  },
+  {
+   "question": 8,
+   "label": "L",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "28-30 days, 36-86F, away from heat, check label; bottom line comes last."
+  },
+  {
+   "question": 8,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No time given; only says check the manual."
+  },
+  {
+   "question": 8,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Up to 30 days below 86F, avoid heat, check label; 28 days is the usual limit."
+  },
+  {
+   "question": 8,
+   "label": "O",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "86F right, but wrong 4-hour limit and confusing use-soon advice."
+  },
+  {
+   "question": 8,
+   "label": "P",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: discard after a few hours at room temperature; would waste needed insulin."
+  },
+  {
+   "question": 8,
+   "label": "Q",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No time given; only says check the packaging."
+  },
+  {
+   "question": 8,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "28 days for some right; invented rubber-stopper rule, pens 14 days wrong; no 86F limit; check label."
+  },
+  {
+   "question": 10,
+   "label": "A",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Airplane mode, radios off, limit screen, power bank; no Low Power Mode or brightness; confusing claims about charging."
+  },
+  {
+   "question": 10,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Radios off, brightness, airplane mode, limit use; no Low Power Mode or charging source."
+  },
+  {
+   "question": 10,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Brightness, radios, airplane mode; no battery saver, closing apps or charging source."
+  },
+  {
+   "question": 10,
+   "label": "D",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "Power saving, brightness, airplane mode, close apps all covered; long list; no charging source."
+  },
+  {
+   "question": 10,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Brightness, radios, close apps; no Low Power Mode, airplane mode or charging source."
+  },
+  {
+   "question": 10,
+   "label": "F",
+   "accuracy": 3,
+   "clarity": 1,
+   "note": "Covers brightness, saver mode, airplane, apps, power bank/car charger; no outdoor car warning; long."
+  },
+  {
+   "question": 10,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Radios, brightness, location, apps; no Low Power Mode, airplane mode or charging source."
+  },
+  {
+   "question": 10,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Turning off saves charge, but nothing on low power mode, brightness, airplane mode or charging."
+  },
+  {
+   "question": 10,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Off when unused, low power mode, brightness, radios; no airplane mode, apps or charging source."
+  },
+  {
+   "question": 10,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Low power, brightness, radios right; false advice about dark rooms, updates, and cannot charge."
+  },
+  {
+   "question": 10,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Covers main steps including saver and airplane mode; bad tip to check software updates; cluttered."
+  },
+  {
+   "question": 10,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Vague; no brightness, low power or airplane mode; says keep plugged in, which misses the question."
+  },
+  {
+   "question": 10,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Airplane mode and radios off; no Low Power Mode, brightness or charging source."
+  },
+  {
+   "question": 10,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Airplane mode, brightness, apps, power bank; only Low Power Mode and texting missing."
+  },
+  {
+   "question": 10,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Low power and brightness right; flashlight, software update and landline tips wrong or confusing."
+  },
+  {
+   "question": 10,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Low power, brightness, apps, data off; wrongly says little can be done to charge; repetitive."
+  },
+  {
+   "question": 10,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Power saving, brightness, radios, portable charger; wrong flashlight tip; no airplane mode; repetitive."
+  },
+  {
+   "question": 10,
+   "label": "R",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Covers saver, airplane, brightness, apps, power bank; false claim that charging drains faster; long."
+  },
+  {
+   "question": 11,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Correct no, but no CO reason and no safe alternative."
+  },
+  {
+   "question": 11,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Never, CO deadly; no safe way to charge given."
+  },
+  {
+   "question": 11,
+   "label": "C",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never, even with door open, CO; charge outside the garage."
+  },
+  {
+   "question": 11,
+   "label": "D",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Never mentions CO; invented electrical reasons; suggests special garage car chargers."
+  },
+  {
+   "question": 11,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Correct no; missing CO reason and alternative."
+  },
+  {
+   "question": 11,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says you can certainly, then not recommended; CO only for closed garage, suggests ventilation; power bank right."
+  },
+  {
+   "question": 11,
+   "label": "G",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never, even with door open, deadly CO; charge outside garage."
+  },
+  {
+   "question": 11,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "CO and park outside right; but allows running in a ventilated garage if you must."
+  },
+  {
+   "question": 11,
+   "label": "I",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No, CO; take car outside; engine-off charging is safe."
+  },
+  {
+   "question": 11,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Opens with confusing yes; names CO, but gives false official if-you-must exception with door open."
+  },
+  {
+   "question": 11,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No, CO, never run vehicle inside; no alternative."
+  },
+  {
+   "question": 11,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Not recommended and park outside right; never mentions CO; invented electrical and keep-in-gear advice."
+  },
+  {
+   "question": 11,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: says yes in a well-ventilated garage."
+  },
+  {
+   "question": 11,
+   "label": "N",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "No, never, deadly CO; charge outside with engine off."
+  },
+  {
+   "question": 11,
+   "label": "O",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Wrong: says yes with ventilation; even suggests closing garage door tightly."
+  },
+  {
+   "question": 11,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Right no, CO, car outside; irrelevant generator advice, no phone-charging answer."
+  },
+  {
+   "question": 11,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "No and mentions CO, but leads with false electrical overload reasons; engine off, ventilated area right."
+  },
+  {
+   "question": 11,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Hedged, no clear no; CO buried among false electrical reasons; outside and power bank right."
+  },
+  {
+   "question": 11,
+   "label": "S",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "CO and charge outside right; but allows garage with window or door open; false car CO-protection claim."
+  },
+  {
+   "question": 25,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and EpiPen named, but says do not use it if unsure; no sting removal or second dose."
+  },
+  {
+   "question": 25,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, epinephrine early, sit or lie, CPR; missing sting removal, legs raised, second dose, do not stand."
+  },
+  {
+   "question": 25,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 and epinephrine right; no position, sting removal or second dose."
+  },
+  {
+   "question": 25,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "911 and detailed EpiPen use; contradictory stinger advice, no positioning or second dose; outdated massage."
+  },
+  {
+   "question": 25,
+   "label": "E",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "911 only; omits epinephrine, says no medications, and gives water to someone with throat swelling."
+  },
+  {
+   "question": 25,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, epinephrine immediately, lie with legs up if faint, CPR; missing sting removal and second dose."
+  },
+  {
+   "question": 25,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 right; omits epinephrine, suggests antihistamine cream; no sting removal."
+  },
+  {
+   "question": 25,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Epinephrine right; 911 only if worsening; covering mouth and nose with cloth is wrong."
+  },
+  {
+   "question": 25,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and epinephrine right; honey advice wrong and risky; says do not treat reaction."
+  },
+  {
+   "question": 25,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, epinephrine, lying down, monitor; missing sit up if breathless, sting removal, second dose."
+  },
+  {
+   "question": 25,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "911, epinephrine, upright if breathless, sting removal, stay; missing second dose; says do not treat yourself."
+  },
+  {
+   "question": 25,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and epinephrine, but contradicts with do not give any medications; epinephrine listed last; no sting removal."
+  },
+  {
+   "question": 25,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 and EpiPen right; no position, sting removal or second dose."
+  },
+  {
+   "question": 25,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "911, sting, epinephrine, sit up; epinephrine comes late, legs-up-if-breathless is backward; no second dose."
+  },
+  {
+   "question": 25,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Epinephrine fifth, after washing and compress; 911 conditional; no positioning or second dose."
+  },
+  {
+   "question": 25,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911, sting removal, sit up; omits epinephrine entirely."
+  },
+  {
+   "question": 25,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and sting removal; omits epinephrine and says do not treat swelling with medication."
+  },
+  {
+   "question": 25,
+   "label": "R",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Epinephrine, 911, upright or lying legs raised; no sting removal or second dose; dubious ice/antihistamine bans."
+  }
+ ]
+}

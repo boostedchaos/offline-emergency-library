@@ -1,0 +1,2754 @@
+{
+ "0A": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "0B": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "0C": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "0D": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "0E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "0F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "0G": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "0H": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "0I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "0J": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "0K": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "0L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "0M": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "0N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "0O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "0P": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "0Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "0R": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "2A": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "2B": {
+  "control": "bad",
+  "source": "survival-llm granite4.2_3b q2"
+ },
+ "2C": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "2D": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "2E": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "2F": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "2G": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "2H": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "2I": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "2J": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "2K": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "2L": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "2M": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "2N": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "2O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "2P": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "2Q": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "2R": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "2S": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3A": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "3B": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "3C": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "3D": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "3E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3F": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3G": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "3H": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "3J": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "3K": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "3L": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3M": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "3N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "3O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3P": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "3Q": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "3R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "3S": {
+  "control": "clean",
+  "source": "survival-llm qwen3.6 q3"
+ },
+ "21A": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "21B": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "21C": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "21D": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "21E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "21F": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "21G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "21H": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "21I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "21J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "21K": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "21L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "21M": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "21N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "21O": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "21P": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "21Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "21R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24C": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "24D": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "24E": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24G": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "24H": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "24J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "24K": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "24L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "24M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "24N": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "24O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "24P": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "24Q": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "24R": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4A": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "4B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4C": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "4D": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4E": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "4F": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "4G": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "4H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "4I": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4J": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "4K": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4L": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "4M": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "4O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "4P": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "4Q": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "4R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6A": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "6B": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6C": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "6D": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6F": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "6G": {
+  "control": "clean",
+  "source": "survival-llm local-ai2 q6"
+ },
+ "6H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "6I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "6J": {
+  "control": "bad",
+  "source": "survival-llm granite4.2_3b q6"
+ },
+ "6K": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "6L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "6M": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6O": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "6P": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "6Q": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "6R": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "6S": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "6T": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7A": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "7B": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7C": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "7D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "7E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7F": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7G": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7H": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "7I": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7J": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "7K": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "7L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "7M": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "7N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "7O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "7P": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "7Q": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "7R": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9A": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "9B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "9C": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "9D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "9F": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "9H": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9J": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "9K": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9L": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "9M": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "9N": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "9O": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "9P": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "9Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "9R": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "23A": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "23B": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "23C": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "23D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "23E": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "23F": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "23G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "23H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "23I": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "23J": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "23K": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "23L": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "23M": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "23N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "23O": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "23P": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "23Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "23R": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "1B": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "1C": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "1D": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "1E": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "1F": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "1H": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1I": {
+  "control": "clean",
+  "source": "survival-llm local-ai2 q1"
+ },
+ "1J": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "1K": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "1L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1O": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "1P": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "1Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "1R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "1S": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8A": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8C": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8D": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8E": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8F": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "8G": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "8H": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "8I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "8J": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "8K": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "8L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "8M": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "8N": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "8O": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "8P": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "8Q": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "8R": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "10A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "10B": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "10C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "10D": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "10E": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "10F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "10G": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "10H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "10I": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "10J": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "10K": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "10L": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "10M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "10N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "10O": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "10P": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "10Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "10R": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11A": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "11B": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "11C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "11D": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "11G": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "11H": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11I": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "11J": {
+  "control": "bad",
+  "source": "survival-llm granite4.2_3b q11"
+ },
+ "11K": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11L": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "11M": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "11N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "11O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11P": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "11Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "11R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "11S": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25A": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25B": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25D": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "25G": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "25H": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "25I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "25J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "25K": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "25L": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "25M": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "25N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "25O": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "25P": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "25Q": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "25R": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "5A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "5B": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "5C": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "5D": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "5E": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "5F": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "5G": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "5H": {
+  "control": "clean",
+  "source": "survival-llm local-ai1 q5"
+ },
+ "5I": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "5J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "5K": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "5L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "5M": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "5N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "5O": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "5P": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "5Q": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "5R": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "5S": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "12A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "12B": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "12C": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "12D": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "12E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "12F": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "12G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "12H": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "12I": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "12J": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "12K": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "12L": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "12M": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "12N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "12O": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "12P": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "12Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "12R": {
+  "control": "bad",
+  "source": "survival-llm granite4.2_3b q12"
+ },
+ "12S": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13A": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "13B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "13C": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "13D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "13E": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "13F": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13G": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "13H": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13I": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "13J": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "13K": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13L": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "13N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "13P": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "13Q": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "13R": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17B": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "17C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "17D": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "17E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "17F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "17G": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17H": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "17I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "17J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "17K": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17L": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "17M": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "17N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "17O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17P": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "17R": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "29A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "29B": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "29C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "29D": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "29E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "29F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "29G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "29H": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "29I": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "29J": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "29K": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "29L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "29M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "29N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "29O": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "29P": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "29Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "29R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14B": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "14C": {
+  "control": "bad",
+  "source": "survival-llm granite4.2_30b q14"
+ },
+ "14D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "14E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14F": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "14G": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "14H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14I": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "14J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14K": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "14M": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "14N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "14O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "14P": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "14Q": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "14R": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "14S": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "16B": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16C": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "16D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "16E": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "16F": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16G": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16H": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16I": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "16J": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "16K": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16L": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "16M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "16N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "16O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "16P": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "16Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "16R": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18A": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "18B": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "18C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18D": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "18E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "18F": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "18G": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "18H": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "18I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "18J": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18K": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "18L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "18M": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18N": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18O": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "18P": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "18Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18R": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "18S": {
+  "control": "clean",
+  "source": "survival-llm local-ai1 q18"
+ },
+ "20A": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "20B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "20C": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "20D": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "20E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "20F": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "20G": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "20H": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "20I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "20J": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "20K": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "20L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "20M": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "20N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "20O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "20P": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "20Q": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "20R": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27A": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "27B": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27C": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "27D": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "27F": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "27G": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "27I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "27J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27K": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "27L": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "27M": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27N": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "27O": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "27P": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "27Q": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "27R": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "15A": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "15B": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "15C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "15D": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "15E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "15F": {
+  "control": "clean",
+  "source": "survival-llm local-ai2 q15"
+ },
+ "15G": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "15H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "15I": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "15J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "15K": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "15L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "15M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "15N": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "15O": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "15P": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "15Q": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "15R": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "15S": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19B": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "19C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19D": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19E": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "19F": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "19G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "19H": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "19I": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "19J": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19K": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "19L": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19M": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "19N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "19O": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "19P": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "19Q": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "19R": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "22B": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22C": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "22D": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "22E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "22F": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22G": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22H": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22I": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "22J": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "22K": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "22L": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "22M": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22N": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "22O": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "22P": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "22Q": {
+  "control": "bad",
+  "source": "written by us q22"
+ },
+ "22R": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "22S": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "26A": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "26B": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "26C": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "26D": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "26E": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "26F": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "26G": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "26H": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "26I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "26J": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "26K": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "26L": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "26M": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "26N": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "26O": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "26P": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "26Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "26R": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28A": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28B": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28C": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "28D": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "28E": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28F": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "28G": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "28H": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28I": {
+  "arm": "sys",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "28J": {
+  "control": "clean",
+  "source": "written by us q28"
+ },
+ "28K": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "28L": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "28M": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "28N": {
+  "arm": "sys",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ },
+ "28O": {
+  "arm": "base",
+  "model": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "28P": {
+  "arm": "base",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28Q": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 1
+ },
+ "28R": {
+  "arm": "sys",
+  "model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+  "seed": 3
+ },
+ "28S": {
+  "arm": "base",
+  "model": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "seed": 2
+ }
+}

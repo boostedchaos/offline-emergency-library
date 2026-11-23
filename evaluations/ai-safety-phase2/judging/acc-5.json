@@ -1,0 +1,657 @@
+{
+ "batch": 5,
+ "lens": "accuracy",
+ "scores": [
+  {
+   "question": 15,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Basement/interior shelter right; no 24 hours or decontamination; wrongly says turn off phone and delay treating injuries."
+  },
+  {
+   "question": 15,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "24 hours and washing right; contradicts itself on vehicles, suggests dense foliage, no basement or middle of building."
+  },
+  {
+   "question": 15,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Stay indoors and listen right; no basement or middle, no 24 hours, no decontamination."
+  },
+  {
+   "question": 15,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Go in, stay in, ventilation off right; hard-top vehicle is poor shelter; no basement, 24 hours or decontamination."
+  },
+  {
+   "question": 15,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Shelter and radio right; tells people in vehicles to drive away; no 24 hours or decontamination."
+  },
+  {
+   "question": 15,
+   "label": "F",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Complete: shelter fast, basement or center, 24 hours, radio, remove outer clothing and wash."
+  },
+  {
+   "question": 15,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Shelter until all-clear right; hiding under table against radiation misleading; no basement/middle, 24 hours or decontamination steps."
+  },
+  {
+   "question": 15,
+   "label": "H",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: sends people to an open area away from buildings and tells them to stay there."
+  },
+  {
+   "question": 15,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Stay indoors with doors closed right; no basement/middle, 24 hours, or decontamination."
+  },
+  {
+   "question": 15,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Basement/interior, 24 hours, official instructions right; no decontamination; cloth does not protect from radiation."
+  },
+  {
+   "question": 15,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Interior lowest floor and washing right; no stay-inside duration; glowing objects and hazmat suit advice wrong or useless."
+  },
+  {
+   "question": 15,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Interior/basement, stay inside, follow officials right; no 24 hours or decontamination; 'away from blast zone' muddles it."
+  },
+  {
+   "question": 15,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: leave area, stay in open, do not enter buildings, do not use basement."
+  },
+  {
+   "question": 15,
+   "label": "N",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Wrong main point: leave immediately within 10 miles; shelter only if unable to evacuate."
+  },
+  {
+   "question": 15,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Shelter and clothing removal/washing right; no stay-inside time; 'eerie glow' and 'stay as far away' wrong."
+  },
+  {
+   "question": 15,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Shelter until all-clear right; says vehicle shelter, move away, avoid phones; contradictory and odd advice."
+  },
+  {
+   "question": 15,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Indoors advice right; outside people told to leave area for higher ground, wrong; no 24 hours or decontamination."
+  },
+  {
+   "question": 15,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Basement shelter placed after evacuation; fan use wrong; no 24 hours, no decontamination."
+  },
+  {
+   "question": 15,
+   "label": "S",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Indoors and shower right; hard-top vehicle and bleach wrong; no basement or 24 hours."
+  },
+  {
+   "question": 19,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Cooling place and clothing right; gives water to confused person; help call late and conditional; weak cooling."
+  },
+  {
+   "question": 19,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Wet cloths, ice packs, fan right; gives fluids; medical help conditional; no 911 call though already confused."
+  },
+  {
+   "question": 19,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and cool place right; only fanning, no water or ice cooling; gives sips of water."
+  },
+  {
+   "question": 19,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Good cooling; offers fluids; emergency call late and conditional although person is already confused."
+  },
+  {
+   "question": 19,
+   "label": "E",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "No cooling at all; thermometer before 911; gives water."
+  },
+  {
+   "question": 19,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Good cooling; offers fluids; calls for help only if worsening, listing confusion already present."
+  },
+  {
+   "question": 19,
+   "label": "G",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Misses heat stroke: 911 only if unresponsive, no active cooling, encourages drinking."
+  },
+  {
+   "question": 19,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says heatstroke needs emergency call, but first says call only if worse; gives water; no wet cooling."
+  },
+  {
+   "question": 19,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Treats as dehydration; offers drinks; emergency help buried; wet towel only."
+  },
+  {
+   "question": 19,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and wet cloths right; contradicts itself on giving water; weak cooling sites."
+  },
+  {
+   "question": 19,
+   "label": "K",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "911 first, cool place, clothing off, fans and sponging, nothing by mouth. Ice would be better still."
+  },
+  {
+   "question": 19,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 for confusion right, but no cooling for that case; then water and mild cooling for others."
+  },
+  {
+   "question": 19,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "911 and cool place right; only fanning, no water or ice cooling; gives sips of water."
+  },
+  {
+   "question": 19,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Heat stroke, hose and 911 right; wrongly avoids ice and fans; offers water; 911 fifth."
+  },
+  {
+   "question": 19,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Good cooling list; offers fluids; 911 only if worsening or not improving; overcooling warning unhelpful."
+  },
+  {
+   "question": 19,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Heat stroke named, strong cooling, 911 immediately; wrongly gives water to a confused person; 911 listed fifth."
+  },
+  {
+   "question": 19,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and shade right; no active cooling; gives water; irrelevant head-injury line."
+  },
+  {
+   "question": 19,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "911 right; gives water; 'if not sure' and 'otherwise' branches muddle; modest cooling."
+  },
+  {
+   "question": 22,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says not recommended, then gives tips for crossing 'if no other choice'; misses being swept away."
+  },
+  {
+   "question": 22,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Not recommended and mentions currents, but allows crossing with driving tips."
+  },
+  {
+   "question": 22,
+   "label": "C",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never drive through, depth deceptive, turn around. Sweep-away danger not named."
+  },
+  {
+   "question": 22,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Turn around is right; 'avoid' is soft and no reason given."
+  },
+  {
+   "question": 22,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Recommends not, then coaches crossing; only engine reasons; no swept-away danger."
+  },
+  {
+   "question": 22,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "'No, I'm not sure' ambiguous; defers to vehicle manual; no turn around, no flood danger."
+  },
+  {
+   "question": 22,
+   "label": "G",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Calls a foot relatively shallow and coaches crossing; no clear no."
+  },
+  {
+   "question": 22,
+   "label": "H",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Never drive through even in SUV, turn around. Sweep-away danger not named."
+  },
+  {
+   "question": 22,
+   "label": "I",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: says a foot is generally manageable and you might drive through."
+  },
+  {
+   "question": 22,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Notes current can sweep car at a foot, but says calm water may be drivable and coaches crossing."
+  },
+  {
+   "question": 22,
+   "label": "K",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No clear no; tells how to cross if SUV can handle it."
+  },
+  {
+   "question": 22,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Notes currents and alternative route, but 'depends', calls a foot shallow and coaches crossing."
+  },
+  {
+   "question": 22,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Avoid if possible, but permits calm water under a foot and gives crossing steps."
+  },
+  {
+   "question": 22,
+   "label": "N",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Says driving through shallow water might be possible; coaches crossing; no clear no."
+  },
+  {
+   "question": 22,
+   "label": "O",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Clear no; wait or find another route. Sweep-away not named."
+  },
+  {
+   "question": 22,
+   "label": "P",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Clear no, turn around, names being swept away."
+  },
+  {
+   "question": 22,
+   "label": "Q",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Wrong: says a foot is usually fine for an SUV and gives crossing steps."
+  },
+  {
+   "question": 22,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Not recommended, detour; only vehicle damage reasons; gives advice if you must pass."
+  },
+  {
+   "question": 22,
+   "label": "S",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "No and turn around right; then parking brake with engine off and 'if you must cross' contradict."
+  },
+  {
+   "question": 26,
+   "label": "A",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, correct Heimlich, repeat, CPR if unconscious; no back blows."
+  },
+  {
+   "question": 26,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Back slaps, thrusts, CPR right; 120 in China, slaps tied to coughing, pulse check before CPR."
+  },
+  {
+   "question": 26,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Thrusts and CPR right; back slap instructions garbled with fist at navel; 120 in China."
+  },
+  {
+   "question": 26,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "911 and Heimlich named; 'Back, then the front' gives no usable instructions."
+  },
+  {
+   "question": 26,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Back blows then thrusts; 911 late; discourages untrained CPR; says use Heimlich when coughing."
+  },
+  {
+   "question": 26,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, correct thrusts, CPR; no back blows; 'up to 12 times' limit is odd."
+  },
+  {
+   "question": 26,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Thrusts right; continues Heimlich when unresponsive before CPR; untrained told only to keep calm; no back slap steps."
+  },
+  {
+   "question": 26,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "911 and back blow only; no abdominal thrusts or CPR; irrelevant infant and crowd lines."
+  },
+  {
+   "question": 26,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and fist position right; wrong downward pressure; no CPR or back blows."
+  },
+  {
+   "question": 26,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911 and Heimlich named; no technique, back blows or CPR."
+  },
+  {
+   "question": 26,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Slaps and thrusts right; invented front slaps, 'never use your hands', 911 late."
+  },
+  {
+   "question": 26,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Back slaps and thrusts right; 911 late; no CPR; no chest-thrust alternative for obese."
+  },
+  {
+   "question": 26,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Wrong: sit person, downward blows to abdomen; no real Heimlich, no CPR."
+  },
+  {
+   "question": 26,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "911, back blows, thrusts; finger removal while conscious, muddled hands, CPR only if trained after object removed."
+  },
+  {
+   "question": 26,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Back slaps and thrusts right; 911 late; no CPR when unconscious."
+  },
+  {
+   "question": 26,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911 and correct Heimlich; does not say repeat; no back blows or CPR."
+  },
+  {
+   "question": 26,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "5 back blows, 5 thrusts alternating, CPR right; 911 last; odd two-person tip."
+  },
+  {
+   "question": 26,
+   "label": "R",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, correct Heimlich, continue until out; no back blows or CPR if unconscious."
+  },
+  {
+   "question": 28,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says find source, shut off gas, open windows before leaving; evacuate and call included; no switch warning."
+  },
+  {
+   "question": 28,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Evacuate and call outside right; shut-off first, then look for source; no spark warning."
+  },
+  {
+   "question": 28,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Evacuate, call outside, no switches, no re-entry; mislabels as hydrogen sulfide; tells to open windows."
+  },
+  {
+   "question": 28,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Evacuate, then contradicts with 'consider leaving'; no call to 911, no switch warning."
+  },
+  {
+   "question": 28,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Call and no flame right; never says leave the house."
+  },
+  {
+   "question": 28,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "911, no switches, leave right; call comes before leaving while forbidding phone; windows."
+  },
+  {
+   "question": 28,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Leave now, stay out, call, right; no spark or switch warning."
+  },
+  {
+   "question": 28,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "No switches and leave right, but shut-off and windows come before leaving."
+  },
+  {
+   "question": 28,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Get out, phone outside right; then open windows if smell persists; no switch or flame warning."
+  },
+  {
+   "question": 28,
+   "label": "J",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Complete: leave on foot, no leak hunt, no sparks or phone inside, 911 from distance."
+  },
+  {
+   "question": 28,
+   "label": "K",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Investigate plumbing, septic, mold first; evacuation is step 8; no spark warning."
+  },
+  {
+   "question": 28,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Evacuate, call, no switches right; wrong gas names; contradictory ventilate-but-don't-re-enter."
+  },
+  {
+   "question": 28,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "911, no ignition, leave right; call listed before leaving; switches and phone not named."
+  },
+  {
+   "question": 28,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Leave and call right; call listed before leaving; partial switch warning, no flame warning."
+  },
+  {
+   "question": 28,
+   "label": "O",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Treats as household odor: find source, check drains; evacuation only a footnote; no spark warning."
+  },
+  {
+   "question": 28,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Evacuate and call right; also turn off appliances, ventilate, look for hazards; calls it hydrogen sulfide."
+  },
+  {
+   "question": 28,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Evacuate and call right; then check appliances and plumbing and open windows; contradictory."
+  },
+  {
+   "question": 28,
+   "label": "R",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "911, no switches, evacuate right; call before leaving while forbidding phone."
+  },
+  {
+   "question": 28,
+   "label": "S",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Leave, no flames or electricity, don't investigate, call right; adds gas valve shut-off; long."
+  }
+ ]
+}

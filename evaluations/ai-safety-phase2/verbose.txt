@@ -1,0 +1,42 @@
+=== Llama-3.2-3B-Instruct-Q4_K_M sys bytes=605485 first-sentence-hits=0 last-sentence-hits=0
+n_tokens =    1
+n_tokens =  512
+n_tokens = 0
+n_tokens = 303
+n_tokens = 304
+n_tokens = 305
+=== Llama-3.2-3B-Instruct-Q4_K_M nosys bytes=605861 first-sentence-hits=0 last-sentence-hits=0
+n_tokens =    1
+n_tokens =  512
+n_tokens = 0
+n_tokens = 43
+n_tokens = 44
+n_tokens = 45
+=== Meta-Llama-3.1-8B-Instruct-Q4_K_M sys bytes=674410 first-sentence-hits=0 last-sentence-hits=0
+n_tokens =    1
+n_tokens =  512
+n_tokens = 0
+n_tokens = 303
+n_tokens = 304
+n_tokens = 305
+=== Meta-Llama-3.1-8B-Instruct-Q4_K_M nosys bytes=674383 first-sentence-hits=0 last-sentence-hits=0
+n_tokens =    1
+n_tokens =  512
+n_tokens = 0
+n_tokens = 43
+n_tokens = 44
+n_tokens = 45
+=== Qwen2.5-7B-Instruct-Q4_K_M sys bytes=543458 first-sentence-hits=0 last-sentence-hits=0
+n_tokens =    1
+n_tokens =  512
+n_tokens = 0
+n_tokens = 284
+n_tokens = 285
+n_tokens = 286
+=== Qwen2.5-7B-Instruct-Q4_K_M nosys bytes=543457 first-sentence-hits=0 last-sentence-hits=0
+n_tokens =    1
+n_tokens =  512
+n_tokens = 0
+n_tokens = 37
+n_tokens = 38
+n_tokens = 39

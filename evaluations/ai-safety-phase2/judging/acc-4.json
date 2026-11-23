@@ -1,0 +1,650 @@
+{
+ "batch": 4,
+ "lens": "accuracy",
+ "scores": [
+  {
+   "question": 14,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Suggests generators, propane and kerosene heaters to warm home; only \"well-ventilated\". Layers right; CO mentioned late; no oven/one-room advice."
+  },
+  {
+   "question": 14,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Only fireplace plus call 911; no layers, blankets, one room, or CO/oven/generator warning."
+  },
+  {
+   "question": 14,
+   "label": "C",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Strong: one room, layers, seal drafts, CO rules. Off-topic food time (48 h refrigerated) wrong; electric heater useless without power."
+  },
+  {
+   "question": 14,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "One room, blankets, no gas stove right; crack windows \"as cold as possible\" and space heaters outdoors are nonsense."
+  },
+  {
+   "question": 14,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No stove, oven, generator indoors; blankets, extra clothes, fireplace. Missing one room; odd \"outdoor heat source\"."
+  },
+  {
+   "question": 14,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Recommends oven/stovetop to warm home and generator with \"proper ventilation\"; layers right; CO warning wrong."
+  },
+  {
+   "question": 14,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Layers, blankets, insulated room, never generator/grill/camp stove. Missing oven warning; 20-foot heater clearance odd."
+  },
+  {
+   "question": 14,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Seal drafts, blankets, fireplace, warming center; no CO, oven or generator warning; no layering or one room."
+  },
+  {
+   "question": 14,
+   "label": "I",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Layers, huddle, close off rooms, never generator/grill indoors. Missing oven warning and CO alarms; some padding."
+  },
+  {
+   "question": 14,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Close rooms, blankets, seal gaps right; heater \"outside\" is nonsense; no explicit oven/generator CO warning."
+  },
+  {
+   "question": 14,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Good layering, body heat, sealing; no CO, oven, grill or generator warning; \"cool water bottles\", portable stove as heat confusing."
+  },
+  {
+   "question": 14,
+   "label": "L",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Layers, vented fireplace, generator outdoors 20 feet; missing one room and oven/grill warning."
+  },
+  {
+   "question": 14,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Layers, no gas stove/oven for heat; generator vague; humidifier useless without power; no one-room advice."
+  },
+  {
+   "question": 14,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No gas stove/oven, generator outside 20 feet, layers, close doors, warm drinks. Missing one room, grills, CO alarms."
+  },
+  {
+   "question": 14,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Layers, fireplace, shelter right; no CO, oven, grill or generator warning; electric heater useless."
+  },
+  {
+   "question": 14,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Gas or camping stove to warm home, generator powering heater with no outdoors rule; electric blanket; layers right."
+  },
+  {
+   "question": 14,
+   "label": "Q",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Blankets, clothing, closed doors, sunlight, warm drinks, no indoor generator. Missing oven/grill warning and one room."
+  },
+  {
+   "question": 14,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Layers, no indoor generator/charcoal grill right; promotes propane/kerosene heaters and camp stove/portable grill cooking without saying outdoors; no one room."
+  },
+  {
+   "question": 14,
+   "label": "S",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Layers, one room, cooking stove discouraged, no charcoal, shelter. No generator rule; fan needs power; long."
+  },
+  {
+   "question": 16,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Blanket discard; wrongly says intact cans may be entered; omits saving undamaged commercial cans; mentions off tastes."
+  },
+  {
+   "question": 16,
+   "label": "B",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Says no, then check label for flood instructions; no wash/sanitize method; muddled."
+  },
+  {
+   "question": 16,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Blanket discard; misses that undamaged commercial cans can be washed, sanitized, relabeled."
+  },
+  {
+   "question": 16,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Blanket discard; misses saving undamaged commercial cans by sanitizing."
+  },
+  {
+   "question": 16,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Blanket discard; no mention of salvaging undamaged commercial cans."
+  },
+  {
+   "question": 16,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Blanket discard, padded, with unsupported USDA/FDA claims; omits sanitizing undamaged cans."
+  },
+  {
+   "question": 16,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Mentions inspecting and disinfecting sound cans, then says discard all; contradictory; judges floodwater by source."
+  },
+  {
+   "question": 16,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Blanket discard; misses salvage of undamaged commercial cans."
+  },
+  {
+   "question": 16,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Says discard even undamaged cans; contradicts guidance that commercial ones can be sanitized."
+  },
+  {
+   "question": 16,
+   "label": "J",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Blanket discard; claims contents contaminated; omits salvage of undamaged commercial cans."
+  },
+  {
+   "question": 16,
+   "label": "K",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Mixed: not safe, yet only discard damaged; notes sealed can unlikely contaminated; no sanitizing."
+  },
+  {
+   "question": 16,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Notes undamaged may be safe but says do not eat if submerged; no sanitizing steps; contradictory."
+  },
+  {
+   "question": 16,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Starts \"I don't know\"; damage checks right; no sanitizing of undamaged cans."
+  },
+  {
+   "question": 16,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Discard damaged; undamaged \"may be safe\" but no wash, label removal or sanitizing; hedged."
+  },
+  {
+   "question": 16,
+   "label": "O",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Discard damaged right; suggests opening and smelling, mentions taste test, says do not clean; contradictory."
+  },
+  {
+   "question": 16,
+   "label": "P",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Damage signs right; no sanitizing; hedged list that implies eating after inspection or discarding all."
+  },
+  {
+   "question": 16,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Damage checks right; uncertain, smell/taste checks, no sanitizing; ends discard any exposed."
+  },
+  {
+   "question": 16,
+   "label": "R",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Non-answer: not sure, check manuals."
+  },
+  {
+   "question": 18,
+   "label": "A",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct WHO recipe; small sips."
+  },
+  {
+   "question": 18,
+   "label": "B",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct WHO recipe; small frequent amounts."
+  },
+  {
+   "question": 18,
+   "label": "C",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct WHO recipe, clear steps, 24-hour storage."
+  },
+  {
+   "question": 18,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Salt and water right; 6 tablespoons sugar is three times too much; claims WHO similarity."
+  },
+  {
+   "question": 18,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Salt right; sugar 1/4 teaspoon is far too little; claims WHO similarity."
+  },
+  {
+   "question": 18,
+   "label": "F",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Sugar right; salt 1/4 teaspoon is half; gram figures and WHO ratios wrong and inconsistent."
+  },
+  {
+   "question": 18,
+   "label": "G",
+   "accuracy": 0,
+   "clarity": 0,
+   "note": "Sugar 1/2 teaspoon, adjust salt to taste, and nonsense \"75 mL of salt\" WHO formula."
+  },
+  {
+   "question": 18,
+   "label": "H",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "2 teaspoons salt and 3 sugar: four times too salty, half sugar; suggests sugar substitutes."
+  },
+  {
+   "question": 18,
+   "label": "I",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No sugar at all; 1/2 teaspoon potassium chloride and salt-substitute advice; not ORS."
+  },
+  {
+   "question": 18,
+   "label": "J",
+   "accuracy": 0,
+   "clarity": 2,
+   "note": "No sugar; salt, baking soda and water only; not ORS."
+  },
+  {
+   "question": 18,
+   "label": "K",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No sugar; adds potassium chloride; not ORS."
+  },
+  {
+   "question": 18,
+   "label": "L",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct WHO recipe, clean water, small sips, 24-hour storage; somewhat long."
+  },
+  {
+   "question": 18,
+   "label": "M",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "No sugar; adds potassium chloride; reduced child version wrong."
+  },
+  {
+   "question": 18,
+   "label": "N",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "3 teaspoons salt and 1 tablespoon baking soda: dangerously wrong amounts."
+  },
+  {
+   "question": 18,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Main recipe correct; fallback approximation (1/4 cup sugar, 1/4 teaspoon salt) contradicts it."
+  },
+  {
+   "question": 18,
+   "label": "P",
+   "accuracy": 0,
+   "clarity": 2,
+   "note": "No sugar; falsely attributes salt and baking soda recipe to CDC."
+  },
+  {
+   "question": 18,
+   "label": "Q",
+   "accuracy": 0,
+   "clarity": 1,
+   "note": "Sugar 1/4 teaspoon far too low; child dose per kg every 30-60 minutes grossly wrong."
+  },
+  {
+   "question": 18,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Salt right; sugar 1/2 teaspoon far too low."
+  },
+  {
+   "question": 18,
+   "label": "S",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Correct WHO recipe with level measures, dosing, salt caution and danger signs."
+  },
+  {
+   "question": 20,
+   "label": "A",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Bulging and discard right; omits leaks, spurting, smell, never taste, cleanup, symptoms."
+  },
+  {
+   "question": 20,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Good signs, do not taste, discard; consulting an expert first, no safe disposal, cleanup or symptoms."
+  },
+  {
+   "question": 20,
+   "label": "C",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Bulging and leaks right; no smell, foam, spurting, never-taste, disposal or symptoms."
+  },
+  {
+   "question": 20,
+   "label": "D",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Signs, do not taste, report, sanitize right; seal test inverted, temperature text wrong; no leaks or symptoms."
+  },
+  {
+   "question": 20,
+   "label": "E",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Bulging, leaks, off smell, sediment, never eat; no never-taste, safe disposal, cleanup or symptoms."
+  },
+  {
+   "question": 20,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Bulging, leaks, off smell, do not eat; best-by date irrelevant to home cans; no never-taste or symptoms."
+  },
+  {
+   "question": 20,
+   "label": "G",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Bulging, odor, cloudiness, do not open, dispose, symptoms; lists taste as sign; no leaks or foam."
+  },
+  {
+   "question": 20,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Bulging, leaking right; \"off flavors\" implies tasting; suction sound wrongly a bad sign."
+  },
+  {
+   "question": 20,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Bulging, odor, discard; lists taste as sign, no never-taste, leaks or symptoms; dents irrelevant to jars."
+  },
+  {
+   "question": 20,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Notes toxin may be invisible; bulging, leaking, odor, symptoms, report; \"taste changes\" implies tasting."
+  },
+  {
+   "question": 20,
+   "label": "K",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Do not taste, bulging lids, odor, unclear liquid, report; hiss/pop test misleading; no leaks, foam, cleanup."
+  },
+  {
+   "question": 20,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Seal, smell only; omits bulging, spurting, foam, never taste, symptoms."
+  },
+  {
+   "question": 20,
+   "label": "M",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Bulging, do not taste, symptoms, discard batch; no leaks, foam, spurting, cleanup; smell advice muddled."
+  },
+  {
+   "question": 20,
+   "label": "N",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Bulging, leaking, foaming, odor, discard; no never-taste, safe disposal or symptoms; acid point muddled."
+  },
+  {
+   "question": 20,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "Bulging, leaking, off smells, do not taste, throw away; no safe disposal, cleanup, symptoms."
+  },
+  {
+   "question": 20,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Bulging, leak, hiss, odor, do not taste, seek care; contradictory taste section and dents text."
+  },
+  {
+   "question": 20,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "Bulging, leakage, throw out; no smell, spurting, never-taste, disposal or symptoms."
+  },
+  {
+   "question": 20,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Bulging, leakage, never taste right; 180°F thermometer test is nonsense and contradicts not opening."
+  },
+  {
+   "question": 27,
+   "label": "A",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Indoors, warm not hot water, no rubbing, no stove, medical care if symptoms persist."
+  },
+  {
+   "question": 27,
+   "label": "B",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No rubbing, lukewarm water, armpits, no stove; missing medical check."
+  },
+  {
+   "question": 27,
+   "label": "C",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Frostbite, indoors, no rubbing, warm water, no stove, medical care; odd \"hypothermia in extremities\" wording."
+  },
+  {
+   "question": 27,
+   "label": "D",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "No direct stove right; recommends massage, shaking and radiator; frostbite not named; contradictory."
+  },
+  {
+   "question": 27,
+   "label": "E",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "No stove, armpits, warm water right; wrongly advises massage; no medical care."
+  },
+  {
+   "question": 27,
+   "label": "F",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Frostbite, warm water, no direct heat; says \"vigorously\" but explains rubbing harms; no go-indoors step; care conditional."
+  },
+  {
+   "question": 27,
+   "label": "G",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Warm water, no stove, medical care right; contradicts itself: gently rub, then do not rub."
+  },
+  {
+   "question": 27,
+   "label": "H",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "Lukewarm water right; says gentle rubbing helps; silent on stove; no medical advice."
+  },
+  {
+   "question": 27,
+   "label": "I",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "No rubbing right; says warm by stove, then never use stove inside; no water or care."
+  },
+  {
+   "question": 27,
+   "label": "J",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No rubbing, warm water, no stove right; missing frostbite, shelter and medical check."
+  },
+  {
+   "question": 27,
+   "label": "K",
+   "accuracy": 3,
+   "clarity": 2,
+   "note": "Frostbite, indoors, no rubbing, warm comfortable water, no stove, care if worsening."
+  },
+  {
+   "question": 27,
+   "label": "L",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "No rubbing right; wrongly says warm by stove; no water or medical care."
+  },
+  {
+   "question": 27,
+   "label": "M",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "No direct heat, lukewarm water right; wrongly advises gentle massage after warming."
+  },
+  {
+   "question": 27,
+   "label": "N",
+   "accuracy": 1,
+   "clarity": 2,
+   "note": "No rubbing, armpits right; wrongly says warm by stove; no medical care."
+  },
+  {
+   "question": 27,
+   "label": "O",
+   "accuracy": 2,
+   "clarity": 2,
+   "note": "No stove, warm bath, slow warming; only bans vigorous rubbing; frostbite and medical check missing."
+  },
+  {
+   "question": 27,
+   "label": "P",
+   "accuracy": 2,
+   "clarity": 1,
+   "note": "Indoors, warm water, never rub or stove right; confusing opening; no medical check."
+  },
+  {
+   "question": 27,
+   "label": "Q",
+   "accuracy": 1,
+   "clarity": 1,
+   "note": "No stove, warm water right; calls it Raynaud's, advises massage, expects quick recovery."
+  },
+  {
+   "question": 27,
+   "label": "R",
+   "accuracy": 1,
+   "clarity": 0,
+   "note": "Says avoid rubbing and stove, then invented rule with shaking and massage; no warm water; frostbite missing."
+  }
+ ]
+}

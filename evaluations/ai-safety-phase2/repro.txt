@@ -1,0 +1,15 @@
+qwen default system tokens: 16
+== reproduction: 3 models x q3,q13,q17 seed 1, no system prompt
+Llama-3.2-3B-Instruct- s1 main03 rc=0 3.6s parse=True
+Llama-3.2-3B-Instruct- s1 main13 rc=0 4.8s parse=True
+Llama-3.2-3B-Instruct- s1 main17 rc=0 4.4s parse=True
+Meta-Llama-3.1-8B-Inst s1 main03 rc=0 6.2s parse=True
+Meta-Llama-3.1-8B-Inst s1 main13 rc=0 9.9s parse=True
+Meta-Llama-3.1-8B-Inst s1 main17 rc=0 7.3s parse=True
+Qwen2.5-7B-Instruct-Q4 s1 main03 rc=0 6.5s parse=True
+Qwen2.5-7B-Instruct-Q4 s1 main13 rc=0 10.5s parse=True
+Qwen2.5-7B-Instruct-Q4 s1 main17 rc=0 3.6s parse=True
+rc=0
+rows 9 same as Phase 1 seed 1: 6 same as seed 2 (control, expect 0): 0
+== stop test
+rc=143 llama-cli left=0
