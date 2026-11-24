@@ -15,7 +15,7 @@ put(){ { printf '%%PDF-%s\n' "$1"; head -c "$2" /dev/zero | tr '\0' "$3"; } > "$
 for f in fetch remote_size fetch_sized fetch_remote get_pdf_url; do
   # A one-line function ends on its own line; a longer one at the first line that is "}".
   awk -v f="$f" '!on && $0 ~ "^"f"\\(\\)" {on=1; print; if (/; }$/) exit; next} on {print} on && /^}/ {exit}' get-offline-library.sh
-done > "$T/helpers.sh"
+done | sed -E 's/--max-time [0-9]+/--max-time 3/' > "$T/helpers.sh"   # 3 s, so the silent-server case is quick
 for f in fetch remote_size fetch_sized fetch_remote get_pdf_url; do
   grep -q "^$f()" "$T/helpers.sh" || { echo "FAIL: $f not found in get-offline-library.sh"; exit 1; }
 done
@@ -30,7 +30,7 @@ $ast = [System.Management.Automation.Language.Parser]::ParseInput($src, [ref]$nu
 foreach($n in 'Fetch','UA','Remote-Size','Fetch-Sized','Fetch-Remote'){
   $f = $ast.Find({ param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $a.Name -eq $n }, $true)
   if(-not $f){ Write-Host "FAIL: $n not found in Get-OfflineLibrary.ps1"; exit 2 }
-  Invoke-Expression $f.Extent.Text
+  Invoke-Expression ($f.Extent.Text -replace '--max-time \d+', '--max-time 3')
 }
 # Off Windows there is no curl.exe; point the installer's calls at curl.
 if($IsLinux -or $IsMacOS){ $c = (Get-Command curl -CommandType Application | Select-Object -First 1).Source; function curl.exe { & $c @args } }
@@ -77,6 +77,13 @@ class H(http.server.BaseHTTPRequestHandler):
     def do_HEAD(self):
         body = open(sys.argv[1], 'rb').read()
         mode = self.path.split('/')[1]
+        if mode == 'silent':                   # never answers; note who gave up first
+            self.connection.settimeout(20)
+            try: self.connection.recv(1); who = 'curl'
+            except ConnectionError: who = 'curl'
+            except OSError: who = 'server'
+            open(sys.argv[3], 'a').write('HEAD silent %s\n' % who)
+            self.close_connection = True; return
         if mode == '503': self.send_response(503); self.send_header('Content-Length', '170')
         elif mode in ('500', '500norange'): self.send_response(500)  # no length, as iris.who.int
         elif mode == '405': self.send_response(405); self.send_header('Content-Length', '150')
@@ -144,6 +151,12 @@ EOF
     rm -f "$T/sh/manual.pdf" "$T/ps/manual.pdf"
     printf 'stale' > "$T/sh/manual.pdf.4999.part"; printf 'stale' > "$T/ps/manual.pdf.4999.part"
     URL="$P/500norange/manual.pdf"; check "HEAD answers 500, Range ignored, empty drive"
+    # A server that takes the HEAD and never answers is cut off, not waited for (#303), and the
+    # one-byte probe still gives the size, so the new edition replaces the older copy.
+    put v7 8000 g; : > "$T/req.log"
+    URL="$P/silent/manual.pdf"; check "HEAD never answered, one-byte probe sizes it, new edition replaces the older copy"
+    if [ "$(grep -c '^HEAD silent curl$' "$T/req.log")" = "$nsh" ]; then echo "  OK   [HEAD never answered: curl gives up in each shell]"
+    else echo "FAIL [HEAD never answered: expected $nsh 'HEAD silent curl', got:]"; sed 's/^/    /' "$T/req.log"; fail=1; fi
     # fetch does its own retries (#298). A Retry-After must not hold the run (gutenberg.org asks for
     # 6 hours; 25 s here, and the pause between tries is off in this check) ...
     want_gets(){ # name mode expected-lines

@@ -440,9 +440,10 @@ fetch(){ # url out
 # ignores Range answers 200: that gives no size, and --max-filesize 1 stops the body (--max-time
 # bounds a 200 of no stated length, which an older curl does not cut off). http(s) only: a
 # file:// source has no status line, and its HEAD already gives the size.
+# The HEAD is cut off after 30 s too, or a server that never answers holds the run (#303).
 remote_size(){
   local n
-  n="$(curl -sIL -A "${UA:-Mozilla/5.0}" "$1" 2>/dev/null | tr -d '\r' | awk 'BEGIN{ok=1} toupper($1) ~ /^HTTP/{ok=($2 ~ /^2/); n=""} ok && tolower($1)=="content-length:"{n=$2} END{if(n>0)print n}')"
+  n="$(curl -sIL --max-time 30 -A "${UA:-Mozilla/5.0}" "$1" 2>/dev/null | tr -d '\r' | awk 'BEGIN{ok=1} toupper($1) ~ /^HTTP/{ok=($2 ~ /^2/); n=""} ok && tolower($1)=="content-length:"{n=$2} END{if(n>0)print n}')"
   if [ -z "$n" ]; then case "$1" in http://*|https://*)
     n="$(curl -sL -r 0-0 --max-filesize 1 --max-time 30 -A "${UA:-Mozilla/5.0}" -D - -o /dev/null "$1" 2>/dev/null | tr -d '\r' | awk 'toupper($1) ~ /^HTTP\//{ok=($2=="206"); n=""} ok && tolower($1)=="content-range:"{n=$NF; sub(/.*\//, "", n)} END{if(n ~ /^[0-9]+$/ && n+0 > 0) print n}')" ;;
   esac; fi
