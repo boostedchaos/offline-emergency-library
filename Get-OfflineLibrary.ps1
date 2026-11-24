@@ -382,9 +382,10 @@ function UA(){ 'Mozilla/5.0' }
 # ignores Range answers 200: that gives no size, and --max-filesize 1 stops the body (--max-time
 # bounds a 200 of no stated length, which an older curl does not cut off). http(s) only: a
 # file:// source has no status line, and its HEAD already gives the size.
+# The HEAD is cut off after 30 s too, or a server that never answers holds the run (#303).
 function Remote-Size($url){
   $n = ''; $ok = $true
-  foreach($l in (curl.exe -sIL -A (UA) $url 2>$null)){ if("$l" -match '^HTTP/\S+\s+(\d)'){ $ok = $Matches[1] -eq '2'; $n = '' } elseif($ok -and "$l" -match '^\s*content-length:\s*(\d+)'){ $n = $Matches[1] } }
+  foreach($l in (curl.exe -sIL --max-time 30 -A (UA) $url 2>$null)){ if("$l" -match '^HTTP/\S+\s+(\d)'){ $ok = $Matches[1] -eq '2'; $n = '' } elseif($ok -and "$l" -match '^\s*content-length:\s*(\d+)'){ $n = $Matches[1] } }
   if(-not ($n -and [int64]$n -gt 0) -and "$url" -match '^https?://'){
     $n = ''; $ok = $false; $nul = if($IsLinux -or $IsMacOS){ '/dev/null' } else { 'NUL' }
     foreach($l in (curl.exe -sL -r 0-0 --max-filesize 1 --max-time 30 -A (UA) -D - -o $nul $url 2>$null)){ if("$l" -match '^HTTP/\S+\s+(\d+)'){ $ok = $Matches[1] -eq '206'; $n = '' } elseif($ok -and "$l" -match '^\s*content-range:.*/(\d+)\s*$'){ $n = $Matches[1] } }
