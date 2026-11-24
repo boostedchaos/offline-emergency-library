@@ -413,8 +413,9 @@ function Fetch-Sized($url,$out,$bytes,[switch]$Soft){
   }
   if((Test-Path $out -PathType Leaf) -and -not (Test-Path "$out.aria2") -and (Get-Item $out).Length -eq [int64]$bytes){ return }
   $part = "$out.$bytes.part"
+  # Compare names: FullName is the resolved path, and $out may spell the folder another way (8.3, relative, #305).
   Get-ChildItem -Path (Split-Path $out -Parent) -Filter ((Split-Path $out -Leaf) + '.*.part') -ErrorAction SilentlyContinue |
-    Where-Object { $_.FullName -ne $part } |
+    Where-Object { $_.Name -ne (Split-Path $part -Leaf) } |
     ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue; Remove-Item -LiteralPath ($_.FullName + '.aria2') -Force -ErrorAction SilentlyContinue }
   if(Test-Path $out -PathType Leaf){ Log "  re-download: $(Split-Path $out -Leaf) (size on disk is not the source's $bytes bytes)" }
   Fetch $url $part -Soft:$Soft

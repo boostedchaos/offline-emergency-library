@@ -19,7 +19,7 @@ done > "$T/helpers.sh"
 for f in fetch remote_size fetch_sized fetch_remote get_pdf_url; do
   grep -q "^$f()" "$T/helpers.sh" || { echo "FAIL: $f not found in get-offline-library.sh"; exit 1; }
 done
-sh_run(){ ( USE_ARIA=0; DL_TTY=0; UA=test; log(){ echo "$*"; }; sleep(){ :; }; . "$T/helpers.sh"; get_pdf_url "$URL" manual.pdf "$T/sh" ) > "$T/sh.log" 2>&1; }
+sh_run(){ ( USE_ARIA=0; DL_TTY=0; UA=test; log(){ echo "$*"; }; sleep(){ :; }; . "$T/helpers.sh"; get_pdf_url "$URL" manual.pdf "$T/sh${ALT:-}" ) > "$T/sh.log" 2>&1; }
 
 # --- PowerShell: the real Fetch, Remote-Size, Fetch-Sized and Fetch-Remote
 cat > "$T/run.ps1" <<'EOF'
@@ -43,7 +43,8 @@ EOF
 PS=""; command -v pwsh >/dev/null 2>&1 && PS=pwsh
 [ -z "$PS" ] && command -v powershell.exe >/dev/null 2>&1 && PS=powershell.exe
 ps_path(){ cygpath -w "$1" 2>/dev/null || printf '%s' "$1"; }
-ps_run(){ OEL_INSTALLER="$(ps_path "$PWD/Get-OfflineLibrary.ps1")" "$PS" -NoProfile -ExecutionPolicy Bypass -File "$(ps_path "$T/run.ps1")" "$URL" "$(ps_path "$T/ps/manual.pdf")" > "$T/ps.log" 2>&1; }
+ps_run(){ out="$(ps_path "$T/ps/manual.pdf")"; [ -z "${ALT:-}" ] || out="$(ps_path "$T/ps")$ALT/manual.pdf"
+  OEL_INSTALLER="$(ps_path "$PWD/Get-OfflineLibrary.ps1")" "$PS" -NoProfile -ExecutionPolicy Bypass -File "$(ps_path "$T/run.ps1")" "$URL" "$out" > "$T/ps.log" 2>&1; }
 
 check(){ # name [file the drive copy must equal; default: the source]
   want="${2:-$T/src/manual.pdf}"
@@ -178,6 +179,11 @@ EOF
     down bash sh sh_run; [ -z "$PS" ] || down PowerShell ps ps_run
     n="$(grep -c "^GET down bytes=$h-\$" "$T/req.log")"
     if [ "$n" = "$(( 11 * nsh ))" ]; then echo "  OK   [source stays down: 11 tries per shell]"; else echo "FAIL [source stays down: $n tries, expected $(( 11 * nsh ))]"; fail=1; fi
+    # A half-done part resumes also when the folder is spelled another way than the system
+    # spells it ("x/." here; an 8.3 short name on Windows does the same, #305).
+    fresh; for d in sh ps; do head -c "$h" "$T/src/manual.pdf" > "$T/$d/manual.pdf.$sz.part"; done
+    ALT=/.; URL="$P/len/manual.pdf"; check "half-done part, folder spelled another way"; ALT=
+    want_gets "folder spelled another way" len "GET len bytes=$h-,"
   fi
 fi
 
