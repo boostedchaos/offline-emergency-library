@@ -19,7 +19,7 @@ done > "$T/helpers.sh"
 for f in fetch remote_size fetch_sized fetch_remote get_pdf_url; do
   grep -q "^$f()" "$T/helpers.sh" || { echo "FAIL: $f not found in get-offline-library.sh"; exit 1; }
 done
-sh_run(){ ( USE_ARIA=0; DL_TTY=0; UA=test; log(){ echo "$*"; }; . "$T/helpers.sh"; get_pdf_url "$URL" manual.pdf "$T/sh" ) > "$T/sh.log" 2>&1; }
+sh_run(){ ( USE_ARIA=0; DL_TTY=0; UA=test; log(){ echo "$*"; }; sleep(){ :; }; . "$T/helpers.sh"; get_pdf_url "$URL" manual.pdf "$T/sh" ) > "$T/sh.log" 2>&1; }
 
 # --- PowerShell: the real Fetch, Remote-Size, Fetch-Sized and Fetch-Remote
 cat > "$T/run.ps1" <<'EOF'
@@ -36,6 +36,7 @@ foreach($n in 'Fetch','UA','Remote-Size','Fetch-Sized','Fetch-Remote'){
 if($IsLinux -or $IsMacOS){ $c = (Get-Command curl -CommandType Application | Select-Object -First 1).Source; function curl.exe { & $c @args } }
 $UseAria = $false; $DlTty = $false
 function Log($m){ Write-Host $m }
+function Start-Sleep{}
 Fetch-Remote $url $out
 exit 0
 EOF
@@ -70,6 +71,7 @@ for c in python3 python; do command -v "$c" >/dev/null 2>&1 && "$c" -c 'import h
 if [ -z "$PY" ]; then echo "  skip HEAD-error cases: no python3"; else
   cat > "$T/srv.py" <<'EOF'
 import re, sys, http.server
+asked = {}
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
     def do_HEAD(self):
@@ -79,7 +81,7 @@ class H(http.server.BaseHTTPRequestHandler):
         elif mode in ('500', '500norange'): self.send_response(500)  # no length, as iris.who.int
         elif mode == '405': self.send_response(405); self.send_header('Content-Length', '150')
         elif mode == '302': self.send_response(302); self.send_header('Location', '/ok/manual.pdf'); self.send_header('Content-Length', '95')
-        elif mode == 'len': self.send_response(200); self.send_header('Content-Length', str(len(body)))
+        elif mode in ('len', 'wait', 'drop', 'dropnorange', 'drop503', 'down'): self.send_response(200); self.send_header('Content-Length', str(len(body)))
         else: self.send_response(200)  # a 200 that states no length
         self.end_headers()
     def do_GET(self):
@@ -87,7 +89,15 @@ class H(http.server.BaseHTTPRequestHandler):
         mode = self.path.split('/')[1]
         r = self.headers.get('Range', '')      # honor 'bytes=N-' and 'bytes=0-0' like a real server, so a resume shows
         open(sys.argv[3], 'a').write('GET %s %s\n' % (mode, r or '-'))
-        m = re.match(r'bytes=(\d+)-(\d*)$', r) if mode != '500norange' else None
+        n = asked[mode] = asked.get(mode, 0) + 1
+        if mode == 'down' or (mode == 'wait' and n % 2) or (mode == 'drop503' and n % 3 == 2):   # 503; 'wait' asks for a pause, once per shell
+            self.send_response(503); self.send_header('Content-Length', '0')
+            if mode != 'drop503': self.send_header('Retry-After', '25' if mode == 'wait' else '2')
+            self.end_headers(); return
+        if (mode == 'drop' and not r) or (mode in ('dropnorange', 'drop503') and n % 3 == 1):  # cut off half way
+            self.send_response(200); self.send_header('Content-Length', str(len(body))); self.end_headers()
+            self.wfile.write(body[:len(body) // 2]); self.wfile.flush(); self.close_connection = True; return
+        m = re.match(r'bytes=(\d+)-(\d*)$', r) if mode not in ('500norange', 'dropnorange') else None
         s = int(m.group(1)) if m else 0
         e = min(int(m.group(2)), len(body) - 1) if m and m.group(2) else len(body) - 1
         if m and s < len(body) and s <= e and (s, e) != (0, len(body) - 1):
@@ -134,6 +144,40 @@ EOF
     rm -f "$T/sh/manual.pdf" "$T/ps/manual.pdf"
     printf 'stale' > "$T/sh/manual.pdf.4999.part"; printf 'stale' > "$T/ps/manual.pdf.4999.part"
     URL="$P/500norange/manual.pdf"; check "HEAD answers 500, Range ignored, empty drive"
+    # fetch does its own retries (#298). A Retry-After must not hold the run (gutenberg.org asks for
+    # 6 hours; 25 s here, and the pause between tries is off in this check) ...
+    want_gets(){ # name mode expected-lines
+      g="$(grep "^GET $2 " "$T/req.log" | tr '\n' ',')"; w="$3"; [ -n "$PS" ] && w="$3$3"
+      if [ "$g" = "$w" ]; then echo "  OK   [$1: requests]"; else echo "FAIL [$1: requests] expected $w got $g"; fail=1; fi
+    }
+    fresh(){ rm -f "$T/sh/"* "$T/ps/"*; : > "$T/req.log"; }
+    fresh; t0="$(date +%s)"; URL="$P/wait/manual.pdf"; check "503 with Retry-After, then up"
+    t="$(( $(date +%s) - t0 ))"
+    if [ "$t" -lt 20 ]; then echo "  OK   [Retry-After not waited for]"; else echo "FAIL [Retry-After waited for: ${t}s]"; fail=1; fi
+    want_gets "Retry-After" wait "GET wait -,GET wait -,"
+    # ... a download cut off half way resumes there ...
+    h="$(( $(wc -c < "$T/src/manual.pdf") / 2 ))"
+    fresh; URL="$P/drop/manual.pdf"; check "cut off half way"
+    want_gets "cut off" drop "GET drop -,GET drop bytes=$h-,"
+    # ... and keeps its part when the source is down in between (an error page is no reason to start over) ...
+    fresh; URL="$P/drop503/manual.pdf"; check "cut off half way, then 503"
+    want_gets "then 503" drop503 "GET drop503 -,GET drop503 bytes=$h-,GET drop503 bytes=$h-,"
+    # ... or starts over, never joined, when the server ignores Range ...
+    fresh; URL="$P/dropnorange/manual.pdf"; check "cut off half way, Range ignored"
+    want_gets "Range ignored" dropnorange "GET dropnorange -,GET dropnorange bytes=$h-,GET dropnorange -,"
+    # ... and a source that stays down is a failure after 11 tries, also with a half-done part file
+    # on the drive (with --retry-max-time, curl 8.14.1 and 8.23.0 exit 0 there, curl/curl#23838).
+    fresh; URL="$P/down/manual.pdf"; sz="$(wc -c < "$T/src/manual.pdf" | tr -d ' ')"
+    for d in sh ps; do head -c "$h" "$T/src/manual.pdf" > "$T/$d/manual.pdf.$sz.part"; done
+    down(){ # shell-name folder runner
+      if "$3"; then echo "FAIL [source stays down] $1: exited 0"; fail=1
+      elif [ -e "$T/$2/manual.pdf" ]; then echo "FAIL [source stays down] $1: half a file was kept as complete"; fail=1
+      elif ! grep -q 'ERROR: download failed' "$T/$2.log"; then echo "FAIL [source stays down] $1: no ERROR line"; sed 's/^/    /' "$T/$2.log"; fail=1
+      else echo "  OK   [source stays down] $1"; fi
+    }
+    down bash sh sh_run; [ -z "$PS" ] || down PowerShell ps ps_run
+    n="$(grep -c "^GET down bytes=$h-\$" "$T/req.log")"
+    if [ "$n" = "$(( 11 * nsh ))" ]; then echo "  OK   [source stays down: 11 tries per shell]"; else echo "FAIL [source stays down: $n tries, expected $(( 11 * nsh ))]"; fail=1; fi
   fi
 fi
 

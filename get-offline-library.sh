@@ -411,10 +411,25 @@ fetch(){ # url out
     echo "  (aria2 failed, falling back to curl)"
   fi
   if [ "$DL_TTY" = 1 ]; then curl_prog="-#"; else curl_prog="-sS"; fi
-  curl -fL -C - --retry 10 --retry-delay 5 --retry-all-errors $curl_prog -o "$2" "$1" || {
-    log "ERROR: download failed: $1 -> $2. Re-run the installer to resume."
-    exit 1
-  }
+  # Retry here, not with curl's --retry (#298): that one sleeps as long as the server's
+  # Retry-After asks (gutenberg.org: 6 hours) and restarts a dropped download from where this
+  # run began. --retry-max-time is no way out: curl 8.14.1 and 8.23.0 then exit 0 on the failed
+  # download (curl/curl#23838). Each try here resumes; one with no data for 2 minutes is cut off.
+  local fresh=1 try=1 had code pause
+  if [ -s "$2" ]; then fresh=0; fi
+  while :; do
+    had=0; if [ -s "$2" ]; then had=1; fi
+    code="$(curl -fL -C - --speed-limit 1 --speed-time 120 $curl_prog -w '%{http_code}' -o "$2" "$1")" && break
+    if [ "$try" -gt 10 ]; then
+      log "ERROR: download failed: $1 -> $2. Re-run the installer to resume."
+      exit 1
+    fi
+    # Asked to resume this run's own part, but the server sent the whole file (200): start over.
+    if [ "$had$fresh$code" = 11200 ]; then rm -f "$2"; fi
+    pause=5; if [ "$code" = 429 ]; then pause=60; fi
+    try=$((try+1)); echo "  (download failed, try $try of 11 in $pause s)"
+    sleep "$pause"
+  done
   [ -s "$2" ] || { log "ERROR: download is missing or empty: $2"; exit 1; }
 }
 # Size of a remote file in bytes after redirects (empty if the server does not say). Only a 2xx

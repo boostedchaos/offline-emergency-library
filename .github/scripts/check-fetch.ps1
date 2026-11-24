@@ -103,6 +103,7 @@ public class AriaFixture {
 `$DlTty = `$$([bool]$case.Tty)
 `$env:OEL_ARGS_LOG = '$($argLog.Replace("'", "''"))'
 function Log(`$m){ Write-Host `$m }
+function Start-Sleep{}  # no pause between Fetch's tries
 $($fetch.Extent.Text)
 $($fsized.Extent.Text)
 `$global:LASTEXITCODE = $($case.Stale)

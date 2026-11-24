@@ -350,8 +350,23 @@ function Fetch($url,$out,[switch]$Soft){
     Log '  (aria2 failed, falling back to curl)'
   }
   $curlProg = if($DlTty){ '-#' } else { '-sS' }
-  $global:LASTEXITCODE = $null
-  curl.exe -fL -C - --retry 10 --retry-delay 5 --retry-all-errors $curlProg -o $out $url
+  # Retry here, not with curl's --retry (#298): that one sleeps as long as the server's
+  # Retry-After asks (gutenberg.org: 6 hours) and restarts a dropped download from where this
+  # run began. --retry-max-time is no way out: curl 8.14.1 and 8.23.0 then exit 0 on the failed
+  # download (curl/curl#23838). Each try here resumes; one with no data for 2 minutes is cut off.
+  $fresh = -not ((Test-Path $out -PathType Leaf) -and (Get-Item $out).Length -gt 0)
+  for($try = 2; ; $try++){
+    $had = (Test-Path $out -PathType Leaf) -and (Get-Item $out).Length -gt 0
+    $global:LASTEXITCODE = $null
+    $code = curl.exe -fL -C - --speed-limit 1 --speed-time 120 $curlProg -w '%{http_code}' -o $out $url
+    # No exit code: curl did not start (#132), so do not try again.
+    if($LASTEXITCODE -eq 0 -or $null -eq $LASTEXITCODE -or $try -gt 11){ break }
+    # Asked to resume this run's own part, but the server sent the whole file (200): start over.
+    if($had -and $fresh -and "$code" -eq '200'){ Remove-Item $out -Force }
+    $pause = if("$code" -eq '429'){ 60 } else { 5 }
+    Log "  (download failed, try $try of 11 in $pause s)"
+    Start-Sleep -Seconds $pause
+  }
   if($LASTEXITCODE -ne 0 -or -not (Test-Path $out -PathType Leaf) -or (Get-Item $out).Length -eq 0){
     if($Soft){ throw "download failed: $url -> $out (optional, skipped; re-run to try again)" }
     Log "ERROR: download failed: $url -> $out. Re-run the installer to resume."
