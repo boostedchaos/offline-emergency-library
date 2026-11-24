@@ -120,21 +120,27 @@ printf '#!/bin/sh\nexit 22\n' > "$fx/bin/curl"; chmod +x "$fx/bin/curl"
   awk '/^fetch_sized\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
   echo 'if ( fetch_sized "https://example.invalid/x.zip" "$1/x.zip" "$(remote_size https://example.invalid/x.zip)" soft ); then echo GOT; else echo SKIPPED; fi'
   echo 'if ( fetch "https://example.invalid/p.html" "$1/p.html.new" soft ); then echo GOT2; else echo SKIPPED2; fi'
+  echo 'if ( fetch_sized "https://example.invalid/y.zip" "$1/y.zip" 5 soft ); then echo GOT3; else echo SKIPPED3; fi'
   echo 'echo AFTER'
 } > "$fx/run.sh"
 PATH="$fx/bin:$PATH" bash "$fx/run.sh" "$fx" > "$fx/out.txt" 2>&1 || true
 grep -Fxq SKIPPED "$fx/out.txt" && grep -Fxq SKIPPED2 "$fx/out.txt" && grep -Fxq AFTER "$fx/out.txt" && [ ! -e "$fx/x.zip" ] \
   && ok "a failed optional download is skipped and the run goes on" || bad "a failed optional download did not leave the run going: $(tr '\n' ' ' < "$fx/out.txt")"
+grep -Fq '( fetch "$1/$2" "$out.new" soft )' get-offline-library.sh && ok "the childbirth page is a soft download" || bad "get_html_doc does not call fetch with soft (#304)"
 grep -q 'ERROR' "$fx/out.txt" && bad "a skipped optional download prints an ERROR line (#304): $(grep ERROR "$fx/out.txt" | tr '\n' ' ')" \
   || ok "a skipped optional download prints no ERROR line (#304)"
 grep -Fxq "  download failed: https://example.invalid/p.html -> $fx/p.html.new (optional, skipped; re-run to try again)" "$fx/out.txt" \
   && ok "a skipped optional download logs PowerShell's Fetch -Soft wording" || bad "soft fetch does not log the PowerShell wording: $(tr '\n' ' ' < "$fx/out.txt")"
-# control: the same calls without soft must log ERROR and end the run, or the checks above prove nothing
+# control: without soft the same calls must log ERROR, and run bare (outside ( ... )) they must
+# end the run, or the checks above prove nothing
 sed 's/ soft ); then/ ); then/' "$fx/run.sh" > "$fx/run-hard.sh"
 grep -q ' soft ); then' "$fx/run-hard.sh" && bad "control script was not made"
 PATH="$fx/bin:$PATH" bash "$fx/run-hard.sh" "$fx" > "$fx/out-hard.txt" 2>&1 || true
 grep -q '^ERROR: download failed' "$fx/out-hard.txt" && ! grep -Fxq GOT "$fx/out-hard.txt" \
   && ok "control: without soft, the same failed download logs ERROR and is not kept" || bad "control: a failed download without soft did not log ERROR: $(tr '\n' ' ' < "$fx/out-hard.txt")"
+sed 's/^if ( \(.*\) ); then.*/\1/' "$fx/run-hard.sh" > "$fx/run-bare.sh"
+PATH="$fx/bin:$PATH" bash "$fx/run-bare.sh" "$fx" > "$fx/out-bare.txt" 2>&1 || true
+grep -Fxq AFTER "$fx/out-bare.txt" && bad "control: a failed required download did not stop the run" || ok "control: a failed required download stops the run"
 
 # Ctrl+C during an aria2 download (#272): aria2 catches SIGINT and exits 7, so bash does not
 # see the signal. fetch must re-raise it, or Ctrl+C in an optional ( ... ) download only skips
