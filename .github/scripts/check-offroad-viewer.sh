@@ -105,10 +105,11 @@ fi
   && ok "legacy viewer starts in app/, where its fonts are" || bad "legacy viewer does not start in app/ (offline map has no street names, #108)"
 grep -Fq "files' to $(cd "$maps" && pwd)/obf and click OK" "$tmp/mc.log" && ok "legacy viewer launcher prints the map folder for Offline Rendering" || bad "legacy viewer launcher does not print the obf folder"
 
-# Optional viewer downloads (#272): fetch exits on a failed download, so every soft call must
-# run in ( ... ), or a 404 / outage of an optional viewer stops the whole install at step 8b.
+# Optional downloads (#272, #304): a soft fetch / fetch_sized returns 1 on a failed download
+# instead of exiting, and logs PowerShell's "(optional, skipped ...)" line, not a fatal-looking
+# ERROR. Soft calls still run in ( ... ) so any other exit ends only the subshell.
 # Static: no soft call outside a subshell. Behavior: the installer's real fetch + fetch_sized
-# with a curl that always fails; the run must go on after the soft call.
+# with a curl that always fails; the run must go on after the soft calls, with no ERROR line.
 unsub="$(grep -n 'fetch_sized .* soft' get-offline-library.sh | grep -v '( fetch_sized ' || true)"
 [ -z "$unsub" ] && ok "every soft fetch_sized call runs in a subshell" || bad "soft fetch_sized call outside ( ... ) stops the install on a failed download: $unsub"
 fx="$tmp/fetchfx"; mkdir -p "$fx/bin"
@@ -118,16 +119,22 @@ printf '#!/bin/sh\nexit 22\n' > "$fx/bin/curl"; chmod +x "$fx/bin/curl"
   awk '/^remote_size\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
   awk '/^fetch_sized\(\)\{/{go=1} go{print} go&&/^\}/{exit}' get-offline-library.sh
   echo 'if ( fetch_sized "https://example.invalid/x.zip" "$1/x.zip" "$(remote_size https://example.invalid/x.zip)" soft ); then echo GOT; else echo SKIPPED; fi'
+  echo 'if ( fetch "https://example.invalid/p.html" "$1/p.html.new" soft ); then echo GOT2; else echo SKIPPED2; fi'
   echo 'echo AFTER'
 } > "$fx/run.sh"
 PATH="$fx/bin:$PATH" bash "$fx/run.sh" "$fx" > "$fx/out.txt" 2>&1 || true
-grep -Fxq SKIPPED "$fx/out.txt" && grep -Fxq AFTER "$fx/out.txt" && [ ! -e "$fx/x.zip" ] \
+grep -Fxq SKIPPED "$fx/out.txt" && grep -Fxq SKIPPED2 "$fx/out.txt" && grep -Fxq AFTER "$fx/out.txt" && [ ! -e "$fx/x.zip" ] \
   && ok "a failed optional download is skipped and the run goes on" || bad "a failed optional download did not leave the run going: $(tr '\n' ' ' < "$fx/out.txt")"
-# control: the same call without ( ... ) must end the run, or the check above proves nothing
-sed 's/^if ( fetch_sized \(.*\) soft ); then/if fetch_sized \1 soft; then/' "$fx/run.sh" > "$fx/run-bare.sh"
-grep -q '^if fetch_sized ' "$fx/run-bare.sh" || bad "control script was not made"
-PATH="$fx/bin:$PATH" bash "$fx/run-bare.sh" "$fx" > "$fx/out-bare.txt" 2>&1 || true
-grep -Fxq AFTER "$fx/out-bare.txt" && bad "control: a bare soft call did not stop the run, so the subshell check is not testing fetch's exit" || ok "control: a bare soft call stops the run (why the subshell is needed)"
+grep -q 'ERROR' "$fx/out.txt" && bad "a skipped optional download prints an ERROR line (#304): $(grep ERROR "$fx/out.txt" | tr '\n' ' ')" \
+  || ok "a skipped optional download prints no ERROR line (#304)"
+grep -Fxq "  download failed: https://example.invalid/p.html -> $fx/p.html.new (optional, skipped; re-run to try again)" "$fx/out.txt" \
+  && ok "a skipped optional download logs PowerShell's Fetch -Soft wording" || bad "soft fetch does not log the PowerShell wording: $(tr '\n' ' ' < "$fx/out.txt")"
+# control: the same calls without soft must log ERROR and end the run, or the checks above prove nothing
+sed 's/ soft ); then/ ); then/' "$fx/run.sh" > "$fx/run-hard.sh"
+grep -q ' soft ); then' "$fx/run-hard.sh" && bad "control script was not made"
+PATH="$fx/bin:$PATH" bash "$fx/run-hard.sh" "$fx" > "$fx/out-hard.txt" 2>&1 || true
+grep -q '^ERROR: download failed' "$fx/out-hard.txt" && ! grep -Fxq GOT "$fx/out-hard.txt" \
+  && ok "control: without soft, the same failed download logs ERROR and is not kept" || bad "control: a failed download without soft did not log ERROR: $(tr '\n' ' ' < "$fx/out-hard.txt")"
 
 # Ctrl+C during an aria2 download (#272): aria2 catches SIGINT and exits 7, so bash does not
 # see the signal. fetch must re-raise it, or Ctrl+C in an optional ( ... ) download only skips
