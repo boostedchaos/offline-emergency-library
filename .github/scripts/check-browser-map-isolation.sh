@@ -11,6 +11,7 @@ echo '{}' > "$T/assets/tozip/nomad-base-styles.json"
 tar -czf "$T/assets.tar.gz" -C "$T/assets" tozip
 export OEL_FIXTURES="$T"
 cat > "$T/network.sh" <<'EOS'
+sleep(){ :; }   # no pause between get_small's tries (#302)
 curl(){
   local out="" url="" arg
   while [ "$#" -gt 0 ]; do
@@ -100,7 +101,7 @@ for case_ in "Frnace|no maps matched region 'Frnace'|" "US|could not read the Os
 done
 
 # The normal install still needs its persistent lookup for later OsmAnd downloads.
-sed -n '/^# ---- OsmAnd map files/,/^# ---- space estimate/p' get-offline-library.sh > "$T/lookup.sh"
+sed -n -e '/^get_small()/,/^}/p' -e '/^# ---- OsmAnd map files/,/^# ---- space estimate/p' get-offline-library.sh > "$T/lookup.sh"
 [ -s "$T/lookup.sh" ] || die "region lookup section missing"
 (
   . "$T/network.sh"
