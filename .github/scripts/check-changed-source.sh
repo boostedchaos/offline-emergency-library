@@ -98,6 +98,13 @@ class H(http.server.BaseHTTPRequestHandler):
         r = self.headers.get('Range', '')      # honor 'bytes=N-' and 'bytes=0-0' like a real server, so a resume shows
         open(sys.argv[3], 'a').write('GET %s %s\n' % (mode, r or '-'))
         n = asked[mode] = asked.get(mode, 0) + 1
+        if mode == 'hang' and n % 2:           # never answers, once per helper; note who gave up first
+            self.connection.settimeout(20)
+            try: self.connection.recv(1); who = 'curl'
+            except ConnectionError: who = 'curl'
+            except OSError: who = 'server'
+            open(sys.argv[3], 'a').write('HANG %s\n' % who)
+            self.close_connection = True; return
         if mode == 'down' or (mode == 'wait' and n % 2) or (mode == 'drop503' and n % 3 == 2):   # 503; 'wait' asks for a pause, once per shell
             self.send_response(503); self.send_header('Content-Length', '0')
             if mode != 'drop503': self.send_header('Retry-After', '25' if mode == 'wait' else '2')
@@ -197,8 +204,71 @@ EOF
     fresh; for d in sh ps; do head -c "$h" "$T/src/manual.pdf" > "$T/$d/manual.pdf.$sz.part"; done
     ALT=/.; URL="$P/len/manual.pdf"; check "half-done part, folder spelled another way"; ALT=
     want_gets "folder spelled another way" len "GET len bytes=$h-,"
+
+    # The small downloads (repo files, the OsmAnd index, doc-qa) do their own retries too (#302):
+    # get_small / Get-Small and doc-qa's own helper, the real ones, with a 3 s limit on a silent try.
+    awk '!on && /^get_small\(\)/ {on=1} on {print} on && /^}/ {exit}' get-offline-library.sh | sed -E 's/--speed-time [0-9]+/--speed-time 3/' > "$T/small.sh"
+    grep -q '^get_small()' "$T/small.sh" || { echo "FAIL: get_small not found in get-offline-library.sh"; fail=1; }
+    sed -E 's/--speed-time [0-9]+/--speed-time 3/' doc-qa/install.sh > "$T/docqa.sh"
+    cat > "$T/small.ps1" <<'EOF'
+param($kind, $url, $out)
+$ErrorActionPreference = 'Continue'
+$src = [IO.File]::ReadAllText($env:OEL_INSTALLER)
+$f = [System.Management.Automation.Language.Parser]::ParseInput($src, [ref]$null, [ref]$null).Find({ param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $a.Name -eq 'Get-Small' }, $true)
+if(-not $f -and $kind -ne 'docqa'){ Write-Host 'FAIL: Get-Small not found in Get-OfflineLibrary.ps1'; exit 2 }
+if($f){ Invoke-Expression ($f.Extent.Text -replace '--speed-time \d+', '--speed-time 3') }
+Invoke-Expression ([IO.File]::ReadAllText($env:OEL_DOCQA) -replace '--speed-time \d+', '--speed-time 3')
+# Off Windows there is no curl.exe; point the installer's calls at curl.
+if($IsLinux -or $IsMacOS){ $c = (Get-Command curl -CommandType Application | Select-Object -First 1).Source; function curl.exe { & $c @args } }
+function Start-Sleep{}
+if($kind -eq 'docqa'){ if(DocQa-Download $url $out){ exit 0 } else { exit 1 } }
+if($kind -eq 'print'){ [IO.File]::WriteAllText($out, "$(Get-Small $url '-' @('-H', 'User-Agent: oel'))"); exit $LASTEXITCODE }
+Get-Small $url $out
+if($LASTEXITCODE -eq 0){ exit 0 } else { exit 1 }
+EOF
+    small(){ # kind shell url out
+      if [ "$2" = PowerShell ]; then
+        OEL_DOCQA="$(ps_path "$PWD/doc-qa/install.ps1")" OEL_INSTALLER="$(ps_path "$PWD/Get-OfflineLibrary.ps1")" "$PS" -NoProfile -ExecutionPolicy Bypass -File "$(ps_path "$T/small.ps1")" "$1" "$3" "$(ps_path "$4")"
+        return
+      fi
+      ( sleep(){ :; }
+        case "$1" in
+          docqa) . "$T/docqa.sh"; doc_qa_download "$3" "$4" ;;
+          print) . "$T/small.sh"; get_small "$3" - -H 'User-Agent: oel' > "$4" ;;
+          *) . "$T/small.sh"; get_small "$3" "$4" ;;
+        esac )
+    }
+    # One line without a line end, so "printed" and "saved" are the same bytes in both shells.
+    printf 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' > "$T/src/manual.pdf"
+    shells=bash; [ -z "$PS" ] || shells="bash PowerShell"
+    for sh in $shells; do for kind in saved printed docqa; do
+      n="$sh $kind"; o="$T/small.out"; k=small; [ "$kind" != printed ] || k=print; [ "$kind" != docqa ] || k=docqa
+      # A 503 that asks for a 25 s wait, then up: no wait.
+      rm -f "$o"; : > "$T/req.log"; t0="$(date +%s)"
+      small $k $sh "$P/wait/manual.pdf" "$o" > "$T/small.log" 2>&1; rc=$?
+      t="$(( $(date +%s) - t0 ))"
+      if [ "$rc" = 0 ] && cmp -s "$o" "$T/src/manual.pdf"; then echo "  OK   [$n: 503 with Retry-After, then up]"
+      else echo "FAIL [$n: 503 with Retry-After, then up] exit $rc, or not the source's file"; sed 's/^/    /' "$T/small.log"; fail=1; fi
+      if [ "$t" -lt 20 ]; then echo "  OK   [$n: Retry-After not waited for]"; else echo "FAIL [$n: Retry-After waited for: ${t}s]"; fail=1; fi
+      # A server that takes the request and never answers is cut off and asked again.
+      rm -f "$o"; : > "$T/req.log"
+      small $k $sh "$P/hang/manual.pdf" "$o" > "$T/small.log" 2>&1; rc=$?
+      if [ "$rc" = 0 ] && cmp -s "$o" "$T/src/manual.pdf" && grep -q '^HANG curl$' "$T/req.log"; then echo "  OK   [$n: silent server cut off, then up]"
+      else echo "FAIL [$n: silent server not cut off] exit $rc, log: $(tr '\n' ',' < "$T/req.log")"; sed 's/^/    /' "$T/small.log"; fail=1; fi
+      # A source that stays down is a failure after 4 tries (6 in doc-qa), and nothing is kept as the file.
+      rm -f "$o"; : > "$T/req.log"; w=4; [ "$kind" != docqa ] || w=6
+      small $k $sh "$P/down/manual.pdf" "$o" > "$T/small.log" 2>&1; rc=$?
+      g="$(grep -c '^GET down ' "$T/req.log")"
+      if [ "$rc" != 0 ] && [ "$g" = "$w" ] && [ ! -s "$o" ]; then echo "  OK   [$n: source stays down, $w tries]"
+      else echo "FAIL [$n: source stays down] exit $rc, $g tries, expected $w, kept $(wc -c < "$o" 2>/dev/null || echo 0) bytes"; fail=1; fi
+    done; done
   fi
 fi
+
+# No download may go back to curl's own --retry (#298, #302).
+for f in get-offline-library.sh Get-OfflineLibrary.ps1 doc-qa/install.sh doc-qa/install.ps1; do
+  if l="$(grep -nE 'curl(\.exe)? .*--retry([ -]|$)' "$f" | grep -vE '^[0-9]+: *#')"; then echo "FAIL: $f uses curl's --retry:"; printf '%s\n' "$l" | cut -c1-120; fail=1; fi
+done
 
 # The PDFs and models must go through the helper in both installers.
 for pat in '^  fetch_remote "\$1" "\$out"' '^if \[ -z "\$ONLY" \]; then fetch_remote "\$M3B"' '^  fetch_remote "\$M8B"' '^  fetch_remote "\$MQ7"' '^  fetch_remote "\$MTR"'; do

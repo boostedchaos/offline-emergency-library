@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # Called by get-offline-library.sh with its existing fetch and log helpers.
 doc_qa_download(){ # url target - non-fatal, unlike the installer's fetch
-  local part="$2.new"
-  rm -f "$part"
-  if curl -fL --retry 5 --retry-all-errors --retry-delay 3 -sS -o "$part" "$1" && [ -s "$part" ]; then
-    mv -f "$part" "$2"; return 0
-  fi
+  # 6 tries, 3 s apart; a try with no data for a minute is cut off. Not curl's --retry, which
+  # sleeps as long as a server's Retry-After asks (#302).
+  local part="$2.new" try=1
+  while :; do
+    rm -f "$part"
+    if curl -fL --speed-limit 1 --speed-time 60 -sS -o "$part" "$1" && [ -s "$part" ]; then
+      mv -f "$part" "$2"; return 0
+    fi
+    [ "$try" -lt 6 ] || break
+    try=$((try+1)); sleep 3
+  done
   rm -f "$part"; return 1
 }
 install_manual_qa(){

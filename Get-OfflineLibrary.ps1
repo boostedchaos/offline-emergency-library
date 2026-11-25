@@ -168,11 +168,23 @@ $RegionAlias = @{
 }
 function Resolve-RegionToken($t){ $k=$t.ToLower(); if($RegionAlias.ContainsKey($k)){ $RegionAlias[$k] } else { $t } }
 
+# Get-Small url out [curl options]: a small file (repo files, the OsmAnd index); out '-' prints it.
+# 4 tries, 3 s apart; a try with no data for a minute is cut off. Not curl's --retry, which sleeps
+# as long as a server's Retry-After asks (#298, #302); --max-time does not end that sleep.
+# The result is in LASTEXITCODE: 0, curl's code, or null when curl did not start (#132).
+function Get-Small($url, $out, $curlOpts = @()){
+  for($try = 1; ; $try++){
+    $global:LASTEXITCODE = $null
+    curl.exe -fLsS --speed-limit 1 --speed-time 60 @curlOpts -o $out $url
+    if($LASTEXITCODE -eq 0 -or $null -eq $LASTEXITCODE -or $try -ge 4){ return }
+    Start-Sleep -Seconds 3
+  }
+}
+
 # ---------------------------------------------------------------- -ListRegions (discovery, no download)
 if($ListRegions){
   $tmp = Join-Path $env:TEMP 'osmand_idx.xml'
-  $global:LASTEXITCODE = $null
-  curl.exe -fsSL --retry 3 'https://download.osmand.net/get_indexes' -o $tmp
+  Get-Small 'https://download.osmand.net/get_indexes' $tmp
   # exit 1, not return: return ends the script with exit code 0 (#192)
   try { if($LASTEXITCODE -ne 0){ throw 'download failed' }; [xml]$ix = Get-Content $tmp } catch { Write-Host "Could not fetch the OsmAnd region index." -ForegroundColor Red; exit 1 }
   $maps = $ix.osmand_regions.region | Where-Object { $_.type -eq 'map' }
@@ -441,14 +453,12 @@ if($Guided){ Log "Guided install: $SelList (same as: $GuidedCmd)" }
 if($Only){ Log "Adding to the finished library: $($Only -join ', ') (nothing else is downloaded)" }
 # Repo files fetched later (guides, map viewer, helpers) come from the commit main is on now,
 # not from a main that moved during a run of several hours (#193). Falls back to main.
-$global:LASTEXITCODE = $null
-$repoSha = "$(curl.exe -fsS --retry 3 -H 'Accept: application/vnd.github.sha' -H 'User-Agent: oel' 'https://api.github.com/repos/elhajahmadj/offline-emergency-library/commits/main' 2>$null)".Trim()
+$repoSha = "$(Get-Small 'https://api.github.com/repos/elhajahmadj/offline-emergency-library/commits/main' '-' @('-H', 'Accept: application/vnd.github.sha', '-H', 'User-Agent: oel') 2>$null)".Trim()
 if($LASTEXITCODE -eq 0 -and $repoSha -cmatch '^[0-9a-f]{40}$'){ $RepoRaw = $RepoRaw -replace '/main$', "/$repoSha"; Log "Repo files: commit $repoSha" }
 else { Log 'Repo files: main (could not look up its commit)' }
 # Get-RepoFile path out: one file of this repo; retries a network blip, fails on a 404 or 5xx (#193).
 function Get-RepoFile($path, $out){
-  $global:LASTEXITCODE = $null
-  curl.exe -fLsS --retry 3 --retry-all-errors -A (UA) "$RepoRaw/$path" -o $out
+  Get-Small "$RepoRaw/$path" $out @('-A', (UA))
   $LASTEXITCODE -eq 0
 }
 
@@ -457,8 +467,7 @@ $sel = @(); $osmErr = $null
 if((-not $SkipMaps) -or $BmOnly){   # -Only browser-maps needs the sizes for its estimate, not the maps
   try{
     $idxFile = Join-Path $env:TEMP 'osmand_idx.xml'
-    $global:LASTEXITCODE = $null
-    curl.exe -fsSL --retry 3 'https://download.osmand.net/get_indexes' -o $idxFile
+    Get-Small 'https://download.osmand.net/get_indexes' $idxFile
     if($LASTEXITCODE -ne 0){ throw 'could not download the OsmAnd map index' }
     [xml]$idx = Get-Content $idxFile
     $allmaps = $idx.osmand_regions.region | Where-Object { $_.type -eq 'map' }
