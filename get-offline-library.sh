@@ -385,7 +385,10 @@ if [ "${NO_ARIA:-0}" != "1" ] && command -v aria2c >/dev/null 2>&1; then USE_ARI
 # Show a live progress meter (percent/size/speed/ETA) only when stdout is a real
 # terminal; stay quiet with no TTY (cron/CI/piped) so logs don't fill with bars.
 DL_TTY=0; [ -t 1 ] && DL_TTY=1
-fetch(){ # url out
+# fetch url out [soft]: a failed download logs ERROR and exits. With soft (an optional download)
+# it logs the same line as PowerShell's Fetch -Soft and returns 1, so the caller can skip it (#304).
+# Ctrl+C still stops the run.
+fetch(){ # url out [soft]
   if [ "$USE_ARIA" = 1 ]; then
     # --summary-interval=0 always: any other value prints a 5-line block that scrolls the
     # screen, while the one-line live readout needs no flag. With no terminal, also turn the
@@ -402,6 +405,7 @@ fetch(){ # url out
     # would see a "complete" file and keep a corrupt copy. aria2 resumes it from its
     # .aria2 control file on the next run.
     if [ "$arc" = 7 ] || [ -e "$2.aria2" ]; then
+      if [ -n "${3:-}" ] && [ "$arc" != 7 ]; then log "  download stopped: $1 -> $2 (optional, skipped; re-run to resume)"; return 1; fi
       log "ERROR: download stopped: $1 -> $2. Re-run the installer to resume."
       # aria2 catches Ctrl+C and exits 7, so bash never sees the signal: re-raise it on this
       # shell, or a fetch inside ( ... ) (optional downloads) ends only the subshell (#272).
@@ -421,6 +425,7 @@ fetch(){ # url out
     had=0; if [ -s "$2" ]; then had=1; fi
     code="$(curl -fL -C - --speed-limit 1 --speed-time 120 $curl_prog -w '%{http_code}' -o "$2" "$1")" && break
     if [ "$try" -gt 10 ]; then
+      if [ -n "${3:-}" ]; then log "  download failed: $1 -> $2 (optional, skipped; re-run to try again)"; return 1; fi
       log "ERROR: download failed: $1 -> $2. Re-run the installer to resume."
       exit 1
     fi
@@ -430,6 +435,7 @@ fetch(){ # url out
     try=$((try+1)); echo "  (download failed, try $try of 11 in $pause s)"
     sleep "$pause"
   done
+  if [ ! -s "$2" ] && [ -n "${3:-}" ]; then log "  download failed: $1 -> $2 (optional, skipped; re-run to try again)"; return 1; fi
   [ -s "$2" ] || { log "ERROR: download is missing or empty: $2"; exit 1; }
 }
 # Size of a remote file in bytes after redirects (empty if the server does not say). Only a 2xx
@@ -456,22 +462,24 @@ remote_size(){
 # With no size known (#289), a finished copy is kept and a missing one downloads whole to
 # "$2.unknown.part": never a resume, which could join two editions. With a 4th arg (soft), a size mismatch from
 # the source changing mid-download is not fatal: it returns 1 so an optional download (the
-# desktop viewer) can be skipped and the run continues (#99). A failed download still exits
-# (fetch), so run a soft call in ( ... ): the exit then ends only the subshell (#272).
+# desktop viewer) can be skipped and the run continues (#99). soft also reaches fetch, so a failed
+# download returns 1 too (#304). Still run a soft call in ( ... ), so any other exit ends only the
+# subshell (#272).
 fetch_sized(){ # url out bytes [soft]
   if [ -z "$3" ]; then
     # Size unknown (the HEAD failed or gave no length): never resume, since the copy on the
     # drive may be an older edition (#289). Keep a finished copy; else download it whole.
     if [ -s "$2" ] && [ ! -e "$2.aria2" ]; then log "  kept: $(basename "$2") (source size unknown; a re-run checks for a new edition)"; return 0; fi
     part="$2.unknown.part"; rm -f "$part" "$part.aria2"
-    fetch "$1" "$part"; rm -f "$2.aria2"; mv -f "$part" "$2"
+    fetch "$1" "$part" "${4:-}" || return 1
+    rm -f "$2.aria2"; mv -f "$part" "$2"
     for o in "$2".*.part; do [ -e "$o" ] && rm -f "$o" "$o.aria2"; done; return 0
   fi
   if [ -f "$2" ] && [ ! -e "$2.aria2" ] && [ "$(wc -c < "$2" | tr -d ' ')" = "$3" ]; then return 0; fi
   part="$2.$3.part"
   for o in "$2".*.part; do [ -e "$o" ] && [ "$o" != "$part" ] && rm -f "$o" "$o.aria2"; done
   [ -f "$2" ] && log "  re-download: $(basename "$2") (size on disk is not the source's $3 bytes)"
-  fetch "$1" "$part"
+  fetch "$1" "$part" "${4:-}" || return 1
   got="$(wc -c < "$part" | tr -d ' ')"
   if [ "$got" != "$3" ]; then
     rm -f "$part" "$part.aria2"
@@ -842,13 +850,13 @@ get_html_doc(){ # baseurl  htmlfile  localname  destdir   (an HTML page + the im
   # Grabs the page and every images/<file> it links, so it opens fully offline in a browser.
   # Its host can be down for days (#298): what cannot be downloaded is logged and skipped, and the
   # self-check names it. A whole page on the drive is replaced only by another whole page.
-  # ( ... ) because fetch exits on a failed download (#272).
+  # soft: a failed download logs and returns 1 (#304); ( ... ) so any other exit ends only the subshell (#272).
   out="$4/$3"
   log "html: $3"
   n="$(remote_size "$1/$2")"
   if ! html_ok "$out" || { [ -n "$n" ] && [ "$(wc -c < "$out" | tr -d ' ')" != "$n" ]; }; then
     rm -f "$out.new" "$out.new.aria2"
-    if ( fetch "$1/$2" "$out.new" ) && html_ok "$out.new"; then mv -f "$out.new" "$out"
+    if ( fetch "$1/$2" "$out.new" soft ) && html_ok "$out.new"; then mv -f "$out.new" "$out"
     else
       rm -f "$out.new" "$out.new.aria2"
       log "  note: could not download $3 (skipped, any copy on the drive is kept; re-run to try again)"
