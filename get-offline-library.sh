@@ -220,10 +220,21 @@ command -v curl >/dev/null 2>&1 || { echo "ERROR: 'curl' is required."; exit 1; 
 HAVE_UNZIP=1; command -v unzip >/dev/null 2>&1 || HAVE_UNZIP=0
 HAVE_TAR=1;   command -v tar   >/dev/null 2>&1 || HAVE_TAR=0
 
+# get_small url out [curl options]: a small file (repo files, the OsmAnd index); out "-" prints it.
+# 4 tries, 3 s apart; a try with no data for a minute is cut off. Not curl's --retry, which sleeps
+# as long as a server's Retry-After asks (#298, #302); --max-time does not end that sleep.
+get_small(){
+  local url="$1" out="$2" try=1; shift 2
+  until curl -fLsS --speed-limit 1 --speed-time 60 "$@" -o "$out" "$url"; do
+    [ "$try" -lt 4 ] || return 1
+    try=$((try+1)); sleep 3
+  done
+}
+
 # ---- --list-regions (discovery, no download) ----
 if [ "$LISTREGIONS" = 1 ]; then
   idx="$(mktemp 2>/dev/null || echo /tmp/osmidx.xml)"
-  curl -fsSL --retry 3 "https://download.osmand.net/get_indexes" -o "$idx" || { echo "Could not fetch the OsmAnd region index."; rm -f "$idx"; exit 1; }
+  get_small "https://download.osmand.net/get_indexes" "$idx" || { echo "Could not fetch the OsmAnd region index."; rm -f "$idx"; exit 1; }
   names="$(grep -oE '<region [^>]*name="[^"]+\.obf\.zip"' "$idx" | sed -E 's/.* name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
   if [ -n "$FILTER" ]; then
     echo "Regions / sub-regions matching '$FILTER' (pass any of these to --region):"
@@ -499,11 +510,11 @@ if [ "$LITE" = 1 ] && [ "$SELECT_SET" = 0 ] && [ "$GUIDED" = 0 ]; then log "Lite
 UA="Mozilla/5.0"
 # Repo files fetched later (guides, map viewer, helpers) come from the commit main is on now,
 # not from a main that moved during a run of several hours (#193). Falls back to main.
-REPO_SHA="$(curl -fsS --retry 3 -H 'Accept: application/vnd.github.sha' -H 'User-Agent: oel' "https://api.github.com/repos/elhajahmadj/offline-emergency-library/commits/main" 2>/dev/null)"
+REPO_SHA="$(get_small "https://api.github.com/repos/elhajahmadj/offline-emergency-library/commits/main" - -H 'Accept: application/vnd.github.sha' -H 'User-Agent: oel' 2>/dev/null)"
 if printf '%s' "$REPO_SHA" | grep -qE '^[0-9a-f]{40}$'; then REPO_RAW="${REPO_RAW%/main}/$REPO_SHA"; log "Repo files: commit $REPO_SHA"
 else log "Repo files: main (could not look up its commit)"; fi
 # get_repo path out: one file of this repo; retries a network blip, fails on a 404 or 5xx (#193).
-get_repo(){ curl -fLsS --retry 3 --retry-all-errors -A "$UA" "$REPO_RAW/$1" -o "$2"; }
+get_repo(){ get_small "$REPO_RAW/$1" "$2" -A "$UA"; }
 
 # ---- platform detection ----
 OSN="$(uname -s)"; ARCHN="$(uname -m)"
@@ -533,7 +544,7 @@ if [ "$SKIP_MAPS" = 0 ] || [ "$BM_ONLY" = 1 ]; then   # --only browser-maps need
   else
     mkdir -p "$MAP_LOOKUP"
   fi
-  curl -fsSL --retry 3 "https://download.osmand.net/get_indexes" -o "$MAP_LOOKUP/_index.xml" || : > "$MAP_LOOKUP/_index.xml"
+  get_small "https://download.osmand.net/get_indexes" "$MAP_LOOKUP/_index.xml" || : > "$MAP_LOOKUP/_index.xml"
   # <region> lines only: the index also lists <deleted_map> names, which answer 404 (#231)
   allnames="$(grep -oE '<region [^>]*name="[^"]+\.obf\.zip"' "$MAP_LOOKUP/_index.xml" | sed -E 's/.* name="([^"]+)"/\1/' | grep -viE 'wiki|srtm|depth|road|hillshade|heightmap')"
   : > "$MAP_LOOKUP/_filelist.txt"

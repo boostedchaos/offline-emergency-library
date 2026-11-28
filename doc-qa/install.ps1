@@ -1,11 +1,19 @@
 # Called by Get-OfflineLibrary.ps1 with its existing Fetch and Log helpers.
 function DocQa-Download($url, $target) {
   # The installer's Fetch stops the whole run on failure; optional source text must not.
+  # 6 tries, 3 s apart; a try with no data for a minute is cut off. Not curl's --retry, which
+  # sleeps as long as a server's Retry-After asks (#302).
   $part = "$target.new"
-  Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue
-  & curl.exe -fL --retry 5 --retry-all-errors --retry-delay 3 -sS -o $part $url 2>$null
-  if($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $part) -and (Get-Item $part).Length -gt 0){
-    Move-Item -LiteralPath $part -Destination $target -Force; return $true
+  for($try = 1; ; $try++){
+    Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue
+    $global:LASTEXITCODE = $null
+    & curl.exe -fL --speed-limit 1 --speed-time 60 -sS -o $part $url 2>$null
+    if($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $part) -and (Get-Item $part).Length -gt 0){
+      Move-Item -LiteralPath $part -Destination $target -Force; return $true
+    }
+    # No exit code: curl did not start (#132), so do not try again.
+    if($null -eq $LASTEXITCODE -or $try -ge 6){ break }
+    Start-Sleep -Seconds 3
   }
   Remove-Item -LiteralPath $part -Force -ErrorAction SilentlyContinue
   return $false

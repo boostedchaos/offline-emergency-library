@@ -39,8 +39,8 @@ New-Zealand|New-zealand_australia-oceania_2.obf.zip
 Belgium|Belgium_flanders_europe_2.obf.zip
 US_delaware|Us_delaware_northamerica_2.obf.zip"
 
-# ---- bash: the installer's CONTINENTS, alias_region and map lookup section
-sed -n '/^CONTINENTS=/p; /^alias_region(){/,/^}/p' get-offline-library.sh > "$T/alias.sh"
+# ---- bash: the installer's CONTINENTS, alias_region, get_small and map lookup section
+sed -n '/^CONTINENTS=/p; /^alias_region(){/,/^}/p; /^get_small(){/,/^}/p' get-offline-library.sh > "$T/alias.sh"
 sed -n '/^# ---- OsmAnd map files/,/^# ---- space estimate/p' get-offline-library.sh > "$T/lookup.sh"
 grep -q '^alias_region' "$T/alias.sh" && [ -s "$T/lookup.sh" ] || { echo "FAIL: region code not found in get-offline-library.sh"; exit 1; }
 sh_maps(){ # token -> sorted map names, one line
